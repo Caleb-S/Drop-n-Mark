@@ -455,21 +455,21 @@ bookmarkmenu.html CSS
 }
 
 #toast-ui5864921 {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+
+  
+  /*
   background-color: #FDBA74;
   color: #202123;
   padding: 10px 20px;
   width: auto;
   height:auto;
 
-  opacity: 1; /* Updated to make the toast initially visible */
+  opacity: 1; 
+  
   transition: opacity 0.3s;
-  /* Additional styles for positioning and visibility */
-  /* display: none; /* Hide the toast initially */
-  z-index: 9999; /* Set a higher z-index to ensure it's on top of other elements */
+
+  z-index: 9999;
+  
 }
 
 .toast-visible-ui5864921 {

@@ -12,14 +12,13 @@
       "48": "assets/icon48.png",
       "128": "assets/icon128.png"
     }
-   
   },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
-    {
-      "matches": ["*://*/*"],
+   {
+      "matches": ["<all_urls>"],
       "js": ["content.js"],
       "css": ["style.css"]
     }
@@ -28,14 +27,15 @@
     {
       "resources": [
         "style.css", 
-      "bookmarkmenu.html", 
-      "content.js", 
-      "assets/newFolderLarge.svg", 
-      "assets/newFolderMedium.svg",
-      "assets/newFolderXLarge.svg",
-      "assets/rubbishBinSmall.svg"
-    ],
-      "matches": ["*://*/*"]
+        "bookmarkmenu.html", 
+        "content.js", 
+        "assets/newFolderLarge.svg", 
+        "assets/newFolderMedium.svg",
+        "assets/newFolderXLarge.svg",
+        "assets/rubbishBinSmall.svg",
+        "toast.js"
+      ],
+      "matches": ["<all_urls>"]
     }
   ]
 }

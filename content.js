@@ -7,13 +7,32 @@ var scrollInterval, scrollThresholdPercentage = 0.2;
 
 
 
+
+// append script with src of toast.js
+(function () {
+  // Create a script element
+  var script = document.createElement('script');
+
+  // Set the source of the script (external file)
+  script.src = chrome.runtime.getURL('toast.js');
+
+  // Append the script to the body
+  document.body.appendChild(script);
+})();
+
+
+
+
+
+
+
 generateMenu()
 updateDivSize2();
 restrictHighlighting();
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.action === "generateMenu") {
-  
+
     generateMenu();
   }
 });
@@ -28,28 +47,28 @@ window.addEventListener('resize', updateDivSize2);
  */
 function handleMouseDown(event) {
   // Send a message to background.js to check if the current page is bookmarked
-chrome.runtime.sendMessage({ action: "checkBookmark" }, function(response) {
-  if (response.bookmarked) {
-    // The current page is bookmarked
-    document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
-    document.querySelector('.bookmarkMenu-updated-ui5864921').style.display = 'none';
+  chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
+    if (response.bookmarked) {
+      // The current page is bookmarked
+      document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
+      document.querySelector('.bookmarkMenu-updated-ui5864921').style.display = 'none';
 
-    delBox = document.querySelector('.deleteBox-ui5864921');
-    delBox.style.display = 'flex';
-    
- 
-    
-  } else {
-    // The current page is not bookmarked
-  
-  document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
-  updateDivSize();
- 
-  }
-});
+      delBox = document.querySelector('.deleteBox-ui5864921');
+      delBox.style.display = 'flex';
 
 
-  
+
+    } else {
+      // The current page is not bookmarked
+
+      document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
+      updateDivSize();
+
+    }
+  });
+
+
+
 
   floatingButton.style.cursor = 'grabbing';
   floatingButton.classList.add('hover-ui5864921');
@@ -63,7 +82,7 @@ chrome.runtime.sendMessage({ action: "checkBookmark" }, function(response) {
   updateDivSize2();
   initialX = event.clientX;
   initialY = event.clientY;
-  isDragging = true;handleMouseDown
+  isDragging = true; handleMouseDown
   document.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', handleMouseUp);
 }
@@ -131,7 +150,7 @@ function handleMouseUp(event) {
   const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
 
   const mainAddBtn = document.querySelector('.main-add-folder-ui5864921');
-              
+
 
   if (!newFolderBtn.contains(event.target) && !event.target.closest('.main-add-folder-ui5864921') && !event.target.closest('.sub-add-folder-ui5864921')) {
     bookmarkMenu.style.display = 'none';
@@ -213,53 +232,53 @@ function processFolders(bookmarks, parentElement) {
           child.children.forEach(function (mainChild) {
             if (mainChild.children && !mainChild.url && mainChild.title.trim() !== "") {
               var mainFolderItem = createFolderItem('main-folder-ui5864921', 'main-add-folder-ui5864921', 'main-f-txt-ui5864921', mainChild.title, mainChild.id);
-           
-               // Create an image element
+
+              // Create an image element
               var imageElement = document.createElement('img');
               imageElement.src = chrome.runtime.getURL('assets/newFolderLarge.svg'); // Replace with the path to your image
               imageElement.style.pointerEvents = 'none';
               imageElement.classList.add('extension-img');
-           
-             
+
+
 
               mainFolderItem.addEventListener('mouseup', function (event) {
                 if (event.target === mainFolderItem) {
                   saveBookmarkToFolder(mainChild.id);
-                  showToast('Bookmark Created In: ' + mainChild.title);   
-                  updateDivSize2();     
+                  showToast('Bookmark Created In: ' + mainChild.title);
+                  updateDivSize2();
                   //showToast(mainChild.title);
                 }
               });
 
-           
+
 
               const addBtn = mainFolderItem.querySelector('.main-add-folder-ui5864921');
               addBtn.appendChild(imageElement);
-              
+
               const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
               const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
               const newFolderInput = bookmarkMenu.querySelector('.folder-input');
               var backDrop = document.querySelector('.backdrop-ui5864921');
-              
+
 
 
               addBtn.addEventListener('mouseup', function (event) {
                 if (event.target === addBtn) {
                   var input = document.querySelector('.folder-input input');
-                
+
                   bookmarkGui.style.display = 'none';
                   newFolderInput.style.display = 'flex';
                   bookmarkMenu.querySelector('.folder-input input').focus();
 
-                  input.addEventListener('keydown', function(event) {
+                  input.addEventListener('keydown', function (event) {
                     if (event.key === 'Enter') {
                       event.preventDefault();
-                  
-                      const folderName = input.value;
-        
-                      chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName, parentFolderId:  mainChild.id}, function(response) {
 
-                  
+                      const folderName = input.value;
+
+                      chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName, parentFolderId: mainChild.id }, function (response) {
+
+
                         const folderId = response.folderId;
                         if (folderId) {
                           saveBookmarkToFolder(folderId);
@@ -268,20 +287,20 @@ function processFolders(bookmarks, parentElement) {
                         } else {
                           console.log('Failed to create folder.');
                         }
-                         
-                 
+
+
                       });
                     }
 
-                    });
-                    
-   
-                  backDrop.addEventListener('mousedown', function(event) {
-                    generateMenu();
-                    
-        
                   });
-                  
+
+
+                  backDrop.addEventListener('mousedown', function (event) {
+                    generateMenu();
+
+
+                  });
+
                 }
               });
 
@@ -291,9 +310,9 @@ function processFolders(bookmarks, parentElement) {
               mainChild.children.forEach(function (subChild) {
                 if (subChild.children && !subChild.url && subChild.title.trim() !== "") {
                   var subFolderItem = createFolderItem('sub-folder-ui5864921', 'sub-add-folder-ui5864921', 'sub-f-txt-ui5864921', subChild.title, subChild.id);
-                  
-                  
-                  
+
+
+
                   subFolderItem.addEventListener('mouseup', function (event) {
                     if (event.target === subFolderItem) {
                       saveBookmarkToFolder(subChild.id);
@@ -305,7 +324,7 @@ function processFolders(bookmarks, parentElement) {
 
 
                   const addBtn = subFolderItem.querySelector('.sub-add-folder-ui5864921');
-              
+
                   const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
                   const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
                   const newFolderInput = bookmarkMenu.querySelector('.folder-input');
@@ -316,28 +335,28 @@ function processFolders(bookmarks, parentElement) {
                   imageElement.style.pointerEvents = 'none';
                   imageElement.classList.add('extension-img');
                   addBtn.appendChild(imageElement);
-           
-    
-    
+
+
+
                   addBtn.addEventListener('mouseup', function (event) {
                     if (event.target === addBtn) {
                       var input = document.querySelector('.folder-input input');
-             
+
                       bookmarkGui.style.display = 'none';
                       newFolderInput.style.display = 'flex';
                       bookmarkMenu.querySelector('.folder-input input').focus();
-    
-                      input.addEventListener('keydown', function(event) {
+
+                      input.addEventListener('keydown', function (event) {
                         if (event.key === 'Enter') {
                           event.preventDefault();
-                      
+
                           const folderName = input.value;
-            
-                          chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName, parentFolderId:  subChild.id}, function(response) {
-                          
-                     
+
+                          chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName, parentFolderId: subChild.id }, function (response) {
+
+
                             const folderId = response.folderId;
-                          
+
                             if (folderId) {
                               saveBookmarkToFolder(folderId);
                               showToast('Bookmark Created in: ' + folderName);
@@ -345,23 +364,23 @@ function processFolders(bookmarks, parentElement) {
                             } else {
                               console.log('Failed to create folder.');
                             }
-                             
-                     
+
+
                           });
                         }
-    
-                        });
-                        
-                   
-    
-    
-    
-                      backDrop.addEventListener('mousedown', function(event) {
-                        generateMenu();
-                      
-            
+
                       });
-                      
+
+
+
+
+
+                      backDrop.addEventListener('mousedown', function (event) {
+                        generateMenu();
+
+
+                      });
+
                     }
                   });
 
@@ -444,17 +463,19 @@ function saveBookmarkToFolder(folderId) {
  * @param {string} toastText - The text to display in the toast message.
  */
 function showToast(toastText) {
-  var toastCreate = document.createElement('div');
-  toastCreate.id = 'toast-ui5864921';
+  var toastCreate = document.createElement('bookmark-toast');
 
   var text = toastText ? toastText : "Null";
   toastCreate.innerText = text;
 
   document.body.appendChild(toastCreate);
 
+  /*
   setTimeout(function () {
     toastCreate.remove();
   }, 3000);
+  */
+
 }
 
 
@@ -491,7 +512,7 @@ function generateMenu() {
       newFolderInput.appendChild(imageElement);
 
       delBox = bookmarkMenu.querySelector('.deleteBox-ui5864921');
-      
+
       var delBoxImage = document.createElement('img');
       delBoxImage.src = chrome.runtime.getURL('assets/rubbishBinSmall.svg');
       delBoxImage.classList.add('extension-img');
@@ -500,68 +521,68 @@ function generateMenu() {
       delBox.addEventListener('mouseup', function (event) {
         if (event.target === delBox) {
           delBox.style.display = 'flex';
-          chrome.runtime.sendMessage({ action: "deleteBookmark" }, function(response) {
+          chrome.runtime.sendMessage({ action: "deleteBookmark" }, function (response) {
             if (response.success) {
               console.log("Bookmark deleted successfully.");
               showToast('Bookmark Deleted');
               updateDivSize2();
-             
+
 
             } else {
               console.log("Current page is not bookmarked.");
             }
           });
-          
+
         }
       });
-      
+
 
 
       newFolderBtn.addEventListener('mouseup', function (event) {
         if (event.target === newFolderBtn) {
-          
-          
-          
+
+
+
           bookmarkGui.style.display = 'none';
           newFolderInput.style.display = 'flex';
           bookmarkMenu.querySelector('.folder-input input').focus();
 
 
-  
+
 
           // Get the input element
           var input = document.querySelector('.folder-input input');
           var backDrop = document.querySelector('.backdrop-ui5864921');
 
-          input.addEventListener('keydown', function(event) {
+          input.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
               event.preventDefault();
-          
+
               const folderName = input.value;
 
-              chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName }, function(response) {
-              
-                  const folderId = response.folderId;
-                  console.log('Folder ID:', folderId);
-          
-                  if (folderId) {
-                    saveBookmarkToFolder(folderId);
-                    showToast('Bookmark Created in: ' + folderName);
-                    updateDivSize2();
-                  } else {
-                    console.log('Failed to create folder.');
-                  }
-         
+              chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName }, function (response) {
+
+                const folderId = response.folderId;
+                console.log('Folder ID:', folderId);
+
+                if (folderId) {
+                  saveBookmarkToFolder(folderId);
+                  showToast('Bookmark Created in: ' + folderName);
+                  updateDivSize2();
+                } else {
+                  console.log('Failed to create folder.');
+                }
+
               });
-       
-          
+
+
               input.value = '';
               document.querySelector('.folder-input').style.display = 'none';
-              
+
             }
           });
 
-          backDrop.addEventListener('mousedown', function(event) {
+          backDrop.addEventListener('mousedown', function (event) {
             generateMenu();
 
 
@@ -569,14 +590,14 @@ function generateMenu() {
 
 
 
-          
+
         }
       });
 
 
       generalBtn.addEventListener('mouseup', function (event) {
         if (event.target === generalBtn) {
-   
+
           saveBookmarkToFolder("2");
         }
       });
@@ -620,7 +641,7 @@ function printBookmarkTree(bookmarks, prefix = '', indent = '') {
   bookmarks.forEach(function (bookmark, index) {
     if (!bookmark.url) {
       var folderNumber = prefix + (index + 1);
-    
+
       var childPrefix = folderNumber + '.';
       printBookmarkTree(bookmark.children, childPrefix, indent + '  ');
     }
@@ -647,7 +668,7 @@ function updateDivSize() {
 
     zoomResistantDiv.style.transform = 'scale(' + divScale + ')';
     var currentWidth = zoomResistantDiv.offsetWidth;
-    
+
 
     zoomResistantDiv.style.height = (currentWidth * 2) + 'px';
   }
@@ -696,27 +717,27 @@ function updateDivSize2() {
   /* New Folder Input */
   var folderInputBox = document.querySelector('.folder-input');
 
-  var divScale = 1 / zoomLevel;  
+  var divScale = 1 / zoomLevel;
 
   if (folderInputBox != null) {
     folderInputBox.style.transform = 'scale(' + divScale + ')';
-   
+
   }
 
   /* toast */
-  var toast = document.getElementById('toast-ui5864921');
+  var toast = document.querySelector('bookmark-toast');
   if (toast != null) {
     toast.style.padding = (10 / zoomLevel) + 'px ' + (20 / zoomLevel) + 'px';
     toast.style.fontSize = (20 / zoomLevel) + 'px';
     toast.style.bottom = divPosition + 'px';
-   
+
   }
 
   /* delete box */
   var delBox = document.querySelector('.deleteBox-ui5864921');
   if (delBox != null) {
     delBox.style.transform = 'scale(' + divScale + ')';
-   
+
   }
 
 

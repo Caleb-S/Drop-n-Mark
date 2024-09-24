@@ -1,0 +1,551 @@
+/*
+Note to Self:
+place bookmark in front of each class to make sure classes don't clash with native website.
+For additinal robustness, add unique id's at end of each class
+
+-ui5864921
+*/
+
+
+/* ----------------------- 
+Extension drop-down menu 
+------------------------*/
+
+
+
+/*--------------- 
+Floating-dot CSS
+----------------*/
+
+/* Floating-dot resting state*/
+.floating-button-ui5864921 {
+  position: fixed;
+  z-index: 2147483647 !important;
+  right: 20px;
+  bottom: 20px;
+  
+  width: 20px;
+  height: 20px;
+  
+  padding: 0px;
+  border-radius: 50%;
+  
+  background-color: #ff7f50f8;
+  
+  
+  
+ 
+  cursor: grab;
+}
+
+/* floating-dot hover */
+.hover-ui5864921 {
+  
+  width: auto;
+  height: auto;
+  z-index: 2147483647 !important;
+
+  
+  padding: 5px 20px 5px 20px;
+  border-radius: 0;
+  align-items: center;
+  
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: visible;
+  white-space: normal;
+  background-color: #ff7f50f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+  
+}
+
+
+/* -----------------------
+bookmarkmenu.html CSS
+-------------------------*/
+#bookmarkMenu-ui5864921 {
+  display: none;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* New Bookmark CSS */
+.bookmarkMenu-updated-ui5864921 {
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  bottom: 0%;
+  right: 0%;
+  z-index: 2147483640;
+  display: block;
+  margin: auto;
+  
+  width: 350px;
+  height: 70vh;
+
+
+  
+
+  
+  background-color: #F7F4EE;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
+  
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+
+  overflow: none;
+
+ 
+}
+
+.new-folder-btn-ui5864921 {
+  height: 10%;
+  width: 100%;
+  min-height: 10%;
+  cursor: pointer;
+  min-width: 100%;
+  background-color: #484952;
+  flex-direction: column;
+  flex: 0 auto;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex: none;
+  line-height: normal;
+  font-size: 26px;
+
+}
+
+.new-btn-txt-ui5864921 {
+  pointer-events: none;
+  cursor: pointer;
+  color: #fff;
+  text-align: center;
+  font-size: 26px !important;
+  font-weight: 600;
+  text-decoration: none;
+  flex: auto;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  
+}
+
+.new-folder-btn-ui5864921:hover {
+  cursor: pointer;
+  box-shadow: none;
+  background-color: #FF7F50;
+  color: white;
+}
+
+
+.general-btn-ui5864921 {
+
+  height: 10%;
+  width: 100%;
+  min-height: 10%;
+  min-width: 100%;
+  background-color: #484952;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: absolute;
+  top: auto;
+  bottom: 0%;
+  left: 0%;
+  right: 0%; 
+  line-height: normal;
+  
+
+
+  
+
+}
+
+.general-btn-ui5864921:hover {
+  box-shadow: none;
+  background-color: #FF7F50;
+  color: white;
+}
+
+.general-btn-txt-ui5864921 {
+
+  pointer-events: none;
+  cursor: pointer;
+  color: #fff;
+  text-align: center;
+  font-size: 28px !important;
+  font-weight: 600;
+  text-decoration: none; 
+  flex: auto;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+ 
+}
+
+.general-sub-txt-ui5864921 {
+  pointer-events: none;
+  cursor: pointer;
+  color: #fff;
+  font-size: 12px !important;
+  width: auto;
+  flex: auto;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.folder-container-ui5864921 {
+  width: 100%;
+  height: 80%;
+  text-align: left;
+  object-fit: fill;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+
+  display: flex;
+  overflow: hidden;
+
+
+ 
+
+
+}
+
+.main-folder-ui5864921 {
+  cursor: pointer;
+  width: 90%;
+  min-height: 60px;
+  background-color: #ffffff;
+  flex-direction: column;
+  justify-content: center;
+  /* align-items: center; */
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-right: 5%;
+  display: flex;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+  text-align: left;
+  align-items: start;
+  padding-left: 95px;
+  
+  box-sizing: border-box;
+  overflow: hidden;
+  
+
+}
+
+.main-folder-ui5864921:hover {
+  box-shadow: none;
+  background-color: #dcdcdc;
+  color: white !important;
+  border: 3px solid #48495244;
+
+}
+
+.main-add-folder-ui5864921 {
+  width: 80px;
+  min-height: 60px;
+  background-color: #ECECEC;
+  position: absolute;
+  top: 0%;
+  bottom: 0%;
+  left: 0%;
+  right: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-add-folder-ui5864921:hover {
+  
+  box-shadow: none;
+  background-color: #999999;
+
+}
+
+
+.main-f-txt-ui5864921 {
+  pointer-events: none;
+  cursor: pointer;
+  color: #585B62;
+  text-align: center;
+  font-size: 23px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  flex: auto;
+  justify-content: center;
+  white-space: nowrap;
+  width: auto;
+  
+}
+
+.main-f-count-ui5864921 {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #57534e;
+  flex: auto;
+  justify-content: center;
+}
+
+.sub-folder-ui5864921 {
+  cursor: pointer;
+  width: 85%;
+  min-height: 50px;
+  background-color: #fdba74;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+  margin-bottom: 5px;
+  margin-right: 5%;
+  display: flex;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+  align-items: start;
+  padding-left: 75px;
+  box-sizing: border-box;
+  overflow: hidden;
+
+
+}
+
+.sub-folder-ui5864921:hover {
+  box-shadow: none;
+  background-color: #f59d4e;
+  color: white;
+  border: 3px solid #48495244;
+}
+
+.sub-add-folder-ui5864921 {
+  width: 60px;
+  min-height: 50px;
+  background-color: #EBC9A6;
+  position: absolute;
+  top: 0%;
+  bottom: 0%;
+  left: 0%;
+  right: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sub-add-folder-ui5864921:hover {
+  box-shadow: none;
+  background-color: #b17842;
+ 
+}
+
+.sub-f-txt-ui5864921 {
+  pointer-events: none;
+  cursor: pointer;
+  color: #57534e;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  flex: auto;
+  justify-content: center;
+  white-space: nowrap;
+  width: auto;
+}
+
+.sub-f-count-ui5864921 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #57534e;
+  display: flex;
+  align-items: center;
+  flex: auto;
+  justify-content: center;
+}
+
+.nested-folder-ui5864921 {
+  cursor: pointer;
+  /* width: 80%; */
+  width: 70%;
+  min-height: 40px;
+  background-color: #C5C1B4;
+  flex-direction: column;
+  justify-content: center;
+  /*align-items: center;*/
+  margin-top: 0px;
+  margin-bottom: 5px;
+  margin-right: 5%;
+  display: flex;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+  align-items: start;
+  /*padding-left: 55px;*/
+  padding-left: 17px;
+  box-sizing: border-box;
+  overflow: hidden;
+ 
+}
+
+.nested-folder-ui5864921:hover {
+  box-shadow: none;
+  background-color: #a79e91;
+  color: white;  
+  border: 3px solid #48495244;
+}
+
+.nested-add-folder-ui5864921 {
+  width: 40px;
+  min-height: 40px;
+  /*background-color: #e2dfd8;*/
+  position: absolute;
+  top: 0%;
+  bottom: 0%;
+  left: 0%;
+  right: auto;
+}
+
+.nested-add-folder-ui5864921:hover {
+  box-shadow: none;
+  /*background-color: #b3b0aa00;*/
+  /*border: 3px solid #48495244;*/
+}
+
+.nested-f-txt-ui5864921 {
+  pointer-events: none;
+  cursor: pointer;
+  color: #57534e;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  position: static;
+  display: flex;
+  align-items: center;
+  flex: auto;
+  justify-content: center;
+  white-space: nowrap;
+  width: auto;
+}
+
+.backdrop-ui5864921 {
+  z-index: 2000000000;
+  display: block;
+  min-width: 100vw;
+  min-height: 100vh;
+  filter: blur(20px);
+  background-color: #1d1e1f83;
+  position: fixed;
+  top: 0%;
+  bottom: 0%;
+  left: 0%;
+  right: 0%;
+}
+
+#toast-ui5864921 {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #FDBA74;
+  color: #202123;
+  padding: 10px 20px;
+  width: auto;
+  height:auto;
+
+  opacity: 1; /* Updated to make the toast initially visible */
+  transition: opacity 0.3s;
+  /* Additional styles for positioning and visibility */
+  /* display: none; /* Hide the toast initially */
+  z-index: 9999; /* Set a higher z-index to ensure it's on top of other elements */
+}
+
+.toast-visible-ui5864921 {
+  display: block; /* Show the toast */
+}
+
+
+  .folder-input {
+    z-index: 2147483647;
+    width: 400px;
+    height: 250px;
+    display: none;
+    justify-content:space-evenly;
+    align-items: center;
+    background-color: #484952;
+    border-radius: 8px;
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+    position: fixed;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    flex-direction: column-reverse;
+  
+  }
+
+  .folder-input input {
+    display: block;
+    width: 80%;
+    height: 40px;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 20px;
+    background-color: #ffffff;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+
+ 
+  #remove-dup-btn:hover {
+    background-color: #2c1c0a;
+  }
+
+  .no-hover {
+    pointer-events: none;
+  }
+
+  .extension-img {
+    filter: none !important;
+    pointer-events: none;
+  }
+
+  .deleteBox-ui5864921 {
+    z-index: 2147483547;
+    width: 250px;
+    height: 250px;
+    background-color: white;
+    display: none;
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+    position: fixed;
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+    border: 15px solid #484952;
+
+  
+    
+  
+  }
+
+  .deleteBox-ui5864921:hover{
+    background-color: #CCCCCC;
+  }

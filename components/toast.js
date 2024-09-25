@@ -1,27 +1,43 @@
-const template = document.createElement('template');
-template.innerHTML = `<style>
-              
-            </style>
-            <div style="background-color: #FDBA74;">
-                <p>${content}</p>
-                 <p>test</p>
-            </div>`;
+let bookmarkTemplate = document.createElement('template');
+bookmarkTemplate.innerHTML = `<style>
+              :host {
+              font-size: 20px;
+              color: black;
+              font-family: arial;
+              }
 
-class Toast extends HTMLElement {
-    /*
+               dialog {
+                width: auto;
+                max-width: fit-content;
+                height: auto;
+                max-height: fit-content;
+                background-color: #FDBA74;
+                position: fixed;
+                bottom: 20px;
+                z-index: 9999;
+                padding: 10px 20px;
+                border-width: 0px;
+                border-radius: 2px;
+              }
+
+            </style>
+
+            <dialog open>
+             
+                    <slot></slot>
+               
+            </dialog>`;
+
+
+class BookmarkToast extends HTMLElement {
+
     constructor() {
         super();
-        this.attachShadow({ mode: 'closed' });
-    }
-    */
-
-    connectedCallback() {
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
-
+        this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
     }
 }
 
-customElements.define('bookmark-toast', Toast);
+customElements.define('bookmark-toast', BookmarkToast);
 
 

@@ -33,7 +33,7 @@
         "assets/newFolderMedium.svg",
         "assets/newFolderXLarge.svg",
         "assets/rubbishBinSmall.svg",
-        "toast.js"
+        "components/toast.js"
       ],
       "matches": ["<all_urls>"]
     }

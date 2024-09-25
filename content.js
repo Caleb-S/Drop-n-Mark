@@ -14,7 +14,7 @@ var scrollInterval, scrollThresholdPercentage = 0.2;
   var script = document.createElement('script');
 
   // Set the source of the script (external file)
-  script.src = chrome.runtime.getURL('toast.js');
+  script.src = chrome.runtime.getURL('components/toast.js');
 
   // Append the script to the body
   document.body.appendChild(script);

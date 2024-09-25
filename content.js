@@ -20,8 +20,8 @@ var animationFrameID;
   var floatingButton = document.createElement('div');
   floatingButton.className = 'floating-button-ui5864921';
   document.body.appendChild(floatingButton);
-  //scaleElementsDynamically();
-  window.addEventListener('resize', scaleElementsDynamically);
+
+  // window.addEventListener('resize', scaleElementsDynamically);
   floatingButton.addEventListener('mousedown', handleMouseDown);
   floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
 
@@ -29,17 +29,14 @@ var animationFrameID;
     floatingButton.classList.add('hover-ui5864921');
     floatingButton.textContent = truncateText(document.title);
     floatingButton.style.borderRadius = '0';
-    scaleElementsDynamically();
+
   });
 
   floatingButton.addEventListener('mouseout', () => {
     if (!isFloatBtnActive) {
-      floatingButton.classList.remove('hover-ui5864921');
-      floatingButton.style.transform = 'translate3d(0, 0, 0)';
-      floatingButton.style.borderRadius = '50%';
-      floatingButton.textContent = '';
-      document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
-      scaleElementsDynamically();
+      resetFloatBtn();
+      //document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
+
     }
   });
 })();
@@ -76,7 +73,7 @@ function handleMouseDown(event) {
     } else {
       // The current page is not bookmarked
       document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
-      scaleElementsDynamically();
+
 
     }
   });
@@ -89,7 +86,7 @@ function handleMouseDown(event) {
   }
 
   floatDragState();
-  scaleElementsDynamically();
+
 }
 
 // adds drag state to float button
@@ -103,7 +100,7 @@ function floatDragState() {
   floatingButton.addEventListener('selectstart', event => event.preventDefault());
   floatingButton.addEventListener('mousedown', event => event.preventDefault());
   document.addEventListener('mousemove', handleMouseMove);
-  document.addEventListener('mouseup', handleMouseUp);
+  document.addEventListener('mouseup', floatDropOutside);
 
   floatingButton.textContent.draggable = false;
   floatingButton.textContent = truncateText(document.title);
@@ -144,12 +141,11 @@ function handleMouseMove(event) {
   }
 }
 
-/**
- * Handles the mouse up event on the page.
- *
- * @param {MouseEvent} event - The mouse event object.
+/*
+ Hides bookmark menu when mouse is released outside of the bookmark menu.
+
  */
-function handleMouseUp(event) {
+function floatDropOutside(event) {
   const newFolderBtn = document.querySelector('.new-folder-btn-ui5864921');
   const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
 
@@ -172,9 +168,9 @@ function resetFloatBtn() {
   floatingButton.classList.remove('hover-ui5864921');
   floatingButton.style.pointerEvents = 'auto';
   floatingButton.textContent = '';
-  document.removeEventListener('mouseup', handleMouseUp);
+  document.removeEventListener('mouseup', floatDropOutside);
   cancelAnimationFrame(animationFrameID);
-  scaleElementsDynamically();
+
 }
 
 
@@ -243,7 +239,7 @@ function generateMenu() {
             if (response.success) {
               console.log("Bookmark deleted successfully.");
               showToast('Bookmark Deleted');
-              scaleElementsDynamically();
+
 
 
             } else {
@@ -279,7 +275,7 @@ function generateMenu() {
                 if (folderId) {
                   saveBookmarkToFolder(folderId);
                   showToast('Bookmark Created in: ' + folderName);
-                  scaleElementsDynamically();
+
                 } else {
                   console.log('Failed to create folder.');
                 }
@@ -305,11 +301,7 @@ function generateMenu() {
         }
       });
 
-      // Function to update the bookmark menu
-      function updateBookmarkMenu(bookmarks) {
-        printBookmarkTree(bookmarks);
-        processFolders(bookmarks, folderContainer);
-      }
+
 
       // Request all bookmarks from the background script
       chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
@@ -319,7 +311,7 @@ function generateMenu() {
         }
 
         var bookmarks = response.bookmarks;
-        updateBookmarkMenu(bookmarks);
+        updateBookmarkMenu(bookmarks, folderContainer);
       });
 
       // Append the new bookmark menu to the document body
@@ -329,6 +321,12 @@ function generateMenu() {
     .catch(error => {
       console.error('Failed to load bookmarkmenu.html:', error);
     });
+}
+
+// Function to update the bookmark menu
+function updateBookmarkMenu(bookmarks, folderContainer) {
+  printBookmarkTree(bookmarks);
+  processFolders(bookmarks, folderContainer);
 }
 
 /**
@@ -361,7 +359,7 @@ function processFolders(bookmarks, parentElement) {
                 if (event.target === mainFolderItem) {
                   saveBookmarkToFolder(mainChild.id);
                   showToast('Bookmark Created In: ' + mainChild.title);
-                  scaleElementsDynamically();
+
                   //showToast(mainChild.title);
                 }
               });
@@ -399,7 +397,7 @@ function processFolders(bookmarks, parentElement) {
                         if (folderId) {
                           saveBookmarkToFolder(folderId);
                           showToast('Bookmark Created in: ' + folderName);
-                          scaleElementsDynamically();
+
                         } else {
                           console.log('Failed to create folder.');
                         }
@@ -433,7 +431,7 @@ function processFolders(bookmarks, parentElement) {
                     if (event.target === subFolderItem) {
                       saveBookmarkToFolder(subChild.id);
                       showToast('Bookmark Created In: ' + subChild.title);
-                      scaleElementsDynamically();
+
                     }
                   });
 
@@ -476,7 +474,7 @@ function processFolders(bookmarks, parentElement) {
                             if (folderId) {
                               saveBookmarkToFolder(folderId);
                               showToast('Bookmark Created in: ' + folderName);
-                              scaleElementsDynamically();
+
                             } else {
                               console.log('Failed to create folder.');
                             }
@@ -511,7 +509,7 @@ function processFolders(bookmarks, parentElement) {
                         if (event.target === nestedFolderItem) {
                           saveBookmarkToFolder(nestedChild.id);
                           showToast('Bookmark Created In: ' + nestedChild.title);
-                          scaleElementsDynamically();
+
                         }
                       });
                       parentElement.appendChild(nestedFolderItem);
@@ -596,29 +594,29 @@ function printBookmarkTree(bookmarks, prefix = '', indent = '') {
 function restrictHighlighting() {
   const menuItems = document.querySelectorAll('.bookmarkMenu-updated-ui5864921, .new-folder-btn-ui5864921, .new-btn-txt-ui5864921, .folder-container-ui5864921, .general-btn-ui5864921, .general-sub-txt-ui5864921, .floating-button-ui5864921, .hover-ui5864921, .floating-button-ui5864921.hover-ui5864921');
 
-  menuItems.forEach(item => {
-    item.addEventListener('selectstart', event => {
-      event.preventDefault();
-    });
-  });
+
 
   menuItems.forEach(item => {
     item.addEventListener('contextmenu', event => {
       event.preventDefault();
     });
-  });
 
-  menuItems.forEach(item => {
-    item.draggable = false;
-  });
+    item.addEventListener('selectstart', event => {
+      event.preventDefault();
+    });
 
-  menuItems.forEach(item => {
     item.addEventListener('mousedown', event => {
       if (event.button === 2) {
         event.preventDefault();
       }
     });
+
+    item.draggable = false;
+
+
   });
+
+
 }
 
 /**
@@ -652,65 +650,3 @@ function updateFloatingButtonPosition() {
   var floatingButton = document.querySelector('.floating-button-ui5864921');
   floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 }
-
-
-/**
- * Updates the size and position elements based on the current zoom level.
- */
-function scaleElementsDynamically() {/*
-  var zoomLevel = parseFloat(getComputedStyle(document.documentElement).zoom);
-
-  // Orange Button 
-  var divSize = 20 / zoomLevel;
-  var divPosition = 20 / zoomLevel;
-  var floatingButton = document.querySelector('.floating-button-ui5864921');
-
-  floatingButton.style.width = divSize + 'px';
-  floatingButton.style.height = divSize + 'px';
-  floatingButton.style.padding = '0px';
-  floatingButton.style.right = divPosition + 'px';
-  floatingButton.style.bottom = divPosition + 'px';
-
-  var hover2 = document.querySelector('.hover-ui5864921');
-
-  //var hoverX = 20 / zoomLevel;
-  var fontSize = 20 / zoomLevel;
-
-  if (hover2 != null) {
-    hover2.style.fontSize = fontSize + 'px';
-    hover2.style.width = 'auto';
-    hover2.style.paddingLeft = (20 / zoomLevel) + 'px';
-    hover2.style.paddingRight = (20 / zoomLevel) + 'px';
-    hover2.style.paddingTop = (5 / zoomLevel) + 'px';
-    hover2.style.paddingBottom = (5 / zoomLevel) + 'px';
-    hover2.style.height = 'auto';
-  }
-
-  // New Folder Input 
-  var folderInputBox = document.querySelector('.folder-input');
-
-  var divScale = 1 / zoomLevel;
-
-  if (folderInputBox != null) {
-    folderInputBox.style.transform = 'scale(' + divScale + ')';
-
-  }
-
-  // toast 
-  var toast = document.querySelector('bookmark-toast');
-  if (toast != null) {
-    toast.style.padding = (10 / zoomLevel) + 'px ' + (20 / zoomLevel) + 'px';
-    toast.style.fontSize = (20 / zoomLevel) + 'px';
-    toast.style.bottom = divPosition + 'px';
-
-  }
-
-  // delete box 
-  var delBox = document.querySelector('.deleteBox-ui5864921');
-  if (delBox != null) {
-    delBox.style.transform = 'scale(' + divScale + ')';
-
-  }
-
-
-*/}

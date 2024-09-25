@@ -1,5 +1,5 @@
-let bookmarkTemplate = document.createElement('template');
-bookmarkTemplate.innerHTML = `<style>
+let buttonTemplate = document.createElement('template');
+buttonTemplate.innerHTML = `<style>
               :host {
               font-size: 20px;
               color: black;
@@ -29,15 +29,15 @@ bookmarkTemplate.innerHTML = `<style>
             </dialog>`;
 
 
-class BookmarkToast extends HTMLElement {
+class FloatButton extends HTMLElement {
 
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
-    }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
+  }
 }
 
-customElements.define('bookmark-toast', BookmarkToast);
+customElements.define('float-button', FloatButton);
 
 

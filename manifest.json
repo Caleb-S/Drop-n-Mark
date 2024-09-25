@@ -33,7 +33,8 @@
         "assets/newFolderMedium.svg",
         "assets/newFolderXLarge.svg",
         "assets/rubbishBinSmall.svg",
-        "components/toast.js"
+        "components/toast.js",
+        "components/floatingBtn.js"
       ],
       "matches": ["<all_urls>"]
     }

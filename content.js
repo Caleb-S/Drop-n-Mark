@@ -1,53 +1,123 @@
-var floatingButton = document.createElement('div');
-floatingButton.className = 'floating-button-ui5864921';
-document.body.appendChild(floatingButton);
 
-var initialX = 0, initialY = 0, offsetX = 0, offsetY = 0, isDragging = false, animationFrameID;
-var scrollInterval, scrollThresholdPercentage = 0.2;
-
-
-
-
-// append script with src of toast.js
+// Append scripts for webcomponents
 (function () {
-  // Create a script element
-  var script = document.createElement('script');
+  var toastScript = document.createElement('script');
+  toastScript.src = chrome.runtime.getURL('components/toast.js');
+  document.head.appendChild(toastScript);
 
-  // Set the source of the script (external file)
-  script.src = chrome.runtime.getURL('components/toast.js');
-
-  // Append the script to the body
-  document.body.appendChild(script);
+  var floatingBtnScript = document.createElement('script');
+  floatingBtnScript.src = chrome.runtime.getURL('components/floatingBtn.js');
+  document.head.appendChild(floatingBtnScript);
 })();
 
-var toastCreate = document.createElement('bookmark-toast');
-
-toastText = "test";
-
-var text = toastText ? toastText : "Null";
-toastCreate.innerText = text;
-
-document.body.appendChild(toastCreate);
 
 
+// Initialize floating button
+var initialX, initialY, offsetX, offsetY = 0;
+var isFloatBtnActive = false;
+var animationFrameID;
+(function () {
+  var floatingButton = document.createElement('div');
+  floatingButton.className = 'floating-button-ui5864921';
+  document.body.appendChild(floatingButton);
+  //scaleElementsDynamically();
+  window.addEventListener('resize', scaleElementsDynamically);
+  floatingButton.addEventListener('mousedown', handleMouseDown);
+  floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
+
+  floatingButton.addEventListener('mouseover', () => {
+    floatingButton.classList.add('hover-ui5864921');
+    floatingButton.textContent = truncateText(document.title);
+    floatingButton.style.borderRadius = '0';
+    scaleElementsDynamically();
+  });
+
+  floatingButton.addEventListener('mouseout', () => {
+    if (!isFloatBtnActive) {
+      floatingButton.style.transform = 'translate3d(0, 0, 0)';
+      floatingButton.classList.remove('hover-ui5864921');
+      floatingButton.textContent = '';
+      floatingButton.style.borderRadius = '50%';
+      document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
+      scaleElementsDynamically();
+    }
+  });
+})();
 
 
 
+// Initialize bookmark menu 
+var scrollInterval, scrollThresholdPercentage = 0.2;
+(function () {
+  generateMenu()
+  restrictHighlighting();
+  chrome.runtime.onMessage.addListener(function (message) {
+    if (message.action === "generateMenu") {
+      generateMenu();
+    }
+  });
+})();
 
+/**
+ * Updates the size and position elements based on the current zoom level.
+ */
+function scaleElementsDynamically() {/*
+  var zoomLevel = parseFloat(getComputedStyle(document.documentElement).zoom);
 
-generateMenu()
-updateDivSize2();
-restrictHighlighting();
+  // Orange Button 
+  var divSize = 20 / zoomLevel;
+  var divPosition = 20 / zoomLevel;
+  var floatingButton = document.querySelector('.floating-button-ui5864921');
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.action === "generateMenu") {
+  floatingButton.style.width = divSize + 'px';
+  floatingButton.style.height = divSize + 'px';
+  floatingButton.style.padding = '0px';
+  floatingButton.style.right = divPosition + 'px';
+  floatingButton.style.bottom = divPosition + 'px';
 
-    generateMenu();
+  var hover2 = document.querySelector('.hover-ui5864921');
+
+  //var hoverX = 20 / zoomLevel;
+  var fontSize = 20 / zoomLevel;
+
+  if (hover2 != null) {
+    hover2.style.fontSize = fontSize + 'px';
+    hover2.style.width = 'auto';
+    hover2.style.paddingLeft = (20 / zoomLevel) + 'px';
+    hover2.style.paddingRight = (20 / zoomLevel) + 'px';
+    hover2.style.paddingTop = (5 / zoomLevel) + 'px';
+    hover2.style.paddingBottom = (5 / zoomLevel) + 'px';
+    hover2.style.height = 'auto';
   }
-});
 
-window.addEventListener('resize', updateDivSize);
-window.addEventListener('resize', updateDivSize2);
+  // New Folder Input 
+  var folderInputBox = document.querySelector('.folder-input');
+
+  var divScale = 1 / zoomLevel;
+
+  if (folderInputBox != null) {
+    folderInputBox.style.transform = 'scale(' + divScale + ')';
+
+  }
+
+  // toast 
+  var toast = document.querySelector('bookmark-toast');
+  if (toast != null) {
+    toast.style.padding = (10 / zoomLevel) + 'px ' + (20 / zoomLevel) + 'px';
+    toast.style.fontSize = (20 / zoomLevel) + 'px';
+    toast.style.bottom = divPosition + 'px';
+
+  }
+
+  // delete box 
+  var delBox = document.querySelector('.deleteBox-ui5864921');
+  if (delBox != null) {
+    delBox.style.transform = 'scale(' + divScale + ')';
+
+  }
+
+
+*/}
 
 /**
  * Handles the mouse down event on the floating button.
@@ -61,39 +131,49 @@ function handleMouseDown(event) {
       // The current page is bookmarked
       document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
       document.querySelector('.bookmarkMenu-updated-ui5864921').style.display = 'none';
-
       delBox = document.querySelector('.deleteBox-ui5864921');
       delBox.style.display = 'flex';
-
-
-
     } else {
       // The current page is not bookmarked
-
       document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
-      updateDivSize();
+      scaleElementsDynamically();
 
     }
   });
 
-
-
-
-  floatingButton.style.cursor = 'grabbing';
-  floatingButton.classList.add('hover-ui5864921');
-  floatingButton.style.pointerEvents = 'none';
-  floatingButton.addEventListener('contextmenu', event => event.preventDefault());
-  floatingButton.textContent.draggable = false;
-  floatingButton.addEventListener('selectstart', event => event.preventDefault());
-  floatingButton.addEventListener('mousedown', event => event.preventDefault());
-  floatingButton.textContent = truncateText(document.title);
-  floatingButton.style.borderRadius = '0';
-  updateDivSize2();
   initialX = event.clientX;
   initialY = event.clientY;
-  isDragging = true; handleMouseDown
+
+
+  floatDragState();
+  scaleElementsDynamically();
+
+
+
+
+}
+
+// adds drag state to float button
+function floatDragState() {
+  var floatingButton = document.querySelector('.floating-button-ui5864921');
+  isFloatBtnActive = true;
+
+  floatingButton.classList.add('hover-ui5864921');
+
+  floatingButton.addEventListener('contextmenu', event => event.preventDefault());
+  floatingButton.addEventListener('selectstart', event => event.preventDefault());
+  floatingButton.addEventListener('mousedown', event => event.preventDefault());
   document.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', handleMouseUp);
+
+  floatingButton.textContent.draggable = false;
+  floatingButton.textContent = truncateText(document.title);
+
+  floatingButton.style.borderRadius = '0';
+  floatingButton.style.pointerEvents = 'none';
+  floatingButton.style.cursor = 'grabbing';
+
+  handleMouseDown();
 }
 
 
@@ -126,7 +206,7 @@ function handleMouseMove(event) {
 }
 
 /**
- * Removes the text highlighting on the page.
+ * Removes the text highlighting on the page, preventing text in floatbutton being highlighted on drag.
  */
 function removeHighlight() {
   if (window.getSelection) {
@@ -140,6 +220,7 @@ function removeHighlight() {
  * Updates the position of the floating button.
  */
 function updateFloatingButtonPosition() {
+  var floatingButton = document.querySelector('.floating-button-ui5864921');
   floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 }
 
@@ -149,49 +230,35 @@ function updateFloatingButtonPosition() {
  * @param {MouseEvent} event - The mouse event object.
  */
 function handleMouseUp(event) {
-  isDragging = false;
-  floatingButton.style.cursor = 'grab';
-  document.removeEventListener('mousemove', handleMouseMove);
-  floatingButton.style.transform = 'translate3d(0, 0, 0)';
-  floatingButton.style.borderRadius = '50%';
-
   const newFolderBtn = document.querySelector('.new-folder-btn-ui5864921');
   const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-
-  const mainAddBtn = document.querySelector('.main-add-folder-ui5864921');
-
 
   if (!newFolderBtn.contains(event.target) && !event.target.closest('.main-add-folder-ui5864921') && !event.target.closest('.sub-add-folder-ui5864921')) {
     bookmarkMenu.style.display = 'none';
   }
+
+  resetFloatBtn();
+}
+
+// resets float button back to circle state
+function resetFloatBtn() {
+  var floatingButton = document.querySelector('.floating-button-ui5864921');
+  isFloatBtnActive = false;
+  floatingButton.style.cursor = 'grab';
+  document.removeEventListener('mousemove', handleMouseMove);
+  floatingButton.style.transform = 'translate3d(0, 0, 0)';
+  floatingButton.style.borderRadius = '50%';
 
   floatingButton.classList.remove('hover-ui5864921');
   floatingButton.style.pointerEvents = 'auto';
   floatingButton.textContent = '';
   document.removeEventListener('mouseup', handleMouseUp);
   cancelAnimationFrame(animationFrameID);
-  updateDivSize2();
+  scaleElementsDynamically();
 }
 
 
-floatingButton.addEventListener('mousedown', handleMouseDown);
-floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
-floatingButton.addEventListener('mouseover', () => {
-  floatingButton.classList.add('hover-ui5864921');
-  updateDivSize2();
-  floatingButton.textContent = truncateText(document.title);
-  floatingButton.style.borderRadius = '0';
-});
-floatingButton.addEventListener('mouseout', () => {
-  if (!isDragging) {
-    floatingButton.style.transform = 'translate3d(0, 0, 0)';
-    floatingButton.classList.remove('hover-ui5864921');
-    floatingButton.textContent = '';
-    floatingButton.style.borderRadius = '50%';
-    updateDivSize2();
-    document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
-  }
-});
+
 
 /**
  * Truncates the given text if it exceeds the maximum length.
@@ -254,7 +321,7 @@ function processFolders(bookmarks, parentElement) {
                 if (event.target === mainFolderItem) {
                   saveBookmarkToFolder(mainChild.id);
                   showToast('Bookmark Created In: ' + mainChild.title);
-                  updateDivSize2();
+                  scaleElementsDynamically();
                   //showToast(mainChild.title);
                 }
               });
@@ -292,7 +359,7 @@ function processFolders(bookmarks, parentElement) {
                         if (folderId) {
                           saveBookmarkToFolder(folderId);
                           showToast('Bookmark Created in: ' + folderName);
-                          updateDivSize2();
+                          scaleElementsDynamically();
                         } else {
                           console.log('Failed to create folder.');
                         }
@@ -326,7 +393,7 @@ function processFolders(bookmarks, parentElement) {
                     if (event.target === subFolderItem) {
                       saveBookmarkToFolder(subChild.id);
                       showToast('Bookmark Created In: ' + subChild.title);
-                      updateDivSize2();
+                      scaleElementsDynamically();
                     }
                   });
 
@@ -369,7 +436,7 @@ function processFolders(bookmarks, parentElement) {
                             if (folderId) {
                               saveBookmarkToFolder(folderId);
                               showToast('Bookmark Created in: ' + folderName);
-                              updateDivSize2();
+                              scaleElementsDynamically();
                             } else {
                               console.log('Failed to create folder.');
                             }
@@ -404,7 +471,7 @@ function processFolders(bookmarks, parentElement) {
                         if (event.target === nestedFolderItem) {
                           saveBookmarkToFolder(nestedChild.id);
                           showToast('Bookmark Created In: ' + nestedChild.title);
-                          updateDivSize2();
+                          scaleElementsDynamically();
                         }
                       });
                       parentElement.appendChild(nestedFolderItem);
@@ -534,7 +601,7 @@ function generateMenu() {
             if (response.success) {
               console.log("Bookmark deleted successfully.");
               showToast('Bookmark Deleted');
-              updateDivSize2();
+              scaleElementsDynamically();
 
 
             } else {
@@ -549,15 +616,9 @@ function generateMenu() {
 
       newFolderBtn.addEventListener('mouseup', function (event) {
         if (event.target === newFolderBtn) {
-
-
-
           bookmarkGui.style.display = 'none';
           newFolderInput.style.display = 'flex';
           bookmarkMenu.querySelector('.folder-input input').focus();
-
-
-
 
           // Get the input element
           var input = document.querySelector('.folder-input input');
@@ -570,20 +631,17 @@ function generateMenu() {
               const folderName = input.value;
 
               chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName }, function (response) {
-
                 const folderId = response.folderId;
                 console.log('Folder ID:', folderId);
 
                 if (folderId) {
                   saveBookmarkToFolder(folderId);
                   showToast('Bookmark Created in: ' + folderName);
-                  updateDivSize2();
+                  scaleElementsDynamically();
                 } else {
                   console.log('Failed to create folder.');
                 }
-
               });
-
 
               input.value = '';
               document.querySelector('.folder-input').style.display = 'none';
@@ -593,13 +651,7 @@ function generateMenu() {
 
           backDrop.addEventListener('mousedown', function (event) {
             generateMenu();
-
-
           });
-
-
-
-
         }
       });
 
@@ -637,8 +689,6 @@ function generateMenu() {
     });
 }
 
-
-
 /**
  * Prints the bookmark tree recursively.
  *
@@ -656,115 +706,6 @@ function printBookmarkTree(bookmarks, prefix = '', indent = '') {
     }
   });
 }
-
-
-
-/**
- * Updates the size of the div element.
- */
-
-function updateDivSize() {
-  var zoomLevel = parseFloat(getComputedStyle(document.documentElement).zoom);
-  var referenceZoomLevel = 1;
-
-  var zoomRatio = zoomLevel / referenceZoomLevel;
-  var divScale = 1 / zoomRatio;
-  var windowHeight = screen.innerHeight * 0.4;
-
-  var zoomResistantDiv = document.querySelector('.bookmarkMenu-updated-ui5864921');
-  zoomResistantDiv.style.width = windowHeight + 'px';
-  if (zoomResistantDiv != null) {
-
-    zoomResistantDiv.style.transform = 'scale(' + divScale + ')';
-    var currentWidth = zoomResistantDiv.offsetWidth;
-
-
-    zoomResistantDiv.style.height = (currentWidth * 2) + 'px';
-  }
-}
-
-
-
-
-/**
- * Updates the size and position of the floating button.
- */
-
-
-function updateDivSize2() {
-  var zoomLevel = parseFloat(getComputedStyle(document.documentElement).zoom);
-
-  /* Orange Button */
-  var divSize = 20 / zoomLevel;
-  var divPosition = 20 / zoomLevel;
-
-  var floatingButton = document.querySelector('.floating-button-ui5864921');
-  floatingButton.style.width = divSize + 'px';
-  floatingButton.style.height = divSize + 'px';
-  floatingButton.style.padding = '0px';
-
-  floatingButton.style.right = divPosition + 'px';
-  floatingButton.style.bottom = divPosition + 'px';
-
-
-  var hover2 = document.querySelector('.hover-ui5864921');
-
-  var hoverX = 20 / zoomLevel;
-  var fontSize = 20 / zoomLevel;
-
-  if (hover2 != null) {
-    hover2.style.fontSize = fontSize + 'px';
-    hover2.style.width = 'auto';
-    hover2.style.paddingLeft = (20 / zoomLevel) + 'px';
-    hover2.style.paddingRight = (20 / zoomLevel) + 'px';
-    hover2.style.paddingTop = (5 / zoomLevel) + 'px';
-    hover2.style.paddingBottom = (5 / zoomLevel) + 'px';
-    hover2.style.height = 'auto';
-    console.log('hover boi!');
-  }
-
-  /* New Folder Input */
-  var folderInputBox = document.querySelector('.folder-input');
-
-  var divScale = 1 / zoomLevel;
-
-  if (folderInputBox != null) {
-    folderInputBox.style.transform = 'scale(' + divScale + ')';
-
-  }
-
-  /* toast */
-  var toast = document.querySelector('bookmark-toast');
-  if (toast != null) {
-    toast.style.padding = (10 / zoomLevel) + 'px ' + (20 / zoomLevel) + 'px';
-    toast.style.fontSize = (20 / zoomLevel) + 'px';
-    toast.style.bottom = divPosition + 'px';
-
-  }
-
-  /* delete box */
-  var delBox = document.querySelector('.deleteBox-ui5864921');
-  if (delBox != null) {
-    delBox.style.transform = 'scale(' + divScale + ')';
-
-  }
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /**

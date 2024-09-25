@@ -19,6 +19,7 @@ Floating-dot CSS
 
 /* Floating-dot resting state*/
 .floating-button-ui5864921 {
+  /*
   position: fixed;
   z-index: 2147483647 !important;
   right: 20px;
@@ -36,10 +37,12 @@ Floating-dot CSS
   
  
   cursor: grab;
+  */
 }
 
 /* floating-dot hover */
 .hover-ui5864921 {
+  /*
   
   width: auto;
   height: auto;
@@ -61,6 +64,7 @@ Floating-dot CSS
   justify-content: center;
   align-items: center;
   white-space: nowrap;
+  */
   
 }
 
@@ -441,7 +445,7 @@ bookmarkmenu.html CSS
 }
 
 .backdrop-ui5864921 {
-  z-index: 2000000000;
+  z-index: 2047483645;
   display: block;
   min-width: 100vw;
   min-height: 100vh;
@@ -478,7 +482,7 @@ bookmarkmenu.html CSS
 
 
   .folder-input {
-    z-index: 2147483647;
+    z-index: 2147483646;
     width: 400px;
     height: 250px;
     display: none;
@@ -526,7 +530,7 @@ bookmarkmenu.html CSS
   }
 
   .deleteBox-ui5864921 {
-    z-index: 2147483547;
+    z-index: 2147483546;
     width: 250px;
     height: 250px;
     background-color: white;

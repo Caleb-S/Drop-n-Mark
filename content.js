@@ -54,17 +54,27 @@ let animationFrameID;
 
   // window.addEventListener('resize', scaleElementsDynamically);
   floatingButton.addEventListener('mousedown', handleMouseDown);
-  floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
+  floatingButton.classList.add('bookmark-float-btn');
+  //floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
 
   floatingButton.addEventListener('mouseover', () => {
     // floatingButton.classList.add('hover-ui5864921');
-    floatingButton.textContent = truncateText(document.title);
     //floatingButton.style.borderRadius = '0';
+
+    /*
+    let ptag = document.createElement('p');
+    ptag.classList.add('ptag');
+    ptag.innerText = document.title;
+    floatingButton.appendChild(ptag);
+    */
+
+    floatingButton.textContent = truncateText(document.title);
 
   });
 
   floatingButton.addEventListener('mouseout', () => {
     if (!isFloatBtnActive) {
+
       resetFloatBtn();
       //document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
 
@@ -122,10 +132,10 @@ function handleMouseDown(event) {
 
 // adds drag state to float button
 function floatDragState() {
-  let floatingButton = document.querySelector('.floating-button-ui5864921');
+  let floatingButton = document.querySelector('bookmark-float-button');
   isFloatBtnActive = true;
 
-  floatingButton.classList.add('hover-ui5864921');
+  //floatingButton.classList.add('hover-ui5864921');
 
   floatingButton.addEventListener('contextmenu', event => event.preventDefault());
   floatingButton.addEventListener('selectstart', event => event.preventDefault());
@@ -137,8 +147,8 @@ function floatDragState() {
   floatingButton.textContent = truncateText(document.title);
 
   floatingButton.style.borderRadius = '0';
-  floatingButton.style.pointerEvents = 'none';
-  floatingButton.style.cursor = 'grabbing';
+  floatingButton.style.pointerEvents = 'none'; // pointer event allows cursor to be seen past floutbtn
+  document.body.style.cursor = 'grabbing';
 
   //handleMouseDown();
 }
@@ -189,15 +199,24 @@ function floatDropOutside(event) {
 
 // resets float button back to circle state
 function resetFloatBtn() {
-  let floatingButton = document.querySelector('.floating-button-ui5864921');
+  let floatingButton = document.querySelector('.bookmark-float-btn');
   isFloatBtnActive = false;
   floatingButton.style.cursor = 'grab';
   document.removeEventListener('mousemove', handleMouseMove);
   floatingButton.style.transform = 'translate3d(0, 0, 0)';
   floatingButton.style.borderRadius = '50%';
 
+  /*
+  let ptag = floatingButton.querySelector('.ptag');
+  if (ptag instanceof Node) {
+    ptag.remove();
+  }
+  */
+  //floatingButton.removeChild(ptag);
+
   floatingButton.classList.remove('hover-ui5864921');
   floatingButton.style.pointerEvents = 'auto';
+  document.body.style.cursor = 'auto';
   floatingButton.textContent = '';
   document.removeEventListener('mouseup', floatDropOutside);
   cancelAnimationFrame(animationFrameID);
@@ -621,7 +640,7 @@ function printBookmarkTree(bookmarks, prefix = '', indent = '') {
  * Restricts text highlighting on menu items.
  */
 function restrictHighlighting() {
-  const menuItems = document.querySelectorAll('.bookmarkMenu-updated-ui5864921, .new-folder-btn-ui5864921, .new-btn-txt-ui5864921, .folder-container-ui5864921, .general-btn-ui5864921, .general-sub-txt-ui5864921, .floating-button-ui5864921, .hover-ui5864921, .floating-button-ui5864921.hover-ui5864921');
+  const menuItems = document.querySelectorAll('.bookmarkMenu-updated-ui5864921, .new-folder-btn-ui5864921, .new-btn-txt-ui5864921, .folder-container-ui5864921, .general-btn-ui5864921, .general-sub-txt-ui5864921, .bookmark-float-btn, .hover-ui5864921, .bookmark-float-btn.hover-ui5864921');
 
   menuItems.forEach(item => {
     item.addEventListener('contextmenu', event => {
@@ -674,6 +693,6 @@ function truncateText(text) {
  * Updates the position of the floating button.
  */
 function updateFloatingButtonPosition() {
-  let floatingButton = document.querySelector('.floating-button-ui5864921');
+  let floatingButton = document.querySelector('.bookmark-float-btn');
   floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 }

@@ -1,43 +1,75 @@
 let buttonTemplate = document.createElement('template');
 buttonTemplate.innerHTML = `
             <style>
+          
+
               :host {
-                font-size: 18px;
-                color: white;
-                font-family: arial;
-                text-align: center;
-                text-overflow: ellipsis;
-                overflow: visible;
-                white-space: nowrap;
+                font-size: 18px !important;
+                color: white !important;
+                font-family: arial !important;
+                text-align: center !important;
+                text-overflow: ellipsis !important;
+                overflow: visible !important;
+                white-space: nowrap !important;
+                z-index: 2147483647 !important;
+                position: fixed !important;
+                bottom: 20px !important;
+                right: 20px !important;
+                tabindex: -1 !important;
+                outline: none !important;
               }
 
-               dialog {
+               button {
+            
+          
                 width: 20px;
                 height: 20px;
-                position: fixed;
-                bottom: 20px;
-                z-index: 2147483647;
-                padding: 0px;
-                border-radius: 50%;
-                cursor: grab;
-                background-color: #ff7f50f8;
-              }
-
-              dialog:hover {
-                width: auto;
-                height: auto;
-                padding: 5px 20px 5px 20px;
-                border-radius: 0;
+       
                 align-items: center;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                
+               
+            
+                padding: 0px;
+                border-radius: 50%;
+                border-width: 0px;
+                cursor: grab;
+                background-color: #ff7f50f8;
+                user-select: none; 
+                
+                      
+              }
+
+              button:hover {
+                width: auto;
+                max-width: fit-content;
+                height: auto;
+                padding: 10px 20px 10px 20px;
+                border-radius: 3px;
+                user-select: none;
+                
+               
+              }
+
+               button:active {
+                cursor: grabbing !important;
+                   box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.2);
+               
+                width: auto;
+                max-width: fit-content;
+                height: auto;
+                padding: 10px 20px 10px 20px;
+                border-radius: 3px;
+                user-select: none; 
+                
               }
             </style>
 
-            <dialog open>
+            <button class="float-button">
               <slot></slot>
-            </dialog>
+            </button>
 `;
 
 
@@ -50,15 +82,15 @@ class FloatButton extends HTMLElement {
     this.shadowRoot.appendChild(buttonTemplate.content.cloneNode(true));
   }
 
-  connectedCalleback() {
-    // when text is added to the dom, change state to drag is true 
-    console.log('connected');
+  static get observedAttributes() {
+    return ['true']
   }
 
-  disconnectedCallback() {
-    // when text is removed from the dom, return to default pos & state
-    console.log('disconnected');
+  attributeChangedCa11back(name, oldVaIue, newVa1ue) {
+    console.log(name, oldVaIue, newVa1ue);
+    // if (name = "checked") this.updateChecked(newVa1ue)
   }
+
 
 
 

@@ -20,6 +20,15 @@ var scrollInterval, scrollThresholdPercentage = 0.2;
   document.body.appendChild(script);
 })();
 
+var toastCreate = document.createElement('bookmark-toast');
+
+toastText = "test";
+
+var text = toastText ? toastText : "Null";
+toastCreate.innerText = text;
+
+document.body.appendChild(toastCreate);
+
 
 
 
@@ -470,11 +479,11 @@ function showToast(toastText) {
 
   document.body.appendChild(toastCreate);
 
-  /*
+
   setTimeout(function () {
     toastCreate.remove();
   }, 3000);
-  */
+
 
 }
 

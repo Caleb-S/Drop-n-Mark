@@ -4,35 +4,31 @@ bookmarkTemplate.innerHTML = `<style>
               font-size: 20px;
               color: black;
               font-family: arial;
-              transition: opacity 0.3s;
-              z-index: 9999;
-              margin: 0px;
+              
               
               }
 
-              div {
+               dialog {
                 width: auto;
                 max-width: fit-content;
                 height: auto;
                 max-height: fit-content;
                 background-color: #FDBA74;
-                position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
+               position: fixed;
+               bottom: 20px;
+                z-index: 9999;
+                padding: 10px 20px;
+                border-width: 0px;
+                border-radius: 2px;
               }
 
-              p {
-                padding: 10px 20px;
-              }
             </style>
 
-            <div>
+            <dialog open>
              
                     <slot></slot>
                
-            </div>`;
+            </dialog>`;
 
 
 class BookmarkToast extends HTMLElement {

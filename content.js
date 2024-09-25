@@ -34,10 +34,10 @@ var animationFrameID;
 
   floatingButton.addEventListener('mouseout', () => {
     if (!isFloatBtnActive) {
-      floatingButton.style.transform = 'translate3d(0, 0, 0)';
       floatingButton.classList.remove('hover-ui5864921');
-      floatingButton.textContent = '';
+      floatingButton.style.transform = 'translate3d(0, 0, 0)';
       floatingButton.style.borderRadius = '50%';
+      floatingButton.textContent = '';
       document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
       scaleElementsDynamically();
     }
@@ -58,66 +58,6 @@ var scrollInterval, scrollThresholdPercentage = 0.2;
   });
 })();
 
-/**
- * Updates the size and position elements based on the current zoom level.
- */
-function scaleElementsDynamically() {/*
-  var zoomLevel = parseFloat(getComputedStyle(document.documentElement).zoom);
-
-  // Orange Button 
-  var divSize = 20 / zoomLevel;
-  var divPosition = 20 / zoomLevel;
-  var floatingButton = document.querySelector('.floating-button-ui5864921');
-
-  floatingButton.style.width = divSize + 'px';
-  floatingButton.style.height = divSize + 'px';
-  floatingButton.style.padding = '0px';
-  floatingButton.style.right = divPosition + 'px';
-  floatingButton.style.bottom = divPosition + 'px';
-
-  var hover2 = document.querySelector('.hover-ui5864921');
-
-  //var hoverX = 20 / zoomLevel;
-  var fontSize = 20 / zoomLevel;
-
-  if (hover2 != null) {
-    hover2.style.fontSize = fontSize + 'px';
-    hover2.style.width = 'auto';
-    hover2.style.paddingLeft = (20 / zoomLevel) + 'px';
-    hover2.style.paddingRight = (20 / zoomLevel) + 'px';
-    hover2.style.paddingTop = (5 / zoomLevel) + 'px';
-    hover2.style.paddingBottom = (5 / zoomLevel) + 'px';
-    hover2.style.height = 'auto';
-  }
-
-  // New Folder Input 
-  var folderInputBox = document.querySelector('.folder-input');
-
-  var divScale = 1 / zoomLevel;
-
-  if (folderInputBox != null) {
-    folderInputBox.style.transform = 'scale(' + divScale + ')';
-
-  }
-
-  // toast 
-  var toast = document.querySelector('bookmark-toast');
-  if (toast != null) {
-    toast.style.padding = (10 / zoomLevel) + 'px ' + (20 / zoomLevel) + 'px';
-    toast.style.fontSize = (20 / zoomLevel) + 'px';
-    toast.style.bottom = divPosition + 'px';
-
-  }
-
-  // delete box 
-  var delBox = document.querySelector('.deleteBox-ui5864921');
-  if (delBox != null) {
-    delBox.style.transform = 'scale(' + divScale + ')';
-
-  }
-
-
-*/}
 
 /**
  * Handles the mouse down event on the floating button.
@@ -141,16 +81,15 @@ function handleMouseDown(event) {
     }
   });
 
-  initialX = event.clientX;
-  initialY = event.clientY;
-
+  try {
+    initialX = event.clientX;
+    initialY = event.clientY;
+  } catch (error) {
+    return;
+  }
 
   floatDragState();
   scaleElementsDynamically();
-
-
-
-
 }
 
 // adds drag state to float button
@@ -173,7 +112,7 @@ function floatDragState() {
   floatingButton.style.pointerEvents = 'none';
   floatingButton.style.cursor = 'grabbing';
 
-  handleMouseDown();
+  //handleMouseDown();
 }
 
 
@@ -203,25 +142,6 @@ function handleMouseMove(event) {
   } else {
     clearInterval(scrollInterval);
   }
-}
-
-/**
- * Removes the text highlighting on the page, preventing text in floatbutton being highlighted on drag.
- */
-function removeHighlight() {
-  if (window.getSelection) {
-    window.getSelection().removeAllRanges();
-  } else if (document.selection) {
-    document.selection.empty();
-  }
-}
-
-/**
- * Updates the position of the floating button.
- */
-function updateFloatingButtonPosition() {
-  var floatingButton = document.querySelector('.floating-button-ui5864921');
-  floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 }
 
 /**
@@ -258,38 +178,158 @@ function resetFloatBtn() {
 }
 
 
-
-
 /**
- * Truncates the given text if it exceeds the maximum length.
+ * Shows a toast message.
  *
- * @param {string} text - The text to truncate.
- * @returns {string} The truncated text.
+ * @param {string} toastText - The text to display in the toast message.
  */
-function truncateText(text) {
-  var linkextra = 10;
-  var maxLength = 20;
-  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+function showToast(toastText) {
+  var toastCreate = document.createElement('bookmark-toast');
+
+  var text = toastText ? toastText : "Null";
+  toastCreate.innerText = text;
+
+  document.body.appendChild(toastCreate);
+
+
+  setTimeout(function () {
+    toastCreate.remove();
+  }, 3000);
+
+
 }
 
-/**
- * Retrieves the current page URL.
- *
- * @returns {string} The current page URL.
- */
-function getCurrentPageUrl() {
-  return window.location.href;
-}
+// Generates the bookmark menu.
+function generateMenu() {
+  // Check if a bookmark menu already exists
+  const existingBookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
+  if (existingBookmarkMenu) {
+    // Remove the existing bookmark menu if it exists
+    existingBookmarkMenu.parentNode.removeChild(existingBookmarkMenu);
+  }
 
-/**
- * Retrieves the current page title.
- *
- * @returns {string} The current page title.
- */
-function getCurrentPageTitle() {
-  return document.title;
-}
+  // Fetch the bookmark menu HTML
+  fetch(chrome.runtime.getURL('bookmarkmenu.html'))
+    .then(response => response.text())
+    .then(html => {
+      // Create a bookmark menu element from the fetched HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const bookmarkMenu = doc.getElementById('bookmarkMenu-ui5864921');
+      const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
 
+      const folderContainer = bookmarkMenu.querySelector('.folder-container-ui5864921');
+
+      const newFolderBtn = bookmarkMenu.querySelector('.new-folder-btn-ui5864921');
+      const generalBtn = bookmarkMenu.querySelector('.general-btn-ui5864921');
+      const newFolderInput = bookmarkMenu.querySelector('.folder-input');
+
+      var imageElement = document.createElement('img');
+      imageElement.src = chrome.runtime.getURL('assets/newFolderXLarge.svg');
+      imageElement.classList.add('extension-img');
+      newFolderInput.appendChild(imageElement);
+
+      delBox = bookmarkMenu.querySelector('.deleteBox-ui5864921');
+
+      var delBoxImage = document.createElement('img');
+      delBoxImage.src = chrome.runtime.getURL('assets/rubbishBinSmall.svg');
+      delBoxImage.classList.add('extension-img');
+      delBox.appendChild(delBoxImage);
+
+      delBox.addEventListener('mouseup', function (event) {
+        if (event.target === delBox) {
+          delBox.style.display = 'flex';
+          chrome.runtime.sendMessage({ action: "deleteBookmark" }, function (response) {
+            if (response.success) {
+              console.log("Bookmark deleted successfully.");
+              showToast('Bookmark Deleted');
+              scaleElementsDynamically();
+
+
+            } else {
+              console.log("Current page is not bookmarked.");
+            }
+          });
+
+        }
+      });
+
+
+
+      newFolderBtn.addEventListener('mouseup', function (event) {
+        if (event.target === newFolderBtn) {
+          bookmarkGui.style.display = 'none';
+          newFolderInput.style.display = 'flex';
+          bookmarkMenu.querySelector('.folder-input input').focus();
+
+          // Get the input element
+          var input = document.querySelector('.folder-input input');
+          var backDrop = document.querySelector('.backdrop-ui5864921');
+
+          input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+
+              const folderName = input.value;
+
+              chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName }, function (response) {
+                const folderId = response.folderId;
+                console.log('Folder ID:', folderId);
+
+                if (folderId) {
+                  saveBookmarkToFolder(folderId);
+                  showToast('Bookmark Created in: ' + folderName);
+                  scaleElementsDynamically();
+                } else {
+                  console.log('Failed to create folder.');
+                }
+              });
+
+              input.value = '';
+              document.querySelector('.folder-input').style.display = 'none';
+
+            }
+          });
+
+          backDrop.addEventListener('mousedown', function (event) {
+            generateMenu();
+          });
+        }
+      });
+
+
+      generalBtn.addEventListener('mouseup', function (event) {
+        if (event.target === generalBtn) {
+
+          saveBookmarkToFolder("2");
+        }
+      });
+
+      // Function to update the bookmark menu
+      function updateBookmarkMenu(bookmarks) {
+        printBookmarkTree(bookmarks);
+        processFolders(bookmarks, folderContainer);
+      }
+
+      // Request all bookmarks from the background script
+      chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+          return;
+        }
+
+        var bookmarks = response.bookmarks;
+        updateBookmarkMenu(bookmarks);
+      });
+
+      // Append the new bookmark menu to the document body
+      document.body.appendChild(bookmarkMenu);
+
+    })
+    .catch(error => {
+      console.error('Failed to load bookmarkmenu.html:', error);
+    });
+}
 
 /**
  * Processes the bookmark folders.
@@ -487,7 +527,6 @@ function processFolders(bookmarks, parentElement) {
   });
 }
 
-
 /**
  * Creates a folder item element.
  *
@@ -515,11 +554,9 @@ function createFolderItem(itemClass, addFolderClass, nameClass, title, id) {
   return folderItem;
 }
 
-/**
- * Saves the current page bookmark to a folder.
- *
- * @param {string} folderId - The ID of the folder to save the bookmark to.
- */
+
+
+// Saves the current page bookmark to a folder.
 function saveBookmarkToFolder(folderId) {
   console.log('folder id: |', folderId);
   //showToast('folder being bookmarke id: ' + folderId);
@@ -533,161 +570,6 @@ function saveBookmarkToFolder(folderId) {
   });
 }
 
-/**
- * Shows a toast message.
- *
- * @param {string} toastText - The text to display in the toast message.
- */
-function showToast(toastText) {
-  var toastCreate = document.createElement('bookmark-toast');
-
-  var text = toastText ? toastText : "Null";
-  toastCreate.innerText = text;
-
-  document.body.appendChild(toastCreate);
-
-
-  setTimeout(function () {
-    toastCreate.remove();
-  }, 3000);
-
-
-}
-
-
-/**
- * Generates the bookmark menu.
- */
-function generateMenu() {
-  // Check if a bookmark menu already exists
-  const existingBookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-  if (existingBookmarkMenu) {
-    // Remove the existing bookmark menu if it exists
-    existingBookmarkMenu.parentNode.removeChild(existingBookmarkMenu);
-  }
-
-  // Fetch the bookmark menu HTML
-  fetch(chrome.runtime.getURL('bookmarkmenu.html'))
-    .then(response => response.text())
-    .then(html => {
-      // Create a bookmark menu element from the fetched HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const bookmarkMenu = doc.getElementById('bookmarkMenu-ui5864921');
-      const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
-
-      const folderContainer = bookmarkMenu.querySelector('.folder-container-ui5864921');
-
-      const newFolderBtn = bookmarkMenu.querySelector('.new-folder-btn-ui5864921');
-      const generalBtn = bookmarkMenu.querySelector('.general-btn-ui5864921');
-      const newFolderInput = bookmarkMenu.querySelector('.folder-input');
-
-      var imageElement = document.createElement('img');
-      imageElement.src = chrome.runtime.getURL('assets/newFolderXLarge.svg');
-      imageElement.classList.add('extension-img');
-      newFolderInput.appendChild(imageElement);
-
-      delBox = bookmarkMenu.querySelector('.deleteBox-ui5864921');
-
-      var delBoxImage = document.createElement('img');
-      delBoxImage.src = chrome.runtime.getURL('assets/rubbishBinSmall.svg');
-      delBoxImage.classList.add('extension-img');
-      delBox.appendChild(delBoxImage);
-
-      delBox.addEventListener('mouseup', function (event) {
-        if (event.target === delBox) {
-          delBox.style.display = 'flex';
-          chrome.runtime.sendMessage({ action: "deleteBookmark" }, function (response) {
-            if (response.success) {
-              console.log("Bookmark deleted successfully.");
-              showToast('Bookmark Deleted');
-              scaleElementsDynamically();
-
-
-            } else {
-              console.log("Current page is not bookmarked.");
-            }
-          });
-
-        }
-      });
-
-
-
-      newFolderBtn.addEventListener('mouseup', function (event) {
-        if (event.target === newFolderBtn) {
-          bookmarkGui.style.display = 'none';
-          newFolderInput.style.display = 'flex';
-          bookmarkMenu.querySelector('.folder-input input').focus();
-
-          // Get the input element
-          var input = document.querySelector('.folder-input input');
-          var backDrop = document.querySelector('.backdrop-ui5864921');
-
-          input.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-
-              const folderName = input.value;
-
-              chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName }, function (response) {
-                const folderId = response.folderId;
-                console.log('Folder ID:', folderId);
-
-                if (folderId) {
-                  saveBookmarkToFolder(folderId);
-                  showToast('Bookmark Created in: ' + folderName);
-                  scaleElementsDynamically();
-                } else {
-                  console.log('Failed to create folder.');
-                }
-              });
-
-              input.value = '';
-              document.querySelector('.folder-input').style.display = 'none';
-
-            }
-          });
-
-          backDrop.addEventListener('mousedown', function (event) {
-            generateMenu();
-          });
-        }
-      });
-
-
-      generalBtn.addEventListener('mouseup', function (event) {
-        if (event.target === generalBtn) {
-
-          saveBookmarkToFolder("2");
-        }
-      });
-
-      // Function to update the bookmark menu
-      function updateBookmarkMenu(bookmarks) {
-        printBookmarkTree(bookmarks);
-        processFolders(bookmarks, folderContainer);
-      }
-
-      // Request all bookmarks from the background script
-      chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError);
-          return;
-        }
-
-        var bookmarks = response.bookmarks;
-        updateBookmarkMenu(bookmarks);
-      });
-
-      // Append the new bookmark menu to the document body
-      document.body.appendChild(bookmarkMenu);
-
-    })
-    .catch(error => {
-      console.error('Failed to load bookmarkmenu.html:', error);
-    });
-}
 
 /**
  * Prints the bookmark tree recursively.
@@ -739,6 +621,96 @@ function restrictHighlighting() {
   });
 }
 
+/**
+ * Removes the text highlighting on the page, preventing text in floatbutton being highlighted on drag.
+ */
+function removeHighlight() {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges();
+  } else if (document.selection) {
+    document.selection.empty();
+  }
+}
+
+/**
+ * Truncates the given text if it exceeds the maximum length.
+ *
+ * @param {string} text - The text to truncate.
+ * @returns {string} The truncated text.
+ */
+function truncateText(text) {
+  var linkextra = 10;
+  var maxLength = 20;
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
 
 
+/**
+ * Updates the position of the floating button.
+ */
+function updateFloatingButtonPosition() {
+  var floatingButton = document.querySelector('.floating-button-ui5864921');
+  floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+}
 
+
+/**
+ * Updates the size and position elements based on the current zoom level.
+ */
+function scaleElementsDynamically() {/*
+  var zoomLevel = parseFloat(getComputedStyle(document.documentElement).zoom);
+
+  // Orange Button 
+  var divSize = 20 / zoomLevel;
+  var divPosition = 20 / zoomLevel;
+  var floatingButton = document.querySelector('.floating-button-ui5864921');
+
+  floatingButton.style.width = divSize + 'px';
+  floatingButton.style.height = divSize + 'px';
+  floatingButton.style.padding = '0px';
+  floatingButton.style.right = divPosition + 'px';
+  floatingButton.style.bottom = divPosition + 'px';
+
+  var hover2 = document.querySelector('.hover-ui5864921');
+
+  //var hoverX = 20 / zoomLevel;
+  var fontSize = 20 / zoomLevel;
+
+  if (hover2 != null) {
+    hover2.style.fontSize = fontSize + 'px';
+    hover2.style.width = 'auto';
+    hover2.style.paddingLeft = (20 / zoomLevel) + 'px';
+    hover2.style.paddingRight = (20 / zoomLevel) + 'px';
+    hover2.style.paddingTop = (5 / zoomLevel) + 'px';
+    hover2.style.paddingBottom = (5 / zoomLevel) + 'px';
+    hover2.style.height = 'auto';
+  }
+
+  // New Folder Input 
+  var folderInputBox = document.querySelector('.folder-input');
+
+  var divScale = 1 / zoomLevel;
+
+  if (folderInputBox != null) {
+    folderInputBox.style.transform = 'scale(' + divScale + ')';
+
+  }
+
+  // toast 
+  var toast = document.querySelector('bookmark-toast');
+  if (toast != null) {
+    toast.style.padding = (10 / zoomLevel) + 'px ' + (20 / zoomLevel) + 'px';
+    toast.style.fontSize = (20 / zoomLevel) + 'px';
+    toast.style.bottom = divPosition + 'px';
+
+  }
+
+  // delete box 
+  var delBox = document.querySelector('.deleteBox-ui5864921');
+  if (delBox != null) {
+    delBox.style.transform = 'scale(' + divScale + ')';
+
+  }
+
+
+*/}

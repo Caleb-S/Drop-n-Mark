@@ -556,15 +556,13 @@ function createFolderItem(itemClass, addFolderClass, nameClass, title, id) {
 
 // Saves the current page bookmark to a folder.
 function saveBookmarkToFolder(folderId) {
-  console.log('folder id: |', folderId);
-  //showToast('folder being bookmarke id: ' + folderId);
+  //showToast('folder being bookmarked id: ' + folderId);
   chrome.runtime.sendMessage({
     action: "saveCurrentPageToBookmark",
     parentFolderId: folderId,
     currentPageUrl: document.URL,
     currentPageTitle: document.title
   }, function (response) {
-    console.log(response);
   });
 }
 
@@ -593,8 +591,6 @@ function printBookmarkTree(bookmarks, prefix = '', indent = '') {
  */
 function restrictHighlighting() {
   const menuItems = document.querySelectorAll('.bookmarkMenu-updated-ui5864921, .new-folder-btn-ui5864921, .new-btn-txt-ui5864921, .folder-container-ui5864921, .general-btn-ui5864921, .general-sub-txt-ui5864921, .floating-button-ui5864921, .hover-ui5864921, .floating-button-ui5864921.hover-ui5864921');
-
-
 
   menuItems.forEach(item => {
     item.addEventListener('contextmenu', event => {

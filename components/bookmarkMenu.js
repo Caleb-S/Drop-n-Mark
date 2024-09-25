@@ -34,7 +34,7 @@ class BookmarkMenu extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
+        this.shadowRoot.appendChild(menuTemplate.content.cloneNode(true));
     }
 
 

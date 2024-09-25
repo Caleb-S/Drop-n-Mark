@@ -34,7 +34,8 @@
         "assets/newFolderXLarge.svg",
         "assets/rubbishBinSmall.svg",
         "components/toast.js",
-        "components/floatingBtn.js"
+        "components/floatingBtn.js",
+        "components/bookmarkMenu.js"
       ],
       "matches": ["<all_urls>"]
     }

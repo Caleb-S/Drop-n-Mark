@@ -1,32 +1,45 @@
 let buttonTemplate = document.createElement('template');
-buttonTemplate.innerHTML = `<style>
+buttonTemplate.innerHTML = `
+            <style>
               :host {
-              font-size: 20px;
-              color: black;
-              font-family: arial;
+                font-size: 18px;
+                color: white;
+                font-family: arial;
+                text-align: center;
+                text-overflow: ellipsis;
+                overflow: visible;
+                white-space: nowrap;
               }
 
                dialog {
-                width: auto;
-                max-width: fit-content;
-                height: auto;
-                max-height: fit-content;
-                background-color: #FDBA74;
+                width: 20px;
+                height: 20px;
                 position: fixed;
                 bottom: 20px;
-                z-index: 9999;
-                padding: 10px 20px;
-                border-width: 0px;
-                border-radius: 3px;
+                z-index: 2147483647;
+                padding: 0px;
+                border-radius: 50%;
+                cursor: grab;
+                background-color: #ff7f50f8;
               }
 
+              dialog:hover {
+                width: auto;
+                height: auto;
+                padding: 5px 20px 5px 20px;
+                border-radius: 0;
+                align-items: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              }
             </style>
 
             <dialog open>
-             
-                    <slot></slot>
-               
-            </dialog>`;
+              <slot></slot>
+            </dialog>
+`;
+
 
 
 class FloatButton extends HTMLElement {
@@ -34,10 +47,24 @@ class FloatButton extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
+    this.shadowRoot.appendChild(buttonTemplate.content.cloneNode(true));
   }
+
+  connectedCalleback() {
+    // when text is added to the dom, change state to drag is true 
+    console.log('connected');
+  }
+
+  disconnectedCallback() {
+    // when text is removed from the dom, return to default pos & state
+    console.log('disconnected');
+  }
+
+
+
+
 }
 
-customElements.define('float-button', FloatButton);
+customElements.define('bookmark-float-button', FloatButton);
 
 

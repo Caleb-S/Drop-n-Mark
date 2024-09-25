@@ -1,23 +1,28 @@
 
 // Append scripts for webcomponents
 (function () {
-  var toastScript = document.createElement('script');
+  let toastScript = document.createElement('script');
   toastScript.src = chrome.runtime.getURL('components/toast.js');
   document.head.appendChild(toastScript);
 
-  var floatingBtnScript = document.createElement('script');
+  let floatingBtnScript = document.createElement('script');
   floatingBtnScript.src = chrome.runtime.getURL('components/floatingBtn.js');
   document.head.appendChild(floatingBtnScript);
+
+  let menuScript = document.createElement('script');
+  menuScript.src = chrome.runtime.getURL('components/bookmarkMenu.js');
+  document.head.appendChild(menuScript);
 })();
 
 
 
 // Initialize floating button
-var initialX, initialY, offsetX, offsetY = 0;
-var isFloatBtnActive = false;
-var animationFrameID;
+let initialX, initialY, offsetX, offsetY = 0;
+let isFloatBtnActive = false;
+let animationFrameID;
+/*
 (function () {
-  var floatingButton = document.createElement('div');
+  let floatingButton = document.createElement('div');
   floatingButton.className = 'floating-button-ui5864921';
   document.body.appendChild(floatingButton);
 
@@ -40,11 +45,37 @@ var animationFrameID;
     }
   });
 })();
+*/
+
+(function () {
+  let floatingButton = document.createElement('bookmark-float-button');
+  //floatingButton.className = 'floating-button-ui5864921';
+  document.body.appendChild(floatingButton);
+
+  // window.addEventListener('resize', scaleElementsDynamically);
+  floatingButton.addEventListener('mousedown', handleMouseDown);
+  floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
+
+  floatingButton.addEventListener('mouseover', () => {
+    // floatingButton.classList.add('hover-ui5864921');
+    floatingButton.textContent = truncateText(document.title);
+    //floatingButton.style.borderRadius = '0';
+
+  });
+
+  floatingButton.addEventListener('mouseout', () => {
+    if (!isFloatBtnActive) {
+      resetFloatBtn();
+      //document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
+
+    }
+  });
+})();
 
 
 
 // Initialize bookmark menu 
-var scrollInterval, scrollThresholdPercentage = 0.2;
+let scrollInterval, scrollThresholdPercentage = 0.2;
 (function () {
   generateMenu()
   restrictHighlighting();
@@ -91,7 +122,7 @@ function handleMouseDown(event) {
 
 // adds drag state to float button
 function floatDragState() {
-  var floatingButton = document.querySelector('.floating-button-ui5864921');
+  let floatingButton = document.querySelector('.floating-button-ui5864921');
   isFloatBtnActive = true;
 
   floatingButton.classList.add('hover-ui5864921');
@@ -124,10 +155,10 @@ function handleMouseMove(event) {
   cancelAnimationFrame(animationFrameID);
   animationFrameID = requestAnimationFrame(updateFloatingButtonPosition);
 
-  var folderContainer = document.querySelector('.folder-container-ui5864921');
-  var rect = folderContainer.getBoundingClientRect();
-  var scrollSpeed = 7;
-  var scrollThresholdPixels = rect.height * scrollThresholdPercentage;
+  let folderContainer = document.querySelector('.folder-container-ui5864921');
+  let rect = folderContainer.getBoundingClientRect();
+  let scrollSpeed = 7;
+  let scrollThresholdPixels = rect.height * scrollThresholdPercentage;
   removeHighlight();
 
   if (event.clientY >= rect.bottom - scrollThresholdPixels && event.clientY <= rect.bottom && event.clientX >= rect.left && event.clientX <= rect.right) {
@@ -158,7 +189,7 @@ function floatDropOutside(event) {
 
 // resets float button back to circle state
 function resetFloatBtn() {
-  var floatingButton = document.querySelector('.floating-button-ui5864921');
+  let floatingButton = document.querySelector('.floating-button-ui5864921');
   isFloatBtnActive = false;
   floatingButton.style.cursor = 'grab';
   document.removeEventListener('mousemove', handleMouseMove);
@@ -180,9 +211,9 @@ function resetFloatBtn() {
  * @param {string} toastText - The text to display in the toast message.
  */
 function showToast(toastText) {
-  var toastCreate = document.createElement('bookmark-toast');
+  let toastCreate = document.createElement('bookmark-toast');
 
-  var text = toastText ? toastText : "Null";
+  let text = toastText ? toastText : "Null";
   toastCreate.innerText = text;
 
   document.body.appendChild(toastCreate);
@@ -220,14 +251,14 @@ function generateMenu() {
       const generalBtn = bookmarkMenu.querySelector('.general-btn-ui5864921');
       const newFolderInput = bookmarkMenu.querySelector('.folder-input');
 
-      var imageElement = document.createElement('img');
+      let imageElement = document.createElement('img');
       imageElement.src = chrome.runtime.getURL('assets/newFolderXLarge.svg');
       imageElement.classList.add('extension-img');
       newFolderInput.appendChild(imageElement);
 
       delBox = bookmarkMenu.querySelector('.deleteBox-ui5864921');
 
-      var delBoxImage = document.createElement('img');
+      let delBoxImage = document.createElement('img');
       delBoxImage.src = chrome.runtime.getURL('assets/rubbishBinSmall.svg');
       delBoxImage.classList.add('extension-img');
       delBox.appendChild(delBoxImage);
@@ -259,8 +290,8 @@ function generateMenu() {
           bookmarkMenu.querySelector('.folder-input input').focus();
 
           // Get the input element
-          var input = document.querySelector('.folder-input input');
-          var backDrop = document.querySelector('.backdrop-ui5864921');
+          let input = document.querySelector('.folder-input input');
+          let backDrop = document.querySelector('.backdrop-ui5864921');
 
           input.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
@@ -310,7 +341,7 @@ function generateMenu() {
           return;
         }
 
-        var bookmarks = response.bookmarks;
+        let bookmarks = response.bookmarks;
         updateBookmarkMenu(bookmarks, folderContainer);
       });
 
@@ -345,10 +376,10 @@ function processFolders(bookmarks, parentElement) {
         if (child.children) {
           child.children.forEach(function (mainChild) {
             if (mainChild.children && !mainChild.url && mainChild.title.trim() !== "") {
-              var mainFolderItem = createFolderItem('main-folder-ui5864921', 'main-add-folder-ui5864921', 'main-f-txt-ui5864921', mainChild.title, mainChild.id);
+              let mainFolderItem = createFolderItem('main-folder-ui5864921', 'main-add-folder-ui5864921', 'main-f-txt-ui5864921', mainChild.title, mainChild.id);
 
               // Create an image element
-              var imageElement = document.createElement('img');
+              let imageElement = document.createElement('img');
               imageElement.src = chrome.runtime.getURL('assets/newFolderLarge.svg'); // Replace with the path to your image
               imageElement.style.pointerEvents = 'none';
               imageElement.classList.add('extension-img');
@@ -372,13 +403,13 @@ function processFolders(bookmarks, parentElement) {
               const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
               const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
               const newFolderInput = bookmarkMenu.querySelector('.folder-input');
-              var backDrop = document.querySelector('.backdrop-ui5864921');
+              let backDrop = document.querySelector('.backdrop-ui5864921');
 
 
 
               addBtn.addEventListener('mouseup', function (event) {
                 if (event.target === addBtn) {
-                  var input = document.querySelector('.folder-input input');
+                  let input = document.querySelector('.folder-input input');
 
                   bookmarkGui.style.display = 'none';
                   newFolderInput.style.display = 'flex';
@@ -423,7 +454,7 @@ function processFolders(bookmarks, parentElement) {
 
               mainChild.children.forEach(function (subChild) {
                 if (subChild.children && !subChild.url && subChild.title.trim() !== "") {
-                  var subFolderItem = createFolderItem('sub-folder-ui5864921', 'sub-add-folder-ui5864921', 'sub-f-txt-ui5864921', subChild.title, subChild.id);
+                  let subFolderItem = createFolderItem('sub-folder-ui5864921', 'sub-add-folder-ui5864921', 'sub-f-txt-ui5864921', subChild.title, subChild.id);
 
 
 
@@ -442,9 +473,9 @@ function processFolders(bookmarks, parentElement) {
                   const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
                   const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
                   const newFolderInput = bookmarkMenu.querySelector('.folder-input');
-                  var backDrop = document.querySelector('.backdrop-ui5864921');
+                  let backDrop = document.querySelector('.backdrop-ui5864921');
 
-                  var imageElement = document.createElement('img');
+                  let imageElement = document.createElement('img');
                   imageElement.src = chrome.runtime.getURL('assets/newFolderMedium.svg'); // Replace with the path to your image
                   imageElement.style.pointerEvents = 'none';
                   imageElement.classList.add('extension-img');
@@ -454,7 +485,7 @@ function processFolders(bookmarks, parentElement) {
 
                   addBtn.addEventListener('mouseup', function (event) {
                     if (event.target === addBtn) {
-                      var input = document.querySelector('.folder-input input');
+                      let input = document.querySelector('.folder-input input');
 
                       bookmarkGui.style.display = 'none';
                       newFolderInput.style.display = 'flex';
@@ -504,7 +535,7 @@ function processFolders(bookmarks, parentElement) {
 
                   subChild.children.forEach(function (nestedChild) {
                     if (!nestedChild.url && nestedChild.title.trim() !== "") {
-                      var nestedFolderItem = createFolderItem('nested-folder-ui5864921', 'nested-add-folder-ui5864921', 'nested-f-txt-ui5864921', nestedChild.title, nestedChild.id);
+                      let nestedFolderItem = createFolderItem('nested-folder-ui5864921', 'nested-add-folder-ui5864921', 'nested-f-txt-ui5864921', nestedChild.title, nestedChild.id);
                       nestedFolderItem.addEventListener('mouseup', function (event) {
                         if (event.target === nestedFolderItem) {
                           saveBookmarkToFolder(nestedChild.id);
@@ -536,13 +567,13 @@ function processFolders(bookmarks, parentElement) {
  * @returns {HTMLElement} The created folder item element.
  */
 function createFolderItem(itemClass, addFolderClass, nameClass, title, id) {
-  var folderItem = document.createElement('div');
+  let folderItem = document.createElement('div');
   folderItem.classList.add(itemClass);
 
-  var addFolder = document.createElement('div');
+  let addFolder = document.createElement('div');
   addFolder.classList.add(addFolderClass);
 
-  var folderName = document.createElement('div');
+  let folderName = document.createElement('div');
   folderName.classList.add(nameClass);
   folderName.textContent = title;
 
@@ -577,9 +608,9 @@ function saveBookmarkToFolder(folderId) {
 function printBookmarkTree(bookmarks, prefix = '', indent = '') {
   bookmarks.forEach(function (bookmark, index) {
     if (!bookmark.url) {
-      var folderNumber = prefix + (index + 1);
+      let folderNumber = prefix + (index + 1);
 
-      var childPrefix = folderNumber + '.';
+      let childPrefix = folderNumber + '.';
       printBookmarkTree(bookmark.children, childPrefix, indent + '  ');
     }
   });
@@ -633,8 +664,8 @@ function removeHighlight() {
  * @returns {string} The truncated text.
  */
 function truncateText(text) {
-  var linkextra = 10;
-  var maxLength = 20;
+  let linkextra = 10;
+  let maxLength = 20;
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
@@ -643,6 +674,6 @@ function truncateText(text) {
  * Updates the position of the floating button.
  */
 function updateFloatingButtonPosition() {
-  var floatingButton = document.querySelector('.floating-button-ui5864921');
+  let floatingButton = document.querySelector('.floating-button-ui5864921');
   floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 }

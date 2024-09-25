@@ -1,7 +1,7 @@
 let bookmarkTemplate = document.createElement('template');
 bookmarkTemplate.innerHTML = `<style>
               :host {
-              font-size: 20px;
+              font-size: 18px;
               color: black;
               font-family: arial;
               }

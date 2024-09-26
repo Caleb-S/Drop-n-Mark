@@ -1,17 +1,37 @@
 
+
+/* if (window.trustedTypes && window.trustedTypes.createPolicy) {
+
+  window.trustedTypes.createPolicy('default', {
+  
+  createHTML: string => string,
+  
+  createScriptURL: string => string,
+  
+  createScript: string => string,
+  
+  });
+  
+  }
+  */
+
+
+
 // Append scripts for webcomponents
 (function () {
+  /*
   let toastScript = document.createElement('script');
   toastScript.src = chrome.runtime.getURL('components/toast.js');
   document.head.appendChild(toastScript);
+  */
 
   let floatingBtnScript = document.createElement('script');
   floatingBtnScript.src = chrome.runtime.getURL('components/floatingBtn.js');
   document.head.appendChild(floatingBtnScript);
-
-  let menuScript = document.createElement('script');
-  menuScript.src = chrome.runtime.getURL('components/bookmarkMenu.js');
-  document.head.appendChild(menuScript);
+  /*
+    let menuScript = document.createElement('script');
+    menuScript.src = chrome.runtime.getURL('components/bookmarkMenu.js');
+    document.head.appendChild(menuScript);*/
 })();
 
 

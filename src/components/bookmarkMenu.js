@@ -1,7 +1,66 @@
 var menuTemplate = document.createElement('template');
+
+
+let initialX, initialY, offsetX, offsetY = 0;
+let isFloatBtnActive = false;
+let animationFrameID;
+let scrollInterval, scrollThresholdPercentage = 0.2;
+class BookmarkMenu extends HTMLElement {
+
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.appendChild(menuTemplate.content.cloneNode(true));
+
+        // Event Listeners
+        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+    }
+
+    connectedCallback() {
+        console.log('connected');
+
+    }
+
+    disconnectedCallback() {
+        console.log('disconnected');
+    }
+
+    updateFloatingButtonPosition() {
+        let floatingButton = document.querySelector('.bookmark-float-btn');
+        floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    }
+
+
+    handleMouseMove(event) {
+        offsetX = event.clientX - initialX;
+        offsetY = event.clientY - initialY;
+        cancelAnimationFrame(animationFrameID);
+        animationFrameID = requestAnimationFrame(this.updateFloatingButtonPosition.bind(this));
+
+        let folderContainer = this.shadowRoot.querySelector('.folder-container');
+        let rect = folderContainer.getBoundingClientRect();
+        let scrollSpeed = 7;
+        let scrollThresholdPixels = rect.height * scrollThresholdPercentage;
+        //removeHighlight();
+
+        if (event.clientY >= rect.bottom - scrollThresholdPixels && event.clientY <= rect.bottom && event.clientX >= rect.left && event.clientX <= rect.right) {
+            clearInterval(scrollInterval);
+            scrollInterval = setInterval(() => { folderContainer.scrollTop += scrollSpeed; }, 10);
+        } else if (event.clientY <= rect.top + scrollThresholdPixels && event.clientY >= rect.top && event.clientX >= rect.left && event.clientX <= rect.right) {
+            clearInterval(scrollInterval);
+            scrollInterval = setInterval(() => { folderContainer.scrollTop -= scrollSpeed; }, 10);
+        } else {
+            clearInterval(scrollInterval);
+        }
+    }
+
+
+}
+
 escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
     createHTML: (to_escape) => to_escape
 })
+
 menuTemplate.innerHTML = escapeHTMLPolicy.createHTML(`
     <style>
         :host {
@@ -249,86 +308,5 @@ menuTemplate.innerHTML = escapeHTMLPolicy.createHTML(`
 
  
 `);
-
-let initialX, initialY, offsetX, offsetY = 0;
-let isFloatBtnActive = false;
-let animationFrameID;
-let scrollInterval, scrollThresholdPercentage = 0.2;
-class BookmarkMenu extends HTMLElement {
-
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(menuTemplate.content.cloneNode(true));
-
-        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
-
-
-    }
-
-
-    handleMouseMove(event) {
-
-
-
-
-        offsetX = event.clientX - initialX;
-        offsetY = event.clientY - initialY;
-        cancelAnimationFrame(animationFrameID);
-        animationFrameID = requestAnimationFrame(updateFloatingButtonPosition);
-
-        let folderContainer = this.shadowRoot.querySelector('.folder-container');
-        let rect = folderContainer.getBoundingClientRect();
-        let scrollSpeed = 7;
-        let scrollThresholdPixels = rect.height * scrollThresholdPercentage;
-        //removeHighlight();
-
-        if (event.clientY >= rect.bottom - scrollThresholdPixels && event.clientY <= rect.bottom && event.clientX >= rect.left && event.clientX <= rect.right) {
-            clearInterval(scrollInterval);
-            scrollInterval = setInterval(() => { folderContainer.scrollTop += scrollSpeed; }, 10);
-        } else if (event.clientY <= rect.top + scrollThresholdPixels && event.clientY >= rect.top && event.clientX >= rect.left && event.clientX <= rect.right) {
-            clearInterval(scrollInterval);
-            scrollInterval = setInterval(() => { folderContainer.scrollTop -= scrollSpeed; }, 10);
-        } else {
-            clearInterval(scrollInterval);
-        }
-    }
-
-
-
-    connectedCallback() {
-        // will trigger everytime somthing is added to the dom
-        console.log('connected');
-        var dialog = this.shadowRoot.querySelector(".bookmarkmenu-updated");
-        console.log(dialog);
-        //dialog.showModal();
-        //openCheck(dialog);
-
-    }
-
-    disconnectedCallback() {
-        // will trigger everytime somthing is removed from the dom
-        console.log('disconnected');
-    }
-
-
-
-
-
-
-}
-
-
-function updateFloatingButtonPosition() {
-    /*
-  let floatingButton = document.querySelector('.bookmark-float-btn');
-  floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-  */
-}
-
-
-
-
-
 
 customElements.define('bookmark-menu', BookmarkMenu);

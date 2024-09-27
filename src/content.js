@@ -24,7 +24,7 @@
 
 // test bookmark menu
 
-(function () {
+function addMenu() {
   let testMenu = document.createElement('bookmark-menu');
   testMenu.classList.add('testmenu');
   document.body.appendChild(testMenu);
@@ -32,7 +32,7 @@
 
 
 
-})();
+};
 
 
 
@@ -92,16 +92,24 @@ function handleMouseDown(event) {
   // Send a message to background.js to check if the current page is bookmarked
   chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
     if (response.bookmarked) {
+      //document.querySelector('bookmark-menu').style.display = 'none';
 
       // The current page is bookmarked
+      /*
       document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
       document.querySelector('.bookmarkMenu-updated-ui5864921').style.display = 'none';
       delBox = document.querySelector('.deleteBox-ui5864921');
       delBox.style.display = 'flex';
+      */
     } else {
 
       // The current page is not bookmarked
-      document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
+      addMenu();
+      generateMenu();
+
+      // document.querySelector('bookmark-menu').remove();
+
+      //document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
 
 
     }
@@ -180,9 +188,11 @@ function floatDropOutside(event) {
 
   if (!newFolderBtn.contains(event.target) && !event.target.closest('.main-add-folder-ui5864921') && !event.target.closest('.sub-add-folder-ui5864921')) {
     bookmarkMenu.style.display = 'none';
+    document.querySelector('bookmark-menu').remove();
   }
 
   resetFloatBtn();
+
 }
 
 // resets float button back to circle state

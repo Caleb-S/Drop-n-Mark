@@ -10,6 +10,7 @@ build/
 
 # Ignore any local development configurations
 .env
+.vscode
 
 # Ignore any temporary files
 .DS_Store

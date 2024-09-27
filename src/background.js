@@ -1,3 +1,24 @@
+const devmode = true;
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'getEnvironment') {
+    sendResponse({ devmode: devmode });
+  }
+});
+
+// restart extension
+if (devmode) {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'refreshExtension') {
+      console.log('Received refresh request from content script');
+
+      chrome.runtime.reload();
+
+
+      sendResponse({ result: 'Extension refresh initiated' });
+    }
+
+  });
+}
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "getAllBookmarks") {

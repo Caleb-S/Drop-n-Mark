@@ -1,6 +1,5 @@
+
 // Append scripts for webcomponents
-
-
 (function () {
   function loadScript(scriptSrc) {
     const script = document.createElement('script');
@@ -15,12 +14,24 @@
   }
 
   const toastScriptSrc = chrome.runtime.getURL('src/components/dist/toast.js');
-  const floatingBtnScriptSrc = chrome.runtime.getURL('src/components/dist/floatingBtn.js');
-  const menuScriptSrc = chrome.runtime.getURL('src/components/dist/bookmarkMenu.js');
+  const floatingBtnScriptSrc = chrome.runtime.getURL('src/components/floatingBtn.js');
+  const menuScriptSrc = chrome.runtime.getURL('src/components/bookmarkMenu.js');
 
   loadScript(toastScriptSrc);
   loadScript(floatingBtnScriptSrc);
   loadScript(menuScriptSrc);
+})();
+
+// test bookmark menu
+
+(function () {
+  let testMenu = document.createElement('bookmark-menu');
+  testMenu.classList.add('testmenu');
+  document.body.appendChild(testMenu);
+  //testMenu.classList.add('bookmark-float-btn');
+
+
+
 })();
 
 
@@ -34,6 +45,8 @@ let animationFrameID;
 (function () {
   let floatingButton = document.createElement('bookmark-float-button');
   //floatingButton.className = 'floating-button-ui5864921';
+
+
   document.body.appendChild(floatingButton);
 
   // window.addEventListener('resize', scaleElementsDynamically);
@@ -69,6 +82,7 @@ let scrollInterval, scrollThresholdPercentage = 0.2;
 })();
 
 
+
 /**
  * Handles the mouse down event on the floating button.
  *
@@ -78,12 +92,14 @@ function handleMouseDown(event) {
   // Send a message to background.js to check if the current page is bookmarked
   chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
     if (response.bookmarked) {
+
       // The current page is bookmarked
       document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
       document.querySelector('.bookmarkMenu-updated-ui5864921').style.display = 'none';
       delBox = document.querySelector('.deleteBox-ui5864921');
       delBox.style.display = 'flex';
     } else {
+
       // The current page is not bookmarked
       document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
 
@@ -348,7 +364,8 @@ function generateMenu() {
 // Function to update the bookmark menu
 function updateBookmarkMenu(bookmarks, folderContainer) {
   printBookmarkTree(bookmarks);
-  processFolders(bookmarks, folderContainer);
+  let testMenu = document.querySelector('.testmenu');
+  processFolders(bookmarks, testMenu);
 }
 
 /**
@@ -439,6 +456,12 @@ function processFolders(bookmarks, parentElement) {
 
                 }
               });
+
+
+              let testMenu = document.querySelector('.testmenu');
+              console.log('testmenu: ', testMenu);
+
+              testMenu.appendChild(mainFolderItem);
 
 
               parentElement.appendChild(mainFolderItem);

@@ -1,17 +1,10 @@
 let buttonTemplate = document.createElement('template');
-let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
   createHTML: (to_escape) => to_escape
 })
 buttonTemplate.innerHTML = escapeHTMLPolicy.createHTML(`
             <style>
-              :host {
-                font-size: 18px !important;
-                color: white !important;
-                font-family: arial !important;
-                text-align: center !important;
-                text-overflow: ellipsis !important;
-                overflow: visible !important;
-                white-space: nowrap !important;
+              :host { 
                 z-index: 2147483647 !important;
                 position: fixed !important;
                 bottom: 20px !important;
@@ -21,50 +14,39 @@ buttonTemplate.innerHTML = escapeHTMLPolicy.createHTML(`
               }
 
                button {
-            
-          
                 width: 20px;
                 height: 20px;
-       
-                align-items: center;
+                padding: 0px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                
-               
-            
-                padding: 0px;
                 border-radius: 50%;
-                border-width: 0px;
-                cursor: grab;
-                background-color: #ff7f50f8;
-                user-select: none; 
-                
-                      
+                border-width: 0px; 
+                font-size: 0px;
+                overflow: hidden;
+                background-color: #ff7f50f8;   
               }
 
-              button:hover {
+              button:hover, button:active {
                 width: auto;
                 max-width: fit-content;
                 height: auto;
                 padding: 10px 20px 10px 20px;
                 border-radius: 3px;
+                box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.2);
+                white-space: nowrap;
+                overflow: visible;
+                color: #f7f4ee;
+                font-size: 16px;
+                text-align: center;
+                text-overflow: ellipsis;
                 user-select: none;
-                
-               
-              }
-
-               button:active {
-                cursor: grabbing !important;
-                   box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.2);
-               
-                width: auto;
-                max-width: fit-content;
-                height: auto;
-                padding: 10px 20px 10px 20px;
-                border-radius: 3px;
+                cursor: grab;
                 user-select: none; 
+              }
                 
+              button:active {
+                cursor: grabbing;
               }
             </style>
 

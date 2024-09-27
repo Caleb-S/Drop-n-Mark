@@ -1,13 +1,13 @@
 
 
 let bookmarkTemplate = document.createElement('template');
-let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
   createHTML: (to_escape) => to_escape
 })
 bookmarkTemplate.innerHTML = escapeHTMLPolicy.createHTML(`<style>
               :host {
               font-size: 18px;
-              font-family: arial;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
               }
 
                .toast-dialog {

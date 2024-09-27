@@ -11,6 +11,29 @@ For additinal robustness, add unique id's at end of each class
 Extension drop-down menu 
 ------------------------*/
 
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v207/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2) format('woff2');
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 
 
 /*--------------- 
@@ -112,7 +135,7 @@ bookmarkmenu.html CSS
   height: 10%;
   width: 100%;
   min-height: 10%;
-  cursor: pointer;
+  /* cursor: pointer; */
   min-width: 100%;
   background-color: #484952;
   flex-direction: column;
@@ -128,7 +151,7 @@ bookmarkmenu.html CSS
 
 .new-btn-txt-ui5864921 {
   pointer-events: none;
-  cursor: pointer;
+  /* cursor: pointer; */
   color: #fff;
   text-align: center;
   font-size: 26px !important;
@@ -142,7 +165,7 @@ bookmarkmenu.html CSS
 }
 
 .new-folder-btn-ui5864921:hover {
-  cursor: pointer;
+  /* cursor: pointer; */
   box-shadow: none;
   background-color: #FF7F50;
   color: white;
@@ -182,7 +205,7 @@ bookmarkmenu.html CSS
 .general-btn-txt-ui5864921 {
 
   pointer-events: none;
-  cursor: pointer;
+  /* cursor: pointer; */
   color: #fff;
   text-align: center;
   font-size: 28px !important;
@@ -197,7 +220,7 @@ bookmarkmenu.html CSS
 
 .general-sub-txt-ui5864921 {
   pointer-events: none;
-  cursor: pointer;
+  /* cursor: pointer; */
   color: #fff;
   font-size: 12px !important;
   width: auto;
@@ -226,7 +249,7 @@ bookmarkmenu.html CSS
 }
 
 .main-folder-ui5864921 {
-  cursor: pointer;
+  /* cursor: pointer; */
   width: 90%;
   min-height: 60px;
   background-color: #ffffff;
@@ -281,7 +304,7 @@ bookmarkmenu.html CSS
 
 .main-f-txt-ui5864921 {
   pointer-events: none;
-  cursor: pointer;
+  /* cursor: pointer; */
   color: #585B62;
   text-align: center;
   font-size: 23px;
@@ -306,7 +329,7 @@ bookmarkmenu.html CSS
 }
 
 .sub-folder-ui5864921 {
-  cursor: pointer;
+  /* cursor: pointer; */
   width: 85%;
   min-height: 50px;
   background-color: #fdba74;
@@ -356,7 +379,7 @@ bookmarkmenu.html CSS
 
 .sub-f-txt-ui5864921 {
   pointer-events: none;
-  cursor: pointer;
+  /* cursor: pointer; */
   color: #57534e;
   text-align: center;
   font-size: 20px;
@@ -381,7 +404,7 @@ bookmarkmenu.html CSS
 }
 
 .nested-folder-ui5864921 {
-  cursor: pointer;
+  /* cursor: pointer; */
   /* width: 80%; */
   width: 70%;
   min-height: 40px;
@@ -429,7 +452,7 @@ bookmarkmenu.html CSS
 
 .nested-f-txt-ui5864921 {
   pointer-events: none;
-  cursor: pointer;
+  /* cursor: pointer; */
   color: #57534e;
   text-align: center;
   font-size: 17px;
@@ -528,6 +551,7 @@ bookmarkmenu.html CSS
     filter: none !important;
     pointer-events: none;
   }
+  
 
   .deleteBox-ui5864921 {
     z-index: 2147483546;

@@ -3,7 +3,7 @@
   "name": "DropNMark",
   "version": "0.1.2",
   "description": "Bookmark Extension",
-  "permissions": ["activeTab", "bookmarks"],
+  "permissions": ["activeTab", "bookmarks", "tabs"],
   "action": {
     "default_popup": "src/html/popup.html",
     "default_icon": {
@@ -19,7 +19,7 @@
   "content_scripts": [
    {
       "matches": ["<all_urls>"],
-      "js": ["src/content.js"],
+      "js": ["src/content.js", "src/devmode.js"],
       "css": ["src/html/styles/style.css"],
       "run_at": "document_end"
     }
@@ -36,7 +36,11 @@
         "src/assets/rubbishBinSmall.svg",
         "src/components/dist/floatingBtn.js",
         "src/components/dist/bookmarkMenu.js",
-        "src/components/dist/toast.js"
+        "src/components/dist/toast.js",
+        "src/components/bookmarkMenu.js",
+        "src/components/toast.js",
+        "src/components/floatingBtn.js",
+        "src/assets/create_new_folder_google-font.svg"
       ],
       "matches": ["<all_urls>"]
     }

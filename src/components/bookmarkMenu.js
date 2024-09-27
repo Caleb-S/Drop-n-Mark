@@ -1,5 +1,8 @@
 let menuTemplate = document.createElement('template');
-menuTemplate.innerHTML = `<style>
+let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+    createHTML: (to_escape) => to_escape
+})
+menuTemplate.innerHTML = escapeHTMLPolicy.createHTML(`<style>
               :host {
               font-size: 20px;
               color: black;
@@ -26,7 +29,7 @@ menuTemplate.innerHTML = `<style>
              
                     <slot></slot>
                
-            </dialog>`;
+            </dialog>`);
 
 
 class BookmarkMenu extends HTMLElement {

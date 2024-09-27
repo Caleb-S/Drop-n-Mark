@@ -14,9 +14,9 @@
     document.head.appendChild(script);
   }
 
-  const toastScriptSrc = chrome.runtime.getURL('src/components/toast.js');
-  const floatingBtnScriptSrc = chrome.runtime.getURL('src/components/floatingBtn.js');
-  const menuScriptSrc = chrome.runtime.getURL('src/components/bookmarkMenu.js');
+  const toastScriptSrc = chrome.runtime.getURL('src/components/dist/toast.js');
+  const floatingBtnScriptSrc = chrome.runtime.getURL('src/components/dist/floatingBtn.js');
+  const menuScriptSrc = chrome.runtime.getURL('src/components/dist/bookmarkMenu.js');
 
   loadScript(toastScriptSrc);
   loadScript(floatingBtnScriptSrc);

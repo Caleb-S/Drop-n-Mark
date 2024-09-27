@@ -34,9 +34,9 @@
         "src/assets/newFolderMedium.svg",
         "src/assets/newFolderXLarge.svg",
         "src/assets/rubbishBinSmall.svg",
-        "src/components/toast.js",
-        "src/components/floatingBtn.js",
-        "src/components/bookmarkMenu.js"
+        "src/components/dist/floatingBtn.js",
+        "src/components/dist/bookmarkMenu.js",
+        "src/components/dist/toast.js"
       ],
       "matches": ["<all_urls>"]
     }

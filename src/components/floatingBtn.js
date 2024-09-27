@@ -1,11 +1,9 @@
 let buttonTemplate = document.createElement('template');
-escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
   createHTML: (to_escape) => to_escape
 })
 buttonTemplate.innerHTML = escapeHTMLPolicy.createHTML(`
             <style>
-          
-
               :host {
                 font-size: 18px !important;
                 color: white !important;

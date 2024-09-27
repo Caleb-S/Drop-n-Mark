@@ -1,7 +1,10 @@
 
 
 let bookmarkTemplate = document.createElement('template');
-bookmarkTemplate.innerHTML = `<style>
+let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+  createHTML: (to_escape) => to_escape
+})
+bookmarkTemplate.innerHTML = escapeHTMLPolicy.createHTML(`<style>
               :host {
               font-size: 18px;
               font-family: arial;
@@ -28,7 +31,7 @@ bookmarkTemplate.innerHTML = `<style>
              
                     <slot></slot>
                
-            </dialog>`;
+            </dialog>`);
 
 
 class BookmarkToast extends HTMLElement {

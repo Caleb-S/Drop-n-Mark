@@ -1,0 +1,20 @@
+{
+    "sourceRoot": "src/components",
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "chrome": "67"
+          },
+          "useBuiltIns": false,
+          "forceAllTransforms": true
+        }
+      ]
+    ],
+    "minified": true,
+     "only": ["src/components"],
+    "assumptions": {
+        "superIsCallableConstructor": true
+      }
+  }

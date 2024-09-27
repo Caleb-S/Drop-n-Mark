@@ -14,9 +14,9 @@
     document.head.appendChild(script);
   }
 
-  const toastScriptSrc = chrome.runtime.getURL('components/toast.js');
-  const floatingBtnScriptSrc = chrome.runtime.getURL('components/floatingBtn.js');
-  const menuScriptSrc = chrome.runtime.getURL('components/bookmarkMenu.js');
+  const toastScriptSrc = chrome.runtime.getURL('src/components/toast.js');
+  const floatingBtnScriptSrc = chrome.runtime.getURL('src/components/floatingBtn.js');
+  const menuScriptSrc = chrome.runtime.getURL('src/components/bookmarkMenu.js');
 
   loadScript(toastScriptSrc);
   loadScript(floatingBtnScriptSrc);
@@ -227,7 +227,7 @@ function generateMenu() {
   }
 
   // Fetch the bookmark menu HTML
-  fetch(chrome.runtime.getURL('bookmarkmenu.html'))
+  fetch(chrome.runtime.getURL('src/html/bookmarkmenu.html'))
     .then(response => response.text())
     .then(html => {
       // Create a bookmark menu element from the fetched HTML
@@ -243,14 +243,14 @@ function generateMenu() {
       const newFolderInput = bookmarkMenu.querySelector('.folder-input');
 
       let imageElement = document.createElement('img');
-      imageElement.src = chrome.runtime.getURL('assets/newFolderXLarge.svg');
+      imageElement.src = chrome.runtime.getURL('src/assets/newFolderXLarge.svg');
       imageElement.classList.add('extension-img');
       newFolderInput.appendChild(imageElement);
 
       delBox = bookmarkMenu.querySelector('.deleteBox-ui5864921');
 
       let delBoxImage = document.createElement('img');
-      delBoxImage.src = chrome.runtime.getURL('assets/rubbishBinSmall.svg');
+      delBoxImage.src = chrome.runtime.getURL('src/assets/rubbishBinSmall.svg');
       delBoxImage.classList.add('extension-img');
       delBox.appendChild(delBoxImage);
 
@@ -371,7 +371,7 @@ function processFolders(bookmarks, parentElement) {
 
               // Create an image element
               let imageElement = document.createElement('img');
-              imageElement.src = chrome.runtime.getURL('assets/newFolderLarge.svg'); // Replace with the path to your image
+              imageElement.src = chrome.runtime.getURL('src/assets/newFolderLarge.svg'); // Replace with the path to your image
               imageElement.style.pointerEvents = 'none';
               imageElement.classList.add('extension-img');
 
@@ -467,7 +467,7 @@ function processFolders(bookmarks, parentElement) {
                   let backDrop = document.querySelector('.backdrop-ui5864921');
 
                   let imageElement = document.createElement('img');
-                  imageElement.src = chrome.runtime.getURL('assets/newFolderMedium.svg'); // Replace with the path to your image
+                  imageElement.src = chrome.runtime.getURL('src/assets/newFolderMedium.svg'); // Replace with the path to your image
                   imageElement.style.pointerEvents = 'none';
                   imageElement.classList.add('extension-img');
                   addBtn.appendChild(imageElement);

@@ -5,43 +5,38 @@
   "description": "Bookmark Extension",
   "permissions": ["activeTab", "bookmarks"],
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/html/popup.html",
     "default_icon": {
-      "16": "assets/icon16.png",
-      "32": "assets/icon32.png",
-      "48": "assets/icon48.png",
-      "128": "assets/icon128.png"
+      "16": "src/assets/icon16.png",
+      "32": "src/assets/icon32.png",
+      "48": "src/assets/icon48.png",
+      "128": "src/assets/icon128.png"
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background.js"
   },
   "content_scripts": [
    {
       "matches": ["<all_urls>"],
-      "js": [
-        "content.js", 
-        "components/toast.js",
-        "components/floatingBtn.js",
-        "components/bookmarkMenu.js"],
-      "css": ["style.css"],
-      "run_at": "document_end",
-      "all_frames": true
+      "js": ["src/content.js"],
+      "css": ["src/html/styles/style.css"],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
     {
       "resources": [
-        "style.css", 
-        "bookmarkmenu.html", 
-        "content.js", 
-        "assets/newFolderLarge.svg", 
-        "assets/newFolderMedium.svg",
-        "assets/newFolderXLarge.svg",
-        "assets/rubbishBinSmall.svg",
-        "components/toast.js",
-        "components/floatingBtn.js",
-        "components/bookmarkMenu.js"
+        "src/html/styles/style.css", 
+        "src/html/bookmarkmenu.html", 
+        "src/content.js", 
+        "src/assets/newFolderLarge.svg", 
+        "src/assets/newFolderMedium.svg",
+        "src/assets/newFolderXLarge.svg",
+        "src/assets/rubbishBinSmall.svg",
+        "src/components/toast.js",
+        "src/components/floatingBtn.js",
+        "src/components/bookmarkMenu.js"
       ],
       "matches": ["<all_urls>"]
     }

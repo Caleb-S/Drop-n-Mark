@@ -4,16 +4,16 @@ let bookmarkTemplate = document.createElement('template');
 bookmarkTemplate.innerHTML = `<style>
               :host {
               font-size: 18px;
-              color: black;
               font-family: arial;
               }
 
-               dialog {
+               .toast-dialog {
                 width: auto;
                 max-width: fit-content;
                 height: auto;
                 max-height: fit-content;
                 background-color: #FDBA74;
+                 color: black;
                 position: fixed;
                 bottom: 20px;
                 z-index: 9999;
@@ -24,7 +24,7 @@ bookmarkTemplate.innerHTML = `<style>
 
             </style>
 
-            <dialog open>
+            <dialog open class="toast-dialog">
              
                     <slot></slot>
                
@@ -33,11 +33,11 @@ bookmarkTemplate.innerHTML = `<style>
 
 class BookmarkToast extends HTMLElement {
 
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
-    }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
+  }
 }
 
 customElements.define('bookmark-toast', BookmarkToast);

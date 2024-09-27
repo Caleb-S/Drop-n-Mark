@@ -1,38 +1,28 @@
-
-
-/* if (window.trustedTypes && window.trustedTypes.createPolicy) {
-
-  window.trustedTypes.createPolicy('default', {
-  
-  createHTML: string => string,
-  
-  createScriptURL: string => string,
-  
-  createScript: string => string,
-  
-  });
-  
-  }
-  */
-
-
-
 // Append scripts for webcomponents
-(function () {
-  /*
-  let toastScript = document.createElement('script');
-  toastScript.src = chrome.runtime.getURL('components/toast.js');
-  document.head.appendChild(toastScript);
-  */
 
-  let floatingBtnScript = document.createElement('script');
-  floatingBtnScript.src = chrome.runtime.getURL('components/floatingBtn.js');
-  document.head.appendChild(floatingBtnScript);
-  /*
-    let menuScript = document.createElement('script');
-    menuScript.src = chrome.runtime.getURL('components/bookmarkMenu.js');
-    document.head.appendChild(menuScript);*/
+
+(function () {
+  function loadScript(scriptSrc) {
+    const script = document.createElement('script');
+    script.src = scriptSrc;
+
+    script.onerror = () => {
+      console.warn(`Error loading script: ${scriptSrc}`);
+
+    };
+
+    document.head.appendChild(script);
+  }
+
+  const toastScriptSrc = chrome.runtime.getURL('components/toast.js');
+  const floatingBtnScriptSrc = chrome.runtime.getURL('components/floatingBtn.js');
+  const menuScriptSrc = chrome.runtime.getURL('components/bookmarkMenu.js');
+
+  loadScript(toastScriptSrc);
+  loadScript(floatingBtnScriptSrc);
+  loadScript(menuScriptSrc);
 })();
+
 
 
 
@@ -40,32 +30,6 @@
 let initialX, initialY, offsetX, offsetY = 0;
 let isFloatBtnActive = false;
 let animationFrameID;
-/*
-(function () {
-  let floatingButton = document.createElement('div');
-  floatingButton.className = 'floating-button-ui5864921';
-  document.body.appendChild(floatingButton);
-
-  // window.addEventListener('resize', scaleElementsDynamically);
-  floatingButton.addEventListener('mousedown', handleMouseDown);
-  floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
-
-  floatingButton.addEventListener('mouseover', () => {
-    floatingButton.classList.add('hover-ui5864921');
-    floatingButton.textContent = truncateText(document.title);
-    floatingButton.style.borderRadius = '0';
-
-  });
-
-  floatingButton.addEventListener('mouseout', () => {
-    if (!isFloatBtnActive) {
-      resetFloatBtn();
-      //document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
-
-    }
-  });
-})();
-*/
 
 (function () {
   let floatingButton = document.createElement('bookmark-float-button');
@@ -78,25 +42,13 @@ let animationFrameID;
   //floatingButton.addEventListener('click', () => console.log('Floating button clicked!'));
 
   floatingButton.addEventListener('mouseover', () => {
-    // floatingButton.classList.add('hover-ui5864921');
-    //floatingButton.style.borderRadius = '0';
-
-    /*
-    let ptag = document.createElement('p');
-    ptag.classList.add('ptag');
-    ptag.innerText = document.title;
-    floatingButton.appendChild(ptag);
-    */
-
     floatingButton.textContent = truncateText(document.title);
 
   });
 
   floatingButton.addEventListener('mouseout', () => {
     if (!isFloatBtnActive) {
-
       resetFloatBtn();
-      //document.getElementById('bookmarkMenu-ui5864921').style.display = 'none';
 
     }
   });

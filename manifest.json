@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "ezbookmark",
-  "version": "0.0.0.1",
+  "name": "DropNMark",
+  "version": "0.1.2",
   "description": "Bookmark Extension",
   "permissions": ["activeTab", "bookmarks"],
   "action": {
@@ -19,8 +19,14 @@
   "content_scripts": [
    {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["style.css"]
+      "js": [
+        "content.js", 
+        "components/toast.js",
+        "components/floatingBtn.js",
+        "components/bookmarkMenu.js"],
+      "css": ["style.css"],
+      "run_at": "document_end",
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [

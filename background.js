@@ -1,29 +1,30 @@
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action === "getAllBookmarks") {
-      chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
-        sendResponse({ bookmarks: bookmarkTreeNodes });
-      });
-      return true;
-    }
-  });
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.action === "getAllBookmarks") {
+    chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
+      sendResponse({ bookmarks: bookmarkTreeNodes });
+    });
+    return true;
+  }
+});
 
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "saveCurrentPageToBookmark") {
     var parentFolderId = request.parentFolderId;
     var currentPageUrl = request.currentPageUrl;
     var currentPageTitle = request.currentPageTitle;
-    
-    
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      var currentPage = tabs[0];
-      
 
-      chrome.bookmarks.create({ 
-        url: currentPageUrl, 
+
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      var currentPage = tabs[0];
+
+
+      chrome.bookmarks.create({
+        url: currentPageUrl,
         title: currentPageTitle,
         parentId: parentFolderId // Use the provided parent folder ID
-      }, function(bookmark) {
+      }, function (bookmark) {
         sendResponse({ success: true, bookmark: bookmark });
       });
     });
@@ -51,7 +52,7 @@ function deleteDuplicateBookmarks() {
     // Traverse through all folders recursively
     traverseFolders(rootFolder, uniqueURLsByFolder);
   });
-  
+
 }
 
 // Recursive function to traverse through folders and delete duplicate bookmarks
@@ -138,7 +139,7 @@ chrome.bookmarks.onChanged.addListener(handleBookmarksUpdated);
 
 function updateButton() {
   // Send a message to the background script to update the button
-  chrome.runtime.sendMessage({ action: "updateButton" }, function(response) {
+  chrome.runtime.sendMessage({ action: "updateButton" }, function (response) {
     if (chrome.runtime.lastError) {
       // Handle error, if any
       console.error(chrome.runtime.lastError);
@@ -150,16 +151,16 @@ function updateButton() {
 }
 
 
-chrome.action.onClicked.addListener(function(tab) {
+chrome.action.onClicked.addListener(function (tab) {
   updateButton();
 });
 
 // Listen for messages from the content script or other parts of the extension
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "countDuplicates") {
     // Perform the logic to count duplicates
 
-    chrome.bookmarks.getTree(function(bookmarkTree) {
+    chrome.bookmarks.getTree(function (bookmarkTree) {
       console.log("counting");
       const rootFolder = bookmarkTree[0];
       const uniqueURLsByFolder = {};
@@ -207,11 +208,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 */
 
 // Add event listener for "keydown" event in the content script
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === 'createFolder') {
     const folderName = request.folderName.trim(); // Get the folder name from the message and remove leading/trailing whitespace
     const parentFolderId = request.parentFolderId;
-    console.log('test | parent folder: ',parentFolderId);
+    console.log('test | parent folder: ', parentFolderId);
     if (folderName !== '') {
 
       if (typeof parentFolderId !== 'undefined') {
@@ -228,20 +229,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
       } else {
         console.log('test | Wrong Path');
-        chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
+        chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
           const bookmarksBarFolder = bookmarkTreeNodes[0].children[0];
-  
+
           if (bookmarksBarFolder) {
             // Get the first child of the "Bookmarks Bar" folder
             const firstChild = bookmarksBarFolder.children[0];
-  
+
             // Create a new folder in the "Bookmarks Bar" folder at the top
             chrome.bookmarks.create({ parentId: bookmarksBarFolder.id, index: firstChild ? firstChild.index : 0, title: folderName }, function (newFolder) {
               console.log('New folder created:', newFolder);
-  
+
               // Set the folderId variable to the ID of the newly created folder
               folderId = newFolder.id;
-  
+
               // Send the folderId back to the content script
               sendResponse({ folderId: folderId });
             });
@@ -250,18 +251,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
       }
       // Get the "Bookmarks Bar" folder
-      
+
     }
   }
 
   return true;
 });
-  
+
 // Listen for messages from content.js
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "checkBookmark") {
     // Check if the current page is bookmarked
-    chrome.bookmarks.search({ url: sender.tab.url }, function(bookmarks) {
+    chrome.bookmarks.search({ url: sender.tab.url }, function (bookmarks) {
       // Send a response back to content.js
       sendResponse({ bookmarked: bookmarks.length > 0 });
     });
@@ -272,13 +273,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "deleteBookmark") {
-    chrome.bookmarks.search({ url: sender.tab.url }, function(bookmarks) {
+    chrome.bookmarks.search({ url: sender.tab.url }, function (bookmarks) {
       if (bookmarks.length > 0) {
         var bookmarkId = bookmarks[0].id;
 
-        chrome.bookmarks.getSubTree("0", function(treeNodes) {
+        chrome.bookmarks.getSubTree("0", function (treeNodes) {
           var foldersToDeleteFrom = [];
 
           // Recursive function to find all folders that contain the bookmark
@@ -303,8 +304,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
           findFolders(treeNodes);
 
           // Delete bookmark from all folders
-          foldersToDeleteFrom.forEach(function(folderId) {
-            chrome.bookmarks.remove(bookmarkId, function() {
+          foldersToDeleteFrom.forEach(function (folderId) {
+            chrome.bookmarks.remove(bookmarkId, function () {
               console.log("Bookmark deleted from folder with ID:", folderId);
             });
           });

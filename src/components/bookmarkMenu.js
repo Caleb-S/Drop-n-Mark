@@ -1,62 +1,5 @@
 var menuTemplate = document.createElement('template');
 
-
-let initialX, initialY, offsetX, offsetY = 0;
-let isFloatBtnActive = false;
-let animationFrameID;
-let scrollInterval, scrollThresholdPercentage = 0.2;
-class BookmarkMenu extends HTMLElement {
-
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(menuTemplate.content.cloneNode(true));
-
-        // Event Listeners
-        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
-    }
-
-    connectedCallback() {
-        console.log('connected');
-
-    }
-
-    disconnectedCallback() {
-        console.log('disconnected');
-    }
-
-    updateFloatingButtonPosition() {
-        let floatingButton = document.querySelector('.bookmark-float-btn');
-        floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-    }
-
-
-    handleMouseMove(event) {
-        offsetX = event.clientX - initialX;
-        offsetY = event.clientY - initialY;
-        cancelAnimationFrame(animationFrameID);
-        animationFrameID = requestAnimationFrame(this.updateFloatingButtonPosition.bind(this));
-
-        let folderContainer = this.shadowRoot.querySelector('.folder-container');
-        let rect = folderContainer.getBoundingClientRect();
-        let scrollSpeed = 7;
-        let scrollThresholdPixels = rect.height * scrollThresholdPercentage;
-        //removeHighlight();
-
-        if (event.clientY >= rect.bottom - scrollThresholdPixels && event.clientY <= rect.bottom && event.clientX >= rect.left && event.clientX <= rect.right) {
-            clearInterval(scrollInterval);
-            scrollInterval = setInterval(() => { folderContainer.scrollTop += scrollSpeed; }, 10);
-        } else if (event.clientY <= rect.top + scrollThresholdPixels && event.clientY >= rect.top && event.clientX >= rect.left && event.clientX <= rect.right) {
-            clearInterval(scrollInterval);
-            scrollInterval = setInterval(() => { folderContainer.scrollTop -= scrollSpeed; }, 10);
-        } else {
-            clearInterval(scrollInterval);
-        }
-    }
-
-
-}
-
 escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
     createHTML: (to_escape) => to_escape
 })
@@ -308,5 +251,106 @@ menuTemplate.innerHTML = escapeHTMLPolicy.createHTML(`
 
  
 `);
+
+
+class BookmarkMenu extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.appendChild(menuTemplate.content.cloneNode(true));
+
+        // Event Listeners
+
+    }
+
+    initialX;
+    initialY;
+    offsetX = 0;
+    offsetY = 0;
+    isFloatBtnActive = false;
+    animationFrameID;
+    lscrollInterval;
+    scrollThresholdPercentage = 0.2;
+    scrollInterval;
+    scrollThresholdPercentage = 0.2;
+
+    connectedCallback() {
+        console.log('connected');
+        this.restrictHighlighting.bind(this);
+        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
+    }
+
+    disconnectedCallback() {
+        console.log('disconnected');
+        this.shadowRoot.removeEventListener('mousemove', this.handleMouseMove.bind(this));
+    }
+
+    updateFloatingButtonPosition() {
+        let floatingButton = document.querySelector('.bookmark-float-btn');
+        floatingButton.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px)`;
+        console.log(`translate(${this.offsetX}px, ${this.offsetY}px)`);
+    }
+
+    removeHighlight() {
+        if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        } else if (document.selection) {
+            document.selection.empty();
+        }
+    }
+
+    restrictHighlighting() {
+        const menuItems = this.shadowRoot.querySelectorAll('.bookmarkMenu-updated, .new-folder-btn, .new-btn-txt, .folder-container, .general-btn, .general-sub-txt, .bookmark-float-btn, .hover, .bookmark-float-btn.hover');
+
+        menuItems.forEach(item => {
+            item.addEventListener('contextmenu', event => {
+                event.preventDefault();
+            });
+
+            item.addEventListener('selectstart', event => {
+                event.preventDefault();
+            });
+
+            item.addEventListener('mousedown', event => {
+                if (event.button === 2) {
+                    event.preventDefault();
+                }
+            });
+
+            item.draggable = false;
+        });
+
+
+    }
+
+    handleMouseMove(event) {
+        this.offsetX = event.clientX - this.initialX;
+        this.offsetY = event.clientY - this.initialY;
+        console.log(this.offsetX, this.offsetY);
+        cancelAnimationFrame(this.animationFrameID);
+        this.animationFrameID = requestAnimationFrame(this.updateFloatingButtonPosition.bind(this));
+
+        let folderContainer = this.shadowRoot.querySelector('.folder-container');
+        let rect = folderContainer.getBoundingClientRect();
+        let scrollSpeed = 7;
+        let scrollThresholdPixels = rect.height * this.scrollThresholdPercentage;
+        this.removeHighlight();
+
+        if (event.clientY >= rect.bottom - scrollThresholdPixels && event.clientY <= rect.bottom && event.clientX >= rect.left && event.clientX <= rect.right) {
+            clearInterval(this.scrollInterval);
+            this.scrollInterval = setInterval(() => { folderContainer.scrollTop += scrollSpeed; }, 10);
+        } else if (event.clientY <= rect.top + scrollThresholdPixels && event.clientY >= rect.top && event.clientX >= rect.left && event.clientX <= rect.right) {
+            clearInterval(this.scrollInterval);
+            this.scrollInterval = setInterval(() => { folderContainer.scrollTop -= scrollSpeed; }, 10);
+        } else {
+            clearInterval(this.scrollInterval);
+        }
+    }
+
+
+}
+
+
 
 customElements.define('bookmark-menu', BookmarkMenu);

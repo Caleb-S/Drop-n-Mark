@@ -136,7 +136,7 @@ function floatDragState() {
   floatingButton.addEventListener('contextmenu', event => event.preventDefault());
   floatingButton.addEventListener('selectstart', event => event.preventDefault());
   floatingButton.addEventListener('mousedown', event => event.preventDefault());
-  document.addEventListener('mousemove', handleMouseMove);
+  //document.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', floatDropOutside);
 
   floatingButton.textContent.draggable = false;
@@ -149,34 +149,6 @@ function floatDragState() {
   //handleMouseDown();
 }
 
-
-/**
- * Handles the mouse move event.
- *
- * @param {MouseEvent} event - The mouse event object.
- */
-function handleMouseMove(event) {
-  offsetX = event.clientX - initialX;
-  offsetY = event.clientY - initialY;
-  cancelAnimationFrame(animationFrameID);
-  animationFrameID = requestAnimationFrame(updateFloatingButtonPosition);
-
-  let folderContainer = document.querySelector('.folder-container-ui5864921');
-  let rect = folderContainer.getBoundingClientRect();
-  let scrollSpeed = 7;
-  let scrollThresholdPixels = rect.height * scrollThresholdPercentage;
-  removeHighlight();
-
-  if (event.clientY >= rect.bottom - scrollThresholdPixels && event.clientY <= rect.bottom && event.clientX >= rect.left && event.clientX <= rect.right) {
-    clearInterval(scrollInterval);
-    scrollInterval = setInterval(() => { folderContainer.scrollTop += scrollSpeed; }, 10);
-  } else if (event.clientY <= rect.top + scrollThresholdPixels && event.clientY >= rect.top && event.clientX >= rect.left && event.clientX <= rect.right) {
-    clearInterval(scrollInterval);
-    scrollInterval = setInterval(() => { folderContainer.scrollTop -= scrollSpeed; }, 10);
-  } else {
-    clearInterval(scrollInterval);
-  }
-}
 
 /*
  Hides bookmark menu when mouse is released outside of the bookmark menu.
@@ -200,7 +172,7 @@ function resetFloatBtn() {
   let floatingButton = document.querySelector('.bookmark-float-btn');
   isFloatBtnActive = false;
   floatingButton.style.cursor = 'grab';
-  document.removeEventListener('mousemove', handleMouseMove);
+  //document.removeEventListener('mousemove', handleMouseMove);
   floatingButton.style.transform = 'translate3d(0, 0, 0)';
   floatingButton.style.borderRadius = '50%';
 
@@ -469,7 +441,7 @@ function processFolders(bookmarks, parentElement) {
 
 
               let testMenu = document.querySelector('.testmenu');
-              console.log('testmenu: ', testMenu);
+              //console.log('testmenu: ', testMenu);
 
               testMenu.appendChild(mainFolderItem);
 
@@ -670,16 +642,7 @@ function restrictHighlighting() {
 
 }
 
-/**
- * Removes the text highlighting on the page, preventing text in floatbutton being highlighted on drag.
- */
-function removeHighlight() {
-  if (window.getSelection) {
-    window.getSelection().removeAllRanges();
-  } else if (document.selection) {
-    document.selection.empty();
-  }
-}
+
 
 /**
  * Truncates the given text if it exceeds the maximum length.
@@ -693,11 +656,3 @@ function truncateText(text) {
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
-
-/**
- * Updates the position of the floating button.
- */
-function updateFloatingButtonPosition() {
-  let floatingButton = document.querySelector('.bookmark-float-btn');
-  floatingButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-}

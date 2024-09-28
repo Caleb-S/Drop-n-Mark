@@ -26,7 +26,10 @@
 function addMenu() {
   let testMenu = document.createElement('bookmark-menu');
   testMenu.classList.add('testmenu');
-  document.body.appendChild(testMenu);
+  //document.body.appendChild(testMenu);
+
+  //updateBookmarkMenu(bookmarks, testMenu);
+  generateMenu();
 
 };
 
@@ -62,13 +65,12 @@ function handleMouseDown(event) {
       */
     } else {
       addMenu();
-      generateMenu();
+
+
     }
   });
   document.addEventListener('mouseup', floatDropOutside);
 }
-
-
 
 
 /*
@@ -76,6 +78,7 @@ function handleMouseDown(event) {
 
  */
 function floatDropOutside(event) {
+  /*
   const newFolderBtn = document.querySelector('.new-folder-btn-ui5864921');
   const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
 
@@ -83,6 +86,9 @@ function floatDropOutside(event) {
     bookmarkMenu.style.display = 'none';
     document.querySelector('bookmark-menu').remove();
   }
+  */
+
+  document.querySelector('bookmark-menu').remove();
 
 }
 
@@ -109,130 +115,28 @@ function showToast(toastText) {
 
 // Generates the bookmark menu.
 function generateMenu() {
-  // Check if a bookmark menu already exists
-  const existingBookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-  if (existingBookmarkMenu) {
-    // Remove the existing bookmark menu if it exists
-    existingBookmarkMenu.parentNode.removeChild(existingBookmarkMenu);
-  }
-
-  // Fetch the bookmark menu HTML
-  fetch(chrome.runtime.getURL('src/html/bookmarkmenu.html'))
-    .then(response => response.text())
-    .then(html => {
-      // Create a bookmark menu element from the fetched HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const bookmarkMenu = doc.getElementById('bookmarkMenu-ui5864921');
-      const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
-
-      const folderContainer = bookmarkMenu.querySelector('.folder-container-ui5864921');
-
-      const newFolderBtn = bookmarkMenu.querySelector('.new-folder-btn-ui5864921');
-      const generalBtn = bookmarkMenu.querySelector('.general-btn-ui5864921');
-      const newFolderInput = bookmarkMenu.querySelector('.folder-input');
-
-      let imageElement = document.createElement('img');
-      imageElement.src = chrome.runtime.getURL('src/assets/newFolderXLarge.svg');
-      imageElement.classList.add('extension-img');
-      newFolderInput.appendChild(imageElement);
-
-      delBox = bookmarkMenu.querySelector('.deleteBox-ui5864921');
-
-      let delBoxImage = document.createElement('img');
-      delBoxImage.src = chrome.runtime.getURL('src/assets/rubbishBinSmall.svg');
-      delBoxImage.classList.add('extension-img');
-      delBox.appendChild(delBoxImage);
-
-      delBox.addEventListener('mouseup', function (event) {
-        if (event.target === delBox) {
-          delBox.style.display = 'flex';
-          chrome.runtime.sendMessage({ action: "deleteBookmark" }, function (response) {
-            if (response.success) {
-              console.log("Bookmark deleted successfully.");
-              showToast('Bookmark Deleted');
 
 
 
-            } else {
-              console.log("Current page is not bookmarked.");
-            }
-          });
+  let testMenu = document.createElement('bookmark-menu');
 
-        }
-      });
+  const folderContainer = testMenu;
 
+  // Request all bookmarks from the background script
+  chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError);
+      return;
+    }
 
+    let bookmarks = response.bookmarks;
+    updateBookmarkMenu(bookmarks, folderContainer);
+  });
 
-      newFolderBtn.addEventListener('mouseup', function (event) {
-        if (event.target === newFolderBtn) {
-          bookmarkGui.style.display = 'none';
-          newFolderInput.style.display = 'flex';
-          bookmarkMenu.querySelector('.folder-input input').focus();
-
-          // Get the input element
-          let input = document.querySelector('.folder-input input');
-          let backDrop = document.querySelector('.backdrop-ui5864921');
-
-          input.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-
-              const folderName = input.value;
-
-              chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName }, function (response) {
-                const folderId = response.folderId;
-                console.log('Folder ID:', folderId);
-
-                if (folderId) {
-                  saveBookmarkToFolder(folderId);
-                  showToast('Bookmark Created in: ' + folderName);
-
-                } else {
-                  console.log('Failed to create folder.');
-                }
-              });
-
-              input.value = '';
-              document.querySelector('.folder-input').style.display = 'none';
-
-            }
-          });
-
-          backDrop.addEventListener('mousedown', function (event) {
-            generateMenu();
-          });
-        }
-      });
+  // Append the new bookmark menu to the document body
+  document.body.appendChild(testMenu);
 
 
-      generalBtn.addEventListener('mouseup', function (event) {
-        if (event.target === generalBtn) {
-
-          saveBookmarkToFolder("2");
-        }
-      });
-
-
-
-      // Request all bookmarks from the background script
-      chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError);
-          return;
-        }
-
-        let bookmarks = response.bookmarks;
-        updateBookmarkMenu(bookmarks, folderContainer);
-      });
-
-      // Append the new bookmark menu to the document body
-      document.body.appendChild(bookmarkMenu);
-
-    })
-    .catch(error => {
-      console.error('Failed to load bookmarkmenu.html:', error);
-    });
 }
 
 // Function to update the bookmark menu
@@ -283,8 +187,8 @@ function processFolders(bookmarks, parentElement) {
               addBtn.appendChild(imageElement);
 
               const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-              const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
-              const newFolderInput = bookmarkMenu.querySelector('.folder-input');
+              // const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
+              //const newFolderInput = bookmarkMenu.querySelector('.folder-input');
               let backDrop = document.querySelector('.backdrop-ui5864921');
 
 
@@ -293,7 +197,7 @@ function processFolders(bookmarks, parentElement) {
                 if (event.target === addBtn) {
                   let input = document.querySelector('.folder-input input');
 
-                  bookmarkGui.style.display = 'none';
+                  // bookmarkGui.style.display = 'none';
                   newFolderInput.style.display = 'flex';
                   bookmarkMenu.querySelector('.folder-input input').focus();
 
@@ -347,8 +251,8 @@ function processFolders(bookmarks, parentElement) {
                   const addBtn = subFolderItem.querySelector('.sub-add-folder-ui5864921');
 
                   const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-                  const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
-                  const newFolderInput = bookmarkMenu.querySelector('.folder-input');
+                  //const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
+                  //  const newFolderInput = bookmarkMenu.querySelector('.folder-input');
                   let backDrop = document.querySelector('.backdrop-ui5864921');
 
                   let imageElement = document.createElement('img');
@@ -363,8 +267,8 @@ function processFolders(bookmarks, parentElement) {
                     if (event.target === addBtn) {
                       let input = document.querySelector('.folder-input input');
 
-                      bookmarkGui.style.display = 'none';
-                      newFolderInput.style.display = 'flex';
+                      // bookmarkGui.style.display = 'none';
+                      //  newFolderInput.style.display = 'flex';
                       bookmarkMenu.querySelector('.folder-input input').focus();
 
                       input.addEventListener('keydown', function (event) {

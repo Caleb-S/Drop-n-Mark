@@ -94,7 +94,7 @@ class FloatButton extends HTMLElement {
     } catch (error) {
       return;
     }
-    console.log('mousedown')
+    //console.log('mousedown')
 
 
     this.floatDragState();
@@ -103,7 +103,7 @@ class FloatButton extends HTMLElement {
   handleMouseMove(event) {
     this.offsetX = event.clientX - this.initialX;
     this.offsetY = event.clientY - this.initialY;
-    console.log('mousemove: ', this.offsetX, this.offsetY);
+    //console.log('mousemove: ', this.offsetX, this.offsetY);
 
     let floatingButton = this.shadowRoot.querySelector('.float-button');
     floatingButton.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px)`;
@@ -113,16 +113,16 @@ class FloatButton extends HTMLElement {
   }
 
   updateFloatingButtonPosition() {
-    console.log('offsetX', this.offsetX, 'offsetY', this.offsetY);
+    //console.log('offsetX', this.offsetX, 'offsetY', this.offsetY);
 
     let floatingButton = this.shadowRoot.querySelector('.float-button');
     floatingButton.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px)`;
-    console.log(`translate(${this.offsetX}px, ${this.offsetY}px)`);
+    //console.log(`translate(${this.offsetX}px, ${this.offsetY}px)`);
   }
 
   floatDragState() {
     document.addEventListener('mousemove', this.boundHandleMouseMove);
-    console.log('floatDragState');
+    //console.log('floatDragState');
     let floatingButton = this.shadowRoot.querySelector('.float-button');
     document.addEventListener('mouseup', this.boundResetFloatBtn);
 
@@ -130,6 +130,7 @@ class FloatButton extends HTMLElement {
     floatingButton.addEventListener('selectstart', event => event.preventDefault());
     floatingButton.addEventListener('mousedown', event => event.preventDefault());
     floatingButton.style.pointerEvents = 'none';
+    document.body.style.cursor = 'grabbing';
 
   }
 
@@ -147,7 +148,7 @@ class FloatButton extends HTMLElement {
     floatingButton.textContent = '';
     //set floating button to not active
 
-    document.style.cursor = 'auto';
+    document.body.style.cursor = 'auto';
   }
 
   // Make text fit within the button.

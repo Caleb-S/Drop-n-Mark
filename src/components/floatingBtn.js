@@ -62,7 +62,6 @@ function buttonTemplate() {
 }
 
 class FloatButton extends HTMLElement {
-
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -81,28 +80,10 @@ class FloatButton extends HTMLElement {
     this.restrictHighlighting.bind(this);
     this.shadowRoot.addEventListener('mousedown', this.handlemousedown.bind(this));
 
+    let floatingButton = this.shadowRoot.querySelector('.float-button');
+    this.shadowRoot.addEventListener('mouseover', () => {
+      floatingButton.textContent = this.truncateText(document.title);
 
-  }
-
-  restrictHighlighting() {
-    const menuItems = this.shadowRoot.querySelectorAll('.float-button');
-
-    menuItems.forEach(item => {
-      item.addEventListener('contextmenu', event => {
-        event.preventDefault();
-      });
-
-      item.addEventListener('selectstart', event => {
-        event.preventDefault();
-      });
-
-      item.addEventListener('mousedown', event => {
-        if (event.button === 2) {
-          event.preventDefault();
-        }
-      });
-
-      item.draggable = false;
     });
   }
 
@@ -144,60 +125,58 @@ class FloatButton extends HTMLElement {
     console.log('floatDragState');
     let floatingButton = this.shadowRoot.querySelector('.float-button');
     document.addEventListener('mouseup', this.boundResetFloatBtn);
-    floatingButton.classList.add('hover');
-    //isFloatBtnActive = true;
-
 
     floatingButton.addEventListener('contextmenu', event => event.preventDefault());
     floatingButton.addEventListener('selectstart', event => event.preventDefault());
     floatingButton.addEventListener('mousedown', event => event.preventDefault());
-    //floatingButton.textContent.draggable = false;
-    //floatingButton.textContent = truncateText(document.title);
-    //floatingButton.style.borderRadius = '0';
     floatingButton.style.pointerEvents = 'none';
-    //document.style.cursor = 'grabbing';
 
-    //handleMouseDown();
   }
 
   resetFloatBtn() {
-    console.log('resetFloatBtn');
     let floatingButton = this.shadowRoot.querySelector('.float-button');
-    //remove hoverstate
-    floatingButton.classList.remove('hover');
-    //isFloatBtnActive = false;
-    //floatingButton.style.cursor = 'grab';
+    this.offsetX = 0;
+    this.offsetY = 0;
+
     document.removeEventListener('mousemove', this.boundHandleMouseMove);
-    floatingButton.style.transform = 'translate3d(0, 0, 0)';
-    //floatingButton.style.borderRadius = '50%';
-
-    /*
-    let ptag = floatingButton.querySelector('.ptag');
-    if (ptag instanceof Node) {
-      ptag.remove();
-    }
-    */
-    //floatingButton.removeChild(ptag);
-
-
-    floatingButton.style.pointerEvents = 'auto';
-    document.style.cursor = 'auto';
-    floatingButton.textContent = '';
     document.removeEventListener('mouseup', this.boundResetFloatBtn);
 
 
-    this.offsetX = 0;
-    this.offsetY = 0;
-    //updateFloatingButtonPosition();
+    floatingButton.style.transform = 'translate3d(0, 0, 0)';
+    floatingButton.style.pointerEvents = 'auto';
+    floatingButton.textContent = '';
+    //set floating button to not active
 
+    document.style.cursor = 'auto';
   }
 
-
-
-
+  // Make text fit within the button.
   truncateText(text) {
     let maxLength = 20;
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  }
+
+  // Restricts text highlighting button text.
+  restrictHighlighting() {
+    const menuItems = this.shadowRoot.querySelectorAll('.float-button');
+
+    menuItems.forEach(item => {
+      item.addEventListener('contextmenu', event => {
+        event.preventDefault();
+      });
+
+      item.addEventListener('selectstart', event => {
+        event.preventDefault();
+      });
+
+      item.addEventListener('mousedown', event => {
+        if (event.button === 2) {
+          event.preventDefault();
+        }
+      });
+
+      item.draggable = false;
+    });
   }
 }
 

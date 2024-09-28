@@ -71,6 +71,8 @@ let animationFrameID;
 
 // Initialize bookmark menu 
 let scrollInterval, scrollThresholdPercentage = 0.2;
+
+/*
 (function () {
   generateMenu()
   restrictHighlighting();
@@ -80,6 +82,7 @@ let scrollInterval, scrollThresholdPercentage = 0.2;
     }
   });
 })();
+*/
 
 
 
@@ -346,7 +349,7 @@ function generateMenu() {
 // Function to update the bookmark menu
 function updateBookmarkMenu(bookmarks, folderContainer) {
   printBookmarkTree(bookmarks);
-  let testMenu = document.querySelector('.testmenu');
+  let testMenu = document.querySelector('bookmark-menu');
   processFolders(bookmarks, testMenu);
 }
 
@@ -443,7 +446,7 @@ function processFolders(bookmarks, parentElement) {
               let testMenu = document.querySelector('.testmenu');
               //console.log('testmenu: ', testMenu);
 
-              testMenu.appendChild(mainFolderItem);
+              // testMenu.appendChild(mainFolderItem);
 
 
               parentElement.appendChild(mainFolderItem);

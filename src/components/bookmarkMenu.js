@@ -301,7 +301,7 @@ class BookmarkMenu extends HTMLElement {
     }
 
     restrictHighlighting() {
-        const menuItems = this.shadowRoot.querySelectorAll('.bookmarkMenu-updated, .new-folder-btn, .new-btn-txt, .folder-container, .general-btn, .general-sub-txt, .bookmark-float-btn, .hover, .bookmark-float-btn.hover');
+        const menuItems = this.shadowRoot.querySelectorAll('div, dialog, p, small');
 
         menuItems.forEach(item => {
             item.addEventListener('contextmenu', event => {
@@ -325,11 +325,7 @@ class BookmarkMenu extends HTMLElement {
     }
 
     handleMouseMove(event) {
-        this.offsetX = event.clientX - this.initialX;
-        this.offsetY = event.clientY - this.initialY;
-        console.log(this.offsetX, this.offsetY);
-        cancelAnimationFrame(this.animationFrameID);
-        this.animationFrameID = requestAnimationFrame(this.updateFloatingButtonPosition.bind(this));
+
 
         let folderContainer = this.shadowRoot.querySelector('.folder-container');
         let rect = folderContainer.getBoundingClientRect();
@@ -347,6 +343,7 @@ class BookmarkMenu extends HTMLElement {
             clearInterval(this.scrollInterval);
         }
     }
+
 
 
 }

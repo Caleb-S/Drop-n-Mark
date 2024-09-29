@@ -239,54 +239,33 @@ function updateBookmarkMenu(bookmarks, folderContainer) {
 
 function processFolders(bookmarks, parentElement) {
   bookmarks.forEach(function (bookmark) {
-    handleBookmarkLevel(bookmark, parentElement, 'root');
+    if (bookmark.children) { // Root Folder
+
+      bookmark.children.forEach(function (child) { // Primary Folders
+        if (child.children) {
+
+          child.children.forEach(function (mainChild) {
+            if (mainChild.children && !mainChild.url && mainChild.title.trim() !== "") {
+              parentElement.appendChild(createFolderItem('main', mainChild.title, mainChild.id));
+
+              mainChild.children.forEach(function (subChild) {
+                if (subChild.children && !subChild.url && subChild.title.trim() !== "") {
+                  parentElement.appendChild(createFolderItem('sub', subChild.title, subChild.id));
+
+                  subChild.children.forEach(function (nestedChild) {
+                    if (!nestedChild.url && nestedChild.title.trim() !== "") {
+                      parentElement.appendChild(createFolderItem('nested', nestedChild.title, nestedChild.id));
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
   });
 }
-
-function handleBookmarkLevel(bookmark, parentElement, level) {
-  switch (level) {
-    case 'root':
-      if (bookmark.children) {
-        bookmark.children.forEach(function (child) {
-          handleBookmarkLevel(child, parentElement, 'primary');
-        });
-      }
-      break;
-
-    case 'primary':
-      if (bookmark.children) {
-        bookmark.children.forEach(function (mainChild) {
-          handleBookmarkLevel(mainChild, parentElement, 'main');
-        });
-      }
-      break;
-
-    case 'main':
-      if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
-        parentElement.appendChild(createFolderItem('main', bookmark.title, bookmark.id));
-        bookmark.children.forEach(function (subChild) {
-          handleBookmarkLevel(subChild, parentElement, 'sub');
-        });
-      }
-      break;
-
-    case 'sub':
-      if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
-        parentElement.appendChild(createFolderItem('sub', bookmark.title, bookmark.id));
-        bookmark.children.forEach(function (nestedChild) {
-          handleBookmarkLevel(nestedChild, parentElement, 'nested');
-        });
-      }
-      break;
-
-    case 'nested':
-      if (!bookmark.url && bookmark.title.trim() !== "") {
-        parentElement.appendChild(createFolderItem('nested', bookmark.title, bookmark.id));
-      }
-      break;
-  }
-}
-
 
 
 

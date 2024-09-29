@@ -1,40 +1,25 @@
 
 // Append scripts for webcomponents
 (function () {
-  function loadScript(scriptSrc) {
-    const script = document.createElement('script');
-    script.src = scriptSrc;
+  const scripts = ['toast', 'floatingBtn', 'bookmarkMenu', 'folderCard'];
+  const prodpath = 'src/components/dist/';
+  const devpath = 'src/components/';
 
-    script.onerror = () => {
-      console.warn(`Error loading script: ${scriptSrc}`);
+  chrome.runtime.sendMessage({ action: 'getEnvironment' }, response => {
+    let path;
+    response.devmode ? path = devpath : path = prodpath;
+    for (let script of scripts) {
+      loadScript(path + script + '.js');
+    }
+  });
 
-    };
-
+  function loadScript(scriptPath) {
+    let script = document.createElement('script');
+    script.src = chrome.runtime.getURL(scriptPath);
+    script.onerror = () => { console.warn(`Error loading script: ${script.src}`); };
     document.head.appendChild(script);
   }
-
-  const toastScriptSrc = chrome.runtime.getURL('src/components/dist/toast.js');
-  const floatingBtnScriptSrc = chrome.runtime.getURL('src/components/floatingBtn.js');
-  const menuScriptSrc = chrome.runtime.getURL('src/components/bookmarkMenu.js');
-
-  loadScript(toastScriptSrc);
-  loadScript(floatingBtnScriptSrc);
-  loadScript(menuScriptSrc);
 })();
-
-// test bookmark menu
-function addMenu() {
-  let testMenu = document.createElement('bookmark-menu');
-  testMenu.classList.add('testmenu');
-  //document.body.appendChild(testMenu);
-
-  //updateBookmarkMenu(bookmarks, testMenu);
-  generateMenu();
-
-
-
-
-};
 
 
 
@@ -60,19 +45,36 @@ function addMenu() {
 function handleMouseDown(event) {
   // Send a message to background.js to check if the current page is bookmarked
   chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
+    let testMenu = document.createElement('bookmark-menu');
+    testMenu.classList.add('testmenu');
     if (response.bookmarked) {
-      //document.querySelector('bookmark-menu').style.display = 'none';
 
-      // The current page is bookmarked
-      /*
-      document.getElementById('bookmarkMenu-ui5864921').style.display = 'block';
-      document.querySelector('.bookmarkMenu-updated-ui5864921').style.display = 'none';
-      delBox = document.querySelector('.deleteBox-ui5864921');
-      delBox.style.display = 'flex';
-      */
+      console.log('is bookmarked');
+      testMenu.setAttribute('bookmarked', '');
+      testMenu.setAttribute('src', chrome.runtime.getURL('src/assets/rubbishBinSmall.svg'));
+      let deleteBox = testMenu.shadowRoot.querySelector('.deleteBox');
+      deleteBox.addEventListener('mouseup', function (event) {
+
+
+        chrome.runtime.sendMessage({ action: "deleteBookmark" }, function (response) {
+          if (response.success) {
+            showToast('Removed Bookmark');
+
+          } else {
+            showToast('Failed To Remove Bookmark');
+          }
+        });
+
+
+      });
+
+      document.body.appendChild(testMenu);
+
+
+
     } else {
-      addMenu();
 
+      generateMenu();
 
     }
   });
@@ -105,6 +107,14 @@ function floatDropOutside(event) {
  * @param {string} toastText - The text to display in the toast message.
  */
 function showToast(toastText) {
+
+  //remove all bookmark-toasts
+  let toasts = document.querySelectorAll('bookmark-toast');
+  toasts.forEach(function (toast) {
+    toast.remove();
+  });
+
+
   let toastCreate = document.createElement('bookmark-toast');
 
   let text = toastText ? toastText : "Null";
@@ -138,15 +148,18 @@ function generateMenu() {
     updateBookmarkMenu(bookmarks, folderContainer);
   });
 
-  let scrollPosition;
 
   chrome.storage.local.get(['scrollPosition'], (result) => {
     if (result.scrollPosition !== undefined) {
       // Set the scrollTop to the saved position
       testMenu.setAttribute('scrollPosition', result.scrollPosition);
-      //scrollPosition = ;
-      console.log('Scroll position restored to:', result.scrollPosition);
     }
+  });
+
+  testMenu.addEventListener('menu-scroll-point', (event) => {
+    const value = event.detail;
+    chrome.storage.local.set({ scrollPosition: value });
+
   });
 
 
@@ -155,15 +168,6 @@ function generateMenu() {
   document.body.appendChild(testMenu);
 
 
-
-  testMenu.addEventListener('menu-scroll-point', (event) => {
-    const value = event.detail;
-    console.log('Contentview - Current Scroll Position:', value);
-    chrome.storage.local.set({ scrollPosition: value }, () => {
-      console.log('Scroll position saved:', value);
-    });
-
-  });
 
 
 }
@@ -191,7 +195,10 @@ function processFolders(bookmarks, parentElement) {
         if (child.children) {
           child.children.forEach(function (mainChild) {
             if (mainChild.children && !mainChild.url && mainChild.title.trim() !== "") {
-              let mainFolderItem = createFolderItem('main-folder-ui5864921', 'main-add-folder-ui5864921', 'main-f-txt-ui5864921', mainChild.title, mainChild.id);
+              let mainFolderItem = createFolderItem('main-folder-ui5864921', 'main-add-folder-ui5864921',
+                'main-f-txt-ui5864921',
+                mainChild.title,
+                mainChild.id);
 
               // Create an image element
               let imageElement = document.createElement('img');
@@ -204,7 +211,7 @@ function processFolders(bookmarks, parentElement) {
               mainFolderItem.addEventListener('mouseup', function (event) {
                 if (event.target === mainFolderItem) {
                   saveBookmarkToFolder(mainChild.id);
-                  showToast('Bookmark Created In: ' + mainChild.title);
+                  showToast('Bookmarked Under: ' + mainChild.title);
 
                   //showToast(mainChild.title);
                 }
@@ -216,8 +223,6 @@ function processFolders(bookmarks, parentElement) {
               addBtn.appendChild(imageElement);
 
               const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-              // const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
-              //const newFolderInput = bookmarkMenu.querySelector('.folder-input');
               let backDrop = document.querySelector('.backdrop-ui5864921');
 
 
@@ -242,7 +247,7 @@ function processFolders(bookmarks, parentElement) {
                         const folderId = response.folderId;
                         if (folderId) {
                           saveBookmarkToFolder(folderId);
-                          showToast('Bookmark Created in: ' + folderName);
+                          showToast('Bookmarked Under: ' + folderName);
 
                         } else {
                           console.log('Failed to create folder.');
@@ -272,7 +277,7 @@ function processFolders(bookmarks, parentElement) {
                   subFolderItem.addEventListener('mouseup', function (event) {
                     if (event.target === subFolderItem) {
                       saveBookmarkToFolder(subChild.id);
-                      showToast('Bookmark Created In: ' + subChild.title);
+                      showToast('Bookmarked Under: ' + subChild.title);
 
                     }
                   });
@@ -312,7 +317,7 @@ function processFolders(bookmarks, parentElement) {
 
                             if (folderId) {
                               saveBookmarkToFolder(folderId);
-                              showToast('Bookmark Created in: ' + folderName);
+                              showToast('Bookmarked Under: ' + folderName);
 
                             } else {
                               console.log('Failed to create folder.');

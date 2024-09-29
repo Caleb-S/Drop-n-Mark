@@ -1,4 +1,6 @@
 const devmode = true;
+
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getEnvironment') {
     sendResponse({ devmode: devmode });

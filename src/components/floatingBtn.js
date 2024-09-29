@@ -1,7 +1,7 @@
 
 function buttonTemplate() {
   let template = document.createElement('template');
-  escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+  let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
     createHTML: (to_escape) => to_escape
   })
   template.innerHTML = escapeHTMLPolicy.createHTML(`

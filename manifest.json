@@ -39,7 +39,9 @@
         "src/components/bookmarkMenu.js",
         "src/components/toast.js",
         "src/components/floatingBtn.js",
-        "src/assets/create_new_folder_google-font.svg"
+        "src/assets/create_new_folder_google-font.svg",
+        "src/components/dist/folderCard.js",
+        "src/components/folderCard.js"
       ],
       "matches": ["<all_urls>"]
     }

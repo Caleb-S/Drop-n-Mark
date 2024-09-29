@@ -1,18 +1,22 @@
-var devmode = false;
 chrome.runtime.sendMessage({ action: 'getEnvironment' }, response => {
-    devmode = response.devmode;
+    let devmode = response.devmode;
     if (devmode) {
-        console.warn(`| WARNING: DROPNMARK IS IN DEVMODE
+        //localStorage.setItem('devmode', devmode);
+        devEnvWarningMsg()
+        reloadExtensionHotkey();
+        blackPageHotkey();
+    }
+});
+
+function devEnvWarningMsg() {
+    console.warn(`| WARNING: DROPNMARK IS IN DEVMODE
   |
   | COMMANDS:
   | [Ctrl Shift L] - Reload Extension
   | [Ctrl Shift K] - Remove html for blank canvas
   |
   `);
-        reloadExtensionHotkey();
-        blackPageHotkey();
-    }
-});
+}
 
 // Reload extension using (Ctrl Shift L) key combination
 function reloadExtensionHotkey() {
@@ -47,6 +51,7 @@ function blackPageHotkey() {
         }
     });
 }
+
 
 
 

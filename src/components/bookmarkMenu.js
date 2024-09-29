@@ -1,7 +1,7 @@
 function menuTemplate() {
     var template = document.createElement('template');
 
-    escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+    let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
         createHTML: (to_escape) => to_escape
     })
 
@@ -11,7 +11,7 @@ function menuTemplate() {
                 font-size: 20px !important;
                 color: #484952 !important;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-                border-radius: 5px !important;
+     
             }
     
             dialog {
@@ -48,6 +48,7 @@ function menuTemplate() {
                 align-items: flex-end;
                 display: flex;
                 overflow: hidden;
+                
             }
     
             .new-folder-btn {
@@ -206,7 +207,27 @@ function menuTemplate() {
                 white-space: nowrap;
                 width: auto;
             }
-    
+
+             .deleteBox {
+                z-index: 2147483546;
+                width: 250px;
+                height: 250px;
+                background-color: white;
+                left: 0%;
+                right: 0%;
+                top: 0%;
+                bottom: 0%;
+                position: fixed;
+                margin: auto;
+                border: 15px solid #484952;
+            }
+
+           .deleteBox[open]{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+                
         </style>
     
        
@@ -221,7 +242,7 @@ function menuTemplate() {
     
     
     
-        <dialog open class="bookmarkmenu-updated" id="bookmarkMenu2">
+        <dialog class="bookmarkmenu-updated" id="bookmarkMenu2">
             <div class="new-folder-btn">
                 <p class="new-btn-txt">New Folder</p>
             </div>
@@ -276,6 +297,27 @@ class BookmarkMenu extends HTMLElement {
         this.restrictHighlighting.bind(this);
         this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
         this.folderContainer = this.shadowRoot.querySelector('.folder-container');
+
+
+        console.log(this.hasAttribute('bookmarked'));
+        // Check if bookmarked attribute is present
+        if (this.hasAttribute('bookmarked')) {
+
+            let deleteBox = this.shadowRoot.querySelector('.deleteBox');
+            deleteBox.setAttribute('open', '');
+            let imageElement = document.createElement('img');
+            imageElement.src = this.getAttribute('src');
+            console.log(imageElement.src);
+            deleteBox.appendChild(imageElement);
+
+
+
+
+        } else {
+            this.shadowRoot.querySelector('.bookmarkmenu-updated').setAttribute('open', '');
+        }
+
+
 
 
         let slot = this.shadowRoot.querySelector('slot');

@@ -1,13 +1,17 @@
 
 
-let bookmarkTemplate = document.createElement('template');
-escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
+let toastTemplate = document.createElement('template');
+let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
   createHTML: (to_escape) => to_escape
 })
-bookmarkTemplate.innerHTML = escapeHTMLPolicy.createHTML(`<style>
+toastTemplate.innerHTML = escapeHTMLPolicy.createHTML(`<style>
               :host {
               font-size: 18px;
               font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              z-index: 2147483647 !important;
+              font-weight: 600 !important;
+              font-color: #18181b;
+          
               }
 
                .toast-dialog {
@@ -19,10 +23,11 @@ bookmarkTemplate.innerHTML = escapeHTMLPolicy.createHTML(`<style>
                  color: black;
                 position: fixed;
                 bottom: 20px;
-                z-index: 9999;
+                
                 padding: 10px 20px;
                 border-width: 0px;
                 border-radius: 3px;
+                z-index: 2147483647 !important;
               }
 
             </style>
@@ -39,7 +44,7 @@ class BookmarkToast extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(bookmarkTemplate.content.cloneNode(true));
+    this.shadowRoot.appendChild(toastTemplate.content.cloneNode(true));
   }
 }
 

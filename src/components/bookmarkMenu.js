@@ -11,6 +11,7 @@ function menuTemplate() {
                 font-size: 20px !important;
                 color: #484952 !important;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+                border-radius: 5px !important;
             }
     
             dialog {
@@ -266,43 +267,77 @@ class BookmarkMenu extends HTMLElement {
         this.shadowRoot.appendChild(menuTemplate());
         this.scrollThresholdPercentage = 0.2;
         this.scrollInterval;
+        this.folderContainer = this.shadowRoot.querySelector('.folder-container');
+        this.scrollPosition = 0;
+        this.positionRestored = false;
     }
 
-
-
-
     connectedCallback() {
-        console.log('connected');
         this.restrictHighlighting.bind(this);
         this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.folderContainer = this.shadowRoot.querySelector('.folder-container');
 
+
+        let slot = this.shadowRoot.querySelector('slot');
+
+        // waits until all folder items are loaded
+        slot.addEventListener('slotchange', () => {
+            this.folderContainer.scrollTop = this.getAttribute('scrollPosition');
+        });
     }
 
     disconnectedCallback() {
         console.log('disconnected');
         this.shadowRoot.removeEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.positionRestored = false;
+
+
+
+        this.dispatchEvent(new CustomEvent('menu-scroll-point', {
+            detail: this.scrollPosition,
+            bubbles: true,  // Allows the event to bubble up through the DOM
+            composed: true  // Allows the event to pass through Shadow DOM boundaries
+        }));
     }
-
-
 
 
     handleMouseMove(event) {
-        let folderContainer = this.shadowRoot.querySelector('.folder-container');
-        let rect = folderContainer.getBoundingClientRect();
+        let rect = this.folderContainer.getBoundingClientRect();
         let scrollSpeed = 7;
         let scrollThresholdPixels = rect.height * this.scrollThresholdPercentage;
+        let scrollStartOffset = 20;
+
         this.removeHighlight();
 
-        if (event.clientY >= rect.bottom - scrollThresholdPixels && event.clientY <= rect.bottom && event.clientX >= rect.left && event.clientX <= rect.right) {
+        // Scroll down logic
+        if (event.clientY >= rect.bottom - scrollThresholdPixels - scrollStartOffset
+            && event.clientY <= rect.bottom
+            && event.clientX >= rect.left
+            && event.clientX <= rect.right) {
+
             clearInterval(this.scrollInterval);
-            this.scrollInterval = setInterval(() => { folderContainer.scrollTop += scrollSpeed; }, 10);
-        } else if (event.clientY <= rect.top + scrollThresholdPixels && event.clientY >= rect.top && event.clientX >= rect.left && event.clientX <= rect.right) {
+            this.scrollInterval = setInterval(() => {
+                this.folderContainer.scrollTop += scrollSpeed;
+            }, 10);
+
+            // Scroll up logic
+        } else if (event.clientY <= rect.top + scrollThresholdPixels + scrollStartOffset
+            && event.clientY >= rect.top
+            && event.clientX >= rect.left
+            && event.clientX <= rect.right) {
+
             clearInterval(this.scrollInterval);
-            this.scrollInterval = setInterval(() => { folderContainer.scrollTop -= scrollSpeed; }, 10);
+            this.scrollInterval = setInterval(() => {
+                this.folderContainer.scrollTop -= scrollSpeed;
+            }, 10);
+
         } else {
             clearInterval(this.scrollInterval);
         }
+        this.scrollPosition = this.folderContainer.scrollTop;
     }
+
+
 
     removeHighlight() {
         if (window.getSelection) {

@@ -31,7 +31,12 @@ function addMenu() {
   //updateBookmarkMenu(bookmarks, testMenu);
   generateMenu();
 
+
+
+
 };
+
+
 
 (function () {
   let floatingButton = document.createElement('bookmark-float-button');
@@ -42,7 +47,9 @@ function addMenu() {
   floatingButton.addEventListener('mousedown', handleMouseDown);
 
 
+
 })();
+
 
 
 /**
@@ -116,8 +123,6 @@ function showToast(toastText) {
 // Generates the bookmark menu.
 function generateMenu() {
 
-
-
   let testMenu = document.createElement('bookmark-menu');
 
   const folderContainer = testMenu;
@@ -133,8 +138,32 @@ function generateMenu() {
     updateBookmarkMenu(bookmarks, folderContainer);
   });
 
+  let scrollPosition;
+
+  chrome.storage.local.get(['scrollPosition'], (result) => {
+    if (result.scrollPosition !== undefined) {
+      // Set the scrollTop to the saved position
+      testMenu.setAttribute('scrollPosition', result.scrollPosition);
+      //scrollPosition = ;
+      console.log('Scroll position restored to:', result.scrollPosition);
+    }
+  });
+
+
+
   // Append the new bookmark menu to the document body
   document.body.appendChild(testMenu);
+
+
+
+  testMenu.addEventListener('menu-scroll-point', (event) => {
+    const value = event.detail;
+    console.log('Contentview - Current Scroll Position:', value);
+    chrome.storage.local.set({ scrollPosition: value }, () => {
+      console.log('Scroll position saved:', value);
+    });
+
+  });
 
 
 }
@@ -385,3 +414,5 @@ function printBookmarkTree(bookmarks, prefix = '', indent = '') {
     }
   });
 }
+
+

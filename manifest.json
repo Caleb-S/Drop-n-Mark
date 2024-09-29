@@ -3,7 +3,7 @@
   "name": "DropNMark",
   "version": "0.1.2",
   "description": "Bookmark Extension",
-  "permissions": ["activeTab", "bookmarks", "tabs"],
+  "permissions": ["activeTab", "bookmarks", "tabs", "storage"],
   "action": {
     "default_popup": "src/html/popup.html",
     "default_icon": {
@@ -28,7 +28,6 @@
     {
       "resources": [
         "src/html/styles/style.css", 
-        "src/html/bookmarkmenu.html", 
         "src/content.js", 
         "src/assets/newFolderLarge.svg", 
         "src/assets/newFolderMedium.svg",

@@ -2,7 +2,13 @@ var devmode = false;
 chrome.runtime.sendMessage({ action: 'getEnvironment' }, response => {
     devmode = response.devmode;
     if (devmode) {
-        console.warn(`!!! DROPNMARK IS IN DEVELOPER MODE !!!`);
+        console.warn(`| WARNING: DROPNMARK IS IN DEVMODE
+  |
+  | COMMANDS:
+  | [Ctrl Shift L] - Reload Extension
+  | [Ctrl Shift K] - Remove html for blank canvas
+  |
+  `);
         reloadExtensionHotkey();
         blackPageHotkey();
     }
@@ -21,7 +27,7 @@ function reloadExtensionHotkey() {
     });
 }
 
-// Remove all html, creting blank page using (Ctrl Shift K) key combination
+// Remove all html, creating blank page using (Ctrl Shift K) key combination
 function blackPageHotkey() {
     document.addEventListener('keydown', function (event) {
         // Check if Ctrl + Shift + K is pressed

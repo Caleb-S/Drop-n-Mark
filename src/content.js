@@ -22,17 +22,38 @@
 })();
 
 
+// test foldercard
+function testFolderCard() {
+  let dummieMenu = document.createElement('bookmark-menu');
+
+
+  let mainCard = document.createElement('bookmark-folder-card');
+  mainCard.innerHTML = 'Main Card';
+  mainCard.setAttribute('type', 'main');
+  mainCard.setAttribute('src', chrome.runtime.getURL('src/assets/newFolderLarge.svg'));
+  dummieMenu.appendChild(mainCard);
+
+  let subCard = document.createElement('bookmark-folder-card');
+  subCard.innerHTML = 'Sub Card';
+  subCard.setAttribute('type', 'sub');
+  subCard.setAttribute('src', chrome.runtime.getURL('src/assets/newFolderMedium.svg'));
+  dummieMenu.appendChild(subCard);
+
+  let nestedCard = document.createElement('bookmark-folder-card');
+  nestedCard.innerHTML = 'Nested Card';
+  nestedCard.setAttribute('type', 'nested');
+  dummieMenu.appendChild(nestedCard);
+
+  document.body.appendChild(dummieMenu);
+}
+
+
+
 
 (function () {
   let floatingButton = document.createElement('bookmark-float-button');
-
-
   document.body.appendChild(floatingButton);
-
   floatingButton.addEventListener('mousedown', handleMouseDown);
-
-
-
 })();
 
 
@@ -172,6 +193,36 @@ function generateMenu() {
 
 }
 
+function createFolderItem(type, title, id) {
+
+  let image = type === 'main' ? 'src/assets/newFolderLarge.svg' : 'src/assets/newFolderMedium.svg';
+
+
+  let FolderItem = document.createElement('bookmark-folder-card');
+  FolderItem.innerText = title;
+  FolderItem.setAttribute('type', type);
+  FolderItem.setAttribute('src', chrome.runtime.getURL(image));
+
+  FolderItem.addEventListener('mouseup', function (event) {
+    if (event.target === FolderItem) {
+      saveBookmarkToFolder(id);
+      showToast('Bookmarked Under: ' + title);
+    }
+  });
+
+  const addBtn = FolderItem.shadowRoot.getElementById('folder-button');
+
+  addBtn.addEventListener('mouseup', function (event) {
+    if (event.target === addBtn) {
+      console.log('Add Folder Selected');
+      // logic for add folder, should bring up input box.
+    }
+  });
+
+  return FolderItem;
+
+}
+
 // Function to update the bookmark menu
 function updateBookmarkMenu(bookmarks, folderContainer) {
   printBookmarkTree(bookmarks);
@@ -185,207 +236,59 @@ function updateBookmarkMenu(bookmarks, folderContainer) {
  * @param {Array} bookmarks - The array of bookmark objects.
  * @param {HTMLElement} parentElement - The parent HTML element to append the folder items to.
  */
+
 function processFolders(bookmarks, parentElement) {
   bookmarks.forEach(function (bookmark) {
-    if (!bookmark.url) {
-      console.log(bookmark.children);
-    }
-    if (bookmark.children) { // Root Folder
-      bookmark.children.forEach(function (child) { // Primary Folders
-        if (child.children) {
-          child.children.forEach(function (mainChild) {
-            if (mainChild.children && !mainChild.url && mainChild.title.trim() !== "") {
-              let mainFolderItem = createFolderItem('main-folder-ui5864921', 'main-add-folder-ui5864921',
-                'main-f-txt-ui5864921',
-                mainChild.title,
-                mainChild.id);
-
-              // Create an image element
-              let imageElement = document.createElement('img');
-              imageElement.src = chrome.runtime.getURL('src/assets/newFolderLarge.svg'); // Replace with the path to your image
-              imageElement.style.pointerEvents = 'none';
-              imageElement.classList.add('extension-img');
-
-
-
-              mainFolderItem.addEventListener('mouseup', function (event) {
-                if (event.target === mainFolderItem) {
-                  saveBookmarkToFolder(mainChild.id);
-                  showToast('Bookmarked Under: ' + mainChild.title);
-
-                  //showToast(mainChild.title);
-                }
-              });
-
-
-
-              const addBtn = mainFolderItem.querySelector('.main-add-folder-ui5864921');
-              addBtn.appendChild(imageElement);
-
-              const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-              let backDrop = document.querySelector('.backdrop-ui5864921');
-
-
-
-              addBtn.addEventListener('mouseup', function (event) {
-                if (event.target === addBtn) {
-                  let input = document.querySelector('.folder-input input');
-
-                  // bookmarkGui.style.display = 'none';
-                  newFolderInput.style.display = 'flex';
-                  bookmarkMenu.querySelector('.folder-input input').focus();
-
-                  input.addEventListener('keydown', function (event) {
-                    if (event.key === 'Enter') {
-                      event.preventDefault();
-
-                      const folderName = input.value;
-
-                      chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName, parentFolderId: mainChild.id }, function (response) {
-
-
-                        const folderId = response.folderId;
-                        if (folderId) {
-                          saveBookmarkToFolder(folderId);
-                          showToast('Bookmarked Under: ' + folderName);
-
-                        } else {
-                          console.log('Failed to create folder.');
-                        }
-
-
-                      });
-                    }
-
-                  });
-
-
-                  backDrop.addEventListener('mousedown', function (event) {
-                    generateMenu();
-
-                  });
-
-                }
-              });
-
-              parentElement.appendChild(mainFolderItem);
-
-              mainChild.children.forEach(function (subChild) {
-                if (subChild.children && !subChild.url && subChild.title.trim() !== "") {
-                  let subFolderItem = createFolderItem('sub-folder-ui5864921', 'sub-add-folder-ui5864921', 'sub-f-txt-ui5864921', subChild.title, subChild.id);
-
-                  subFolderItem.addEventListener('mouseup', function (event) {
-                    if (event.target === subFolderItem) {
-                      saveBookmarkToFolder(subChild.id);
-                      showToast('Bookmarked Under: ' + subChild.title);
-
-                    }
-                  });
-
-                  const addBtn = subFolderItem.querySelector('.sub-add-folder-ui5864921');
-
-                  const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
-                  //const bookmarkGui = bookmarkMenu.querySelector('.bookmarkMenu-updated-ui5864921');
-                  //  const newFolderInput = bookmarkMenu.querySelector('.folder-input');
-                  let backDrop = document.querySelector('.backdrop-ui5864921');
-
-                  let imageElement = document.createElement('img');
-                  imageElement.src = chrome.runtime.getURL('src/assets/newFolderMedium.svg'); // Replace with the path to your image
-                  imageElement.style.pointerEvents = 'none';
-                  imageElement.classList.add('extension-img');
-                  addBtn.appendChild(imageElement);
-
-
-
-                  addBtn.addEventListener('mouseup', function (event) {
-                    if (event.target === addBtn) {
-                      let input = document.querySelector('.folder-input input');
-
-                      // bookmarkGui.style.display = 'none';
-                      //  newFolderInput.style.display = 'flex';
-                      bookmarkMenu.querySelector('.folder-input input').focus();
-
-                      input.addEventListener('keydown', function (event) {
-                        if (event.key === 'Enter') {
-                          event.preventDefault();
-
-                          const folderName = input.value;
-
-                          chrome.runtime.sendMessage({ action: 'createFolder', folderName: folderName, parentFolderId: subChild.id }, function (response) {
-
-                            const folderId = response.folderId;
-
-                            if (folderId) {
-                              saveBookmarkToFolder(folderId);
-                              showToast('Bookmarked Under: ' + folderName);
-
-                            } else {
-                              console.log('Failed to create folder.');
-                            }
-
-                          });
-                        }
-
-                      });
-
-                      backDrop.addEventListener('mousedown', function (event) {
-                        generateMenu();
-                      });
-
-                    }
-                  });
-
-                  parentElement.appendChild(subFolderItem);
-
-                  subChild.children.forEach(function (nestedChild) {
-                    if (!nestedChild.url && nestedChild.title.trim() !== "") {
-                      let nestedFolderItem = createFolderItem('nested-folder-ui5864921', 'nested-add-folder-ui5864921', 'nested-f-txt-ui5864921', nestedChild.title, nestedChild.id);
-                      nestedFolderItem.addEventListener('mouseup', function (event) {
-                        if (event.target === nestedFolderItem) {
-                          saveBookmarkToFolder(nestedChild.id);
-                          showToast('Bookmark Created In: ' + nestedChild.title);
-
-                        }
-                      });
-                      parentElement.appendChild(nestedFolderItem);
-                    }
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
-    }
+    handleBookmarkLevel(bookmark, parentElement, 'root');
   });
 }
 
-/**
- * Creates a folder item element.
- *
- * @param {string} itemClass - The CSS class for the folder item.
- * @param {string} addFolderClass - The CSS class for the add folder button.
- * @param {string} nameClass - The CSS class for the folder name.
- * @param {string} title - The folder title.
- * @param {string} id - The folder ID.
- * @returns {HTMLElement} The created folder item element.
- */
-function createFolderItem(itemClass, addFolderClass, nameClass, title, id) {
-  let folderItem = document.createElement('div');
-  folderItem.classList.add(itemClass);
+function handleBookmarkLevel(bookmark, parentElement, level) {
+  switch (level) {
+    case 'root':
+      if (bookmark.children) {
+        bookmark.children.forEach(function (child) {
+          handleBookmarkLevel(child, parentElement, 'primary');
+        });
+      }
+      break;
 
-  let addFolder = document.createElement('div');
-  addFolder.classList.add(addFolderClass);
+    case 'primary':
+      if (bookmark.children) {
+        bookmark.children.forEach(function (mainChild) {
+          handleBookmarkLevel(mainChild, parentElement, 'main');
+        });
+      }
+      break;
 
-  let folderName = document.createElement('div');
-  folderName.classList.add(nameClass);
-  folderName.textContent = title;
+    case 'main':
+      if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
+        parentElement.appendChild(createFolderItem('main', bookmark.title, bookmark.id));
+        bookmark.children.forEach(function (subChild) {
+          handleBookmarkLevel(subChild, parentElement, 'sub');
+        });
+      }
+      break;
 
-  folderItem.appendChild(addFolder);
-  folderItem.appendChild(folderName);
+    case 'sub':
+      if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
+        parentElement.appendChild(createFolderItem('sub', bookmark.title, bookmark.id));
+        bookmark.children.forEach(function (nestedChild) {
+          handleBookmarkLevel(nestedChild, parentElement, 'nested');
+        });
+      }
+      break;
 
-  return folderItem;
+    case 'nested':
+      if (!bookmark.url && bookmark.title.trim() !== "") {
+        parentElement.appendChild(createFolderItem('nested', bookmark.title, bookmark.id));
+      }
+      break;
+  }
 }
+
+
+
 
 
 

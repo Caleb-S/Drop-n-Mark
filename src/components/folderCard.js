@@ -6,15 +6,167 @@ function folderCardTemplate() {
     })
     template.innerHTML = escapeHTMLPolicy.createHTML(` 
         <style> 
+        :host {
+            width: 100% !important;
+            align-items: flex-end !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        div {
+            display: flex;
+            overflow: hidden;
+        }
+
+        p {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            width: auto;
+            white-space: nowrap;
+            pointer-events: none;
+            margin: 0px;
+
+            display: flex;
+            align-items: center;
+            flex: auto;
+            justify-content: center;
+        }
+
+        :hover {
+            box-shadow: none;
+            color: white;  
+        }
+
+        .main-folder:hover, .sub-folder:hover, .nested-folder:hover  {
+            border: 2px solid #48495244;
+        }
+
+        .main-folder, .sub-folder, .nested-folder {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+            box-sizing: border-box;
+            margin-bottom: 5px;
+            margin-right: 5%;
+            align-items: start;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            /* border: 2px solid transparent; */
+        }
+
+        /* Main Folder */
+
+        .main-folder {
+            min-height: 60px;
+            width: 90%;
+            margin-top: 5px;
+            padding-left: 95px;
+            background-color: #ffffff;
+
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+
+            text-align: left;
+
+            color: #585B62;
+            font-size: 23px;
+        }
+
+        
+
+        .main-folder:hover {
+            background-color: #dcdcdc;
+        }
+ 
+
+        .main-add-folder {
+            min-height: 60px;
+
+            width: 80px;
+
+            position: absolute;
+            top: 0%;
+            bottom: 0%;
+            left: 0%;
+            right: auto;
+
+            justify-content: center;
+            align-items: center;
+
+            background-color: #ECECEC;
+        }
+
+        .main-add-folder:hover {
+            background-color: #999999;
+        }
+
+        /* Sub Folder */
+
+        .sub-folder {
+            min-height: 50px;
+            width: 85%;
+            margin-top: 1px;
+            padding-left: 75px;
+            background-color: #fdba74;
+
+            color: #57534e;
+            font-size: 20px;
+        }
+
+        .sub-folder:hover {
+            background-color: #f59d4e;
+     
+        }
+
+        .sub-add-folder {
+            min-height: 50px;
+
+            width: 60px;
+            
+            position: absolute;
+            top: 0%;
+            bottom: 0%;
+            left: 0%;
+            right: auto;
+
+            justify-content: center;
+            align-items: center;
+
+            background-color: #EBC9A6;
+        }
+
+        .sub-add-folder:hover {
+            background-color: #b17842;
+        }
+
+        .nested-folder {
+            min-height: 40px;
+            width: 67%;
+            margin-top: 0px;
+            padding-left: 17px;
+            background-color: #C5C1B4;
+
+            color: #57534e;
+            font-size: 17px;
+        }
+
+        .nested-folder:hover {
+            background-color: #a79e91;
+        }
+        
+        img {
+            pointer-events: none;    
+        }
+
+
         </style>
 
-        <div class='main-folder' >
-                <div class='main-add-folder'>
-                        
-                </div>
-                <div class='main-f-txt'>
+        <div id='container' >
+            <div id='folder-button'></div>
+            <p>
                 <slot></slot>
-                </div>
+            </p>
         </div>
     
 
@@ -29,13 +181,35 @@ class FolderCard extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(folderCardTemplate());
+        this.buttonType;
+        this.container = this.shadowRoot.getElementById('container');
+        this.folderBtn = this.shadowRoot.getElementById('folder-button');
     }
 
     connectedCallback() {
-        this.restrictHighlighting.bind(this);
-        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
+        this.buttonType = this.getAttribute('type');
+        let imgSrc = this.getAttribute('src');
+
+        if (this.buttonType === 'main') {
+            this.container.classList.add('main-folder');
+            this.folderBtn.classList.add('main-add-folder');
+            this.folderBtn.innerHTML = `<img src="${imgSrc}">`;
+        } else if (this.buttonType === 'sub') {
+            this.container.classList.add('sub-folder');
+            this.folderBtn.classList.add('sub-add-folder');
+            this.folderBtn.innerHTML = `<img src="${imgSrc}">`;
+        } else if (this.buttonType === 'nested') {
+            this.container.classList.add('nested-folder');
+            this.folderBtn.style.display = 'none';
+        }
+
+
+
+
+
     }
 }
 
-customElements.define('folder-card', FolderCard);
+customElements.define('bookmark-folder-card', FolderCard);
 

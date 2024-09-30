@@ -289,34 +289,61 @@ class BookmarkMenu extends HTMLElement {
         this.scrollThresholdPercentage = 0.2;
         this.scrollInterval;
         this.folderContainer = this.shadowRoot.querySelector('.folder-container');
+        this.bookmarkMenu = this.shadowRoot.querySelector('.bookmarkmenu-updated');
+        this.folderInput = this.shadowRoot.querySelector('.folder-input');
         this.scrollPosition = 0;
         this.positionRestored = false;
     }
 
-    connectedCallback() {
-        this.restrictHighlighting.bind(this);
-        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        this.folderContainer = this.shadowRoot.querySelector('.folder-container');
+    static get observedAttributes() {
+        return ['bookmarked', 'src', 'createFolder'];
+    }
 
+    attributeChangedCallback() {
+        let imageElement = document.createElement('img');
+        if (this.hasAttribute('src') ? imageElement.src = this.getAttribute('src') : '');
 
-        console.log(this.hasAttribute('bookmarked'));
-        // Check if bookmarked attribute is present
-        if (this.hasAttribute('bookmarked')) {
+        if (this.hasAttribute('bookmarked') || this.hasAttribute('createFolder')) {
+            this.bookmarkMenu.hasAttribute('open') ? this.bookmarkMenu.removeAttribute('open', '') : '';
 
-            let deleteBox = this.shadowRoot.querySelector('.deleteBox');
-            deleteBox.setAttribute('open', '');
-            let imageElement = document.createElement('img');
-            imageElement.src = this.getAttribute('src');
-            console.log(imageElement.src);
-            deleteBox.appendChild(imageElement);
-
-
-
-
-        } else {
-            this.shadowRoot.querySelector('.bookmarkmenu-updated').setAttribute('open', '');
+            if (this.hasAttribute('bookmarked')) {
+                let deleteBox = this.shadowRoot.querySelector('.deleteBox');
+                deleteBox.setAttribute('open', '');
+                if (!deleteBox.hasChildNodes()) {
+                    deleteBox.appendChild(imageElement);
+                }
+            } else if (this.hasAttribute('createFolder')) {
+                this.folderInput.setAttribute('open', '');
+                if (!this.folderInput.hasChildNodes()) {
+                    this.folderInput.appendChild(imageElement);
+                }
+            }
         }
 
+
+    }
+
+    connectedCallback() {
+        console.log('connected');
+        this.restrictHighlighting.bind(this);
+        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        let imageElement = document.createElement('img');
+        if (this.hasAttribute('src') ? imageElement.src = this.getAttribute('src') : '');
+
+        if (this.hasAttribute('bookmarked') || this.hasAttribute('createFolder')) {
+            this.bookmarkMenu.hasAttribute('open') ? this.bookmarkMenu.removeAttribute('open', '') : '';
+
+            if (this.hasAttribute('bookmarked')) {
+                let deleteBox = this.shadowRoot.querySelector('.deleteBox');
+                deleteBox.setAttribute('open', '');
+                deleteBox.appendChild(imageElement);
+            } else if (this.hasAttribute('createFolder')) {
+                this.folderInput.setAttribute('open', '');
+                this.folderInput.appendChild(imageElement);
+            }
+        } else {
+            this.bookmarkMenu.setAttribute('open', '');
+        }
 
 
 

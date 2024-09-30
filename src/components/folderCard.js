@@ -186,6 +186,7 @@ class FolderCard extends HTMLElement {
         this.folderBtn = this.shadowRoot.getElementById('folder-button');
     }
 
+
     connectedCallback() {
 
         this.buttonType = this.getAttribute('type');

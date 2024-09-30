@@ -25,8 +25,6 @@ let devmode;
 })();
 
 
-
-
 (function () {
   let floatingButton = document.createElement('bookmark-float-button');
   document.body.appendChild(floatingButton);
@@ -34,50 +32,50 @@ let devmode;
 })();
 
 
-
-/**
- * Handles the mouse down event on the floating button.
- *
- * @param {MouseEvent} event - The mouse event object.
- */
 function handleMouseDown(event) {
-  // Send a message to background.js to check if the current page is bookmarked
   chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
-    let bookmarkMenu = document.createElement('bookmark-menu');
-    bookmarkMenu.classList.add('bookmarkMenu');
     if (response.bookmarked) {
-
-      console.log('is bookmarked');
+      let bookmarkMenu = document.createElement('bookmark-menu')
       bookmarkMenu.setAttribute('bookmarked', '');
       bookmarkMenu.setAttribute('src', chrome.runtime.getURL('src/assets/rubbishBinSmall.svg'));
       let deleteBox = bookmarkMenu.shadowRoot.querySelector('.deleteBox');
       deleteBox.addEventListener('mouseup', function (event) {
-
-
         chrome.runtime.sendMessage({ action: "deleteBookmark" }, function (response) {
-          if (response.success) {
-            showToast('Removed Bookmark');
-
-          } else {
-            showToast('Failed To Remove Bookmark');
-          }
+          response.success ? showToast('Removed Bookmark') : showToast('Failed To Remove Bookmark');
         });
-
-
       });
-
       document.body.appendChild(bookmarkMenu);
 
-
-
     } else {
+      let bookmarkMenu = document.createElement('bookmark-menu');
+      bookmarkMenu.addEventListener('menu-scroll-point', (event) => {
+        chrome.storage.local.set({ scrollPosition: event.detail });
+      });
 
-      generateMenu();
+      chrome.storage.local.get(['scrollPosition'], (result) => {
+        if (result.scrollPosition !== undefined) {
+          bookmarkMenu.setAttribute('scrollPosition', result.scrollPosition);
+        }
+      });
 
+      chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+          return;
+        } else {
+          (response.bookmarks).forEach(function (bookmark) {
+            handleBookmarkLevel(bookmark, bookmarkMenu, 'root');
+          });
+          devmode ? printBookmarkTree(response.bookmarks) : '';
+        }
+      });
+      document.body.appendChild(bookmarkMenu);
     }
   });
+
   document.addEventListener('mouseup', floatDropOutside);
 }
+
 
 
 /*
@@ -106,76 +104,25 @@ function floatDropOutside(event) {
  * @param {string} toastText - The text to display in the toast message.
  */
 function showToast(toastText) {
-
-  //remove all bookmark-toasts
+  let toastCreate = document.createElement('bookmark-toast');
+  let text = toastText ? toastText : "Null";
   let toasts = document.querySelectorAll('bookmark-toast');
+
   toasts.forEach(function (toast) {
     toast.remove();
   });
 
-
-  let toastCreate = document.createElement('bookmark-toast');
-
-  let text = toastText ? toastText : "Null";
   toastCreate.innerText = text;
-
   document.body.appendChild(toastCreate);
-
 
   setTimeout(function () {
     toastCreate.remove();
   }, 3000);
-
-
 }
 
-// Generates the bookmark menu.
-function generateMenu() {
-  const bookmarkMenu = document.createElement('bookmark-menu');
-
-  // Request all bookmarks from the background script
-  chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
-    if (chrome.runtime.lastError) {
-      console.error(chrome.runtime.lastError);
-      return;
-    }
-    let bookmarks = response.bookmarks;
-
-    bookmarks.forEach(function (bookmarks) {
-      handleBookmarkLevel(bookmarks, bookmarkMenu, 'root');
-    });
-
-    if (devmode) {
-      printBookmarkTree(bookmarks);
-    }
-
-  });
-
-
-  chrome.storage.local.get(['scrollPosition'], (result) => {
-    if (result.scrollPosition !== undefined) {
-      // Set the scrollTop to the saved position
-      bookmarkMenu.setAttribute('scrollPosition', result.scrollPosition);
-    }
-  });
-
-  bookmarkMenu.addEventListener('menu-scroll-point', (event) => {
-    const value = event.detail;
-    chrome.storage.local.set({ scrollPosition: value });
-
-  });
-
-
-
-  // Append the new bookmark menu to the document body
-  document.body.appendChild(bookmarkMenu);
-
-}
 
 function createFolderItem(type, title, id) {
-
   let image = type === 'main' ? 'src/assets/newFolderLarge.svg' : 'src/assets/newFolderMedium.svg';
-
 
   let FolderItem = document.createElement('bookmark-folder-card');
   FolderItem.innerText = title;
@@ -184,7 +131,12 @@ function createFolderItem(type, title, id) {
 
   FolderItem.addEventListener('mouseup', function (event) {
     if (event.target === FolderItem) {
-      saveBookmarkToFolder(id);
+      chrome.runtime.sendMessage({
+        action: "saveCurrentPageToBookmark",
+        parentFolderId: id,
+        currentPageUrl: document.URL,
+        currentPageTitle: document.title
+      });
       showToast('Bookmarked Under: ' + title);
     }
   });
@@ -199,12 +151,10 @@ function createFolderItem(type, title, id) {
   });
 
   return FolderItem;
-
 }
 
 
 function handleBookmarkLevel(bookmark, parentElement, level) {
-
   switch (level) {
     case 'root':
       if (bookmark.children) {
@@ -249,19 +199,6 @@ function handleBookmarkLevel(bookmark, parentElement, level) {
 }
 
 
-// Saves the current page bookmark to a folder.
-function saveBookmarkToFolder(folderId) {
-  //showToast('folder being bookmarked id: ' + folderId);
-  chrome.runtime.sendMessage({
-    action: "saveCurrentPageToBookmark",
-    parentFolderId: folderId,
-    currentPageUrl: document.URL,
-    currentPageTitle: document.title
-  }, function (response) {
-  });
-}
-
-
 /**
  * Prints the bookmark tree recursively.
  *
@@ -270,14 +207,22 @@ function saveBookmarkToFolder(folderId) {
  * @param {string} indent - The indentation string.
  */
 function printBookmarkTree(bookmarks, prefix = '', indent = '') {
-  bookmarks.forEach(function (bookmark, index) {
-    if (!bookmark.url) {
-      let folderNumber = prefix + (index + 1);
+  let output = [];
 
-      let childPrefix = folderNumber + '.';
-      printBookmarkTree(bookmark.children, childPrefix, indent + '  ');
-    }
-  });
+  function traverse(bookmarks, prefix = '', indent = '') {
+    bookmarks.forEach(function (bookmark, index) {
+      if (!bookmark.url) {
+        let folderNumber = prefix + (index + 1);
+        let childPrefix = folderNumber + '.';
+        output.push(`${bookmark.title} : ${folderNumber}`);
+        traverse(bookmark.children, childPrefix, indent + '  ');
+      }
+    });
+  }
+
+  traverse(bookmarks, prefix, indent);
+  console.log(output.join('\n'));
 }
+
 
 

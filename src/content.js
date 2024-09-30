@@ -1,4 +1,6 @@
 
+let devmode;
+
 // Append scripts for webcomponents
 (function () {
   const scripts = ['toast', 'floatingBtn', 'bookmarkMenu', 'folderCard'];
@@ -7,6 +9,7 @@
 
   chrome.runtime.sendMessage({ action: 'getEnvironment' }, response => {
     let path;
+    devmode = response.devmode;
     response.devmode ? path = devpath : path = prodpath;
     for (let script of scripts) {
       loadScript(path + script + '.js');
@@ -20,32 +23,6 @@
     document.head.appendChild(script);
   }
 })();
-
-
-// test foldercard
-function testFolderCard() {
-  let dummieMenu = document.createElement('bookmark-menu');
-
-
-  let mainCard = document.createElement('bookmark-folder-card');
-  mainCard.innerHTML = 'Main Card';
-  mainCard.setAttribute('type', 'main');
-  mainCard.setAttribute('src', chrome.runtime.getURL('src/assets/newFolderLarge.svg'));
-  dummieMenu.appendChild(mainCard);
-
-  let subCard = document.createElement('bookmark-folder-card');
-  subCard.innerHTML = 'Sub Card';
-  subCard.setAttribute('type', 'sub');
-  subCard.setAttribute('src', chrome.runtime.getURL('src/assets/newFolderMedium.svg'));
-  dummieMenu.appendChild(subCard);
-
-  let nestedCard = document.createElement('bookmark-folder-card');
-  nestedCard.innerHTML = 'Nested Card';
-  nestedCard.setAttribute('type', 'nested');
-  dummieMenu.appendChild(nestedCard);
-
-  document.body.appendChild(dummieMenu);
-}
 
 
 
@@ -66,14 +43,14 @@ function testFolderCard() {
 function handleMouseDown(event) {
   // Send a message to background.js to check if the current page is bookmarked
   chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
-    let testMenu = document.createElement('bookmark-menu');
-    testMenu.classList.add('testmenu');
+    let bookmarkMenu = document.createElement('bookmark-menu');
+    bookmarkMenu.classList.add('bookmarkMenu');
     if (response.bookmarked) {
 
       console.log('is bookmarked');
-      testMenu.setAttribute('bookmarked', '');
-      testMenu.setAttribute('src', chrome.runtime.getURL('src/assets/rubbishBinSmall.svg'));
-      let deleteBox = testMenu.shadowRoot.querySelector('.deleteBox');
+      bookmarkMenu.setAttribute('bookmarked', '');
+      bookmarkMenu.setAttribute('src', chrome.runtime.getURL('src/assets/rubbishBinSmall.svg'));
+      let deleteBox = bookmarkMenu.shadowRoot.querySelector('.deleteBox');
       deleteBox.addEventListener('mouseup', function (event) {
 
 
@@ -89,7 +66,7 @@ function handleMouseDown(event) {
 
       });
 
-      document.body.appendChild(testMenu);
+      document.body.appendChild(bookmarkMenu);
 
 
 
@@ -108,17 +85,18 @@ function handleMouseDown(event) {
 
  */
 function floatDropOutside(event) {
-  /*
-  const newFolderBtn = document.querySelector('.new-folder-btn-ui5864921');
-  const bookmarkMenu = document.getElementById('bookmarkMenu-ui5864921');
 
-  if (!newFolderBtn.contains(event.target) && !event.target.closest('.main-add-folder-ui5864921') && !event.target.closest('.sub-add-folder-ui5864921')) {
-    bookmarkMenu.style.display = 'none';
+
+  const bookmarkMenu = document.querySelector('bookmark-menu');
+  const newFolderBtn = bookmarkMenu.shadowRoot.querySelector('.new-folder-btn');
+
+  if (!newFolderBtn.contains(event.target) && !event.target.closest('.main-add-folder') && !event.target.closest('.sub-add-folder')) {
+    //bookmarkMenu.style.display = 'none';
     document.querySelector('bookmark-menu').remove();
   }
-  */
 
-  document.querySelector('bookmark-menu').remove();
+
+  //document.querySelector('bookmark-menu').remove();
 
 }
 
@@ -153,10 +131,7 @@ function showToast(toastText) {
 
 // Generates the bookmark menu.
 function generateMenu() {
-
-  let testMenu = document.createElement('bookmark-menu');
-
-  const folderContainer = testMenu;
+  const bookmarkMenu = document.createElement('bookmark-menu');
 
   // Request all bookmarks from the background script
   chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
@@ -164,20 +139,27 @@ function generateMenu() {
       console.error(chrome.runtime.lastError);
       return;
     }
-
     let bookmarks = response.bookmarks;
-    updateBookmarkMenu(bookmarks, folderContainer);
+
+    bookmarks.forEach(function (bookmarks) {
+      handleBookmarkLevel(bookmarks, bookmarkMenu, 'root');
+    });
+
+    if (devmode) {
+      printBookmarkTree(bookmarks);
+    }
+
   });
 
 
   chrome.storage.local.get(['scrollPosition'], (result) => {
     if (result.scrollPosition !== undefined) {
       // Set the scrollTop to the saved position
-      testMenu.setAttribute('scrollPosition', result.scrollPosition);
+      bookmarkMenu.setAttribute('scrollPosition', result.scrollPosition);
     }
   });
 
-  testMenu.addEventListener('menu-scroll-point', (event) => {
+  bookmarkMenu.addEventListener('menu-scroll-point', (event) => {
     const value = event.detail;
     chrome.storage.local.set({ scrollPosition: value });
 
@@ -186,10 +168,7 @@ function generateMenu() {
 
 
   // Append the new bookmark menu to the document body
-  document.body.appendChild(testMenu);
-
-
-
+  document.body.appendChild(bookmarkMenu);
 
 }
 
@@ -223,27 +202,9 @@ function createFolderItem(type, title, id) {
 
 }
 
-// Function to update the bookmark menu
-function updateBookmarkMenu(bookmarks, folderContainer) {
-  printBookmarkTree(bookmarks);
-  let testMenu = document.querySelector('bookmark-menu');
-  processFolders(bookmarks, testMenu);
-}
-
-/**
- * Processes the bookmark folders.
- *
- * @param {Array} bookmarks - The array of bookmark objects.
- * @param {HTMLElement} parentElement - The parent HTML element to append the folder items to.
- */
-
-function processFolders(bookmarks, parentElement) {
-  bookmarks.forEach(function (bookmark) {
-    handleBookmarkLevel(bookmark, parentElement, 'root');
-  });
-}
 
 function handleBookmarkLevel(bookmark, parentElement, level) {
+
   switch (level) {
     case 'root':
       if (bookmark.children) {
@@ -286,10 +247,6 @@ function handleBookmarkLevel(bookmark, parentElement, level) {
       break;
   }
 }
-
-
-
-
 
 
 // Saves the current page bookmark to a folder.

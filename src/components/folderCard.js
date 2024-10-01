@@ -95,10 +95,13 @@ function folderCardTemplate() {
             align-items: center;
 
             background-color: #ECECEC;
+            
         }
 
         .main-add-folder:hover {
             background-color: #999999;
+          
+
         }
 
         /* Sub Folder */
@@ -204,6 +207,25 @@ class FolderCard extends HTMLElement {
             this.container.classList.add('nested-folder');
             this.folderBtn.style.display = 'none';
         }
+
+        this.container.addEventListener('mouseup', (event) => {
+            if (event.target !== this.folderBtn) {
+                this.dispatchEvent(new CustomEvent('create-bookmark', {
+                    detail: event.detail,
+                    bubbles: true,  // Allows the event to bubble up through the DOM
+                    composed: true  // Allows the event to pass through Shadow DOM boundaries
+                }));
+            }
+
+        });
+
+        this.folderBtn.addEventListener('mouseup', (event) => {
+            this.dispatchEvent(new CustomEvent('create-sub-folder', {
+                detail: event.detail,
+                bubbles: true,  // Allows the event to bubble up through the DOM
+                composed: true  // Allows the event to pass through Shadow DOM boundaries
+            }));
+        });
 
 
 

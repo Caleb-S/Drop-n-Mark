@@ -227,6 +227,42 @@ function menuTemplate() {
                 justify-content: center;
                 align-items: center;
             }
+
+            .folder-input {
+                z-index: 2147483646;
+                width: 400px;
+                height: 250px;
+           
+                justify-content:space-evenly;
+                align-items: center;
+                
+                background-color: #484952;
+                border-radius: 8px;
+          
+     
+                margin: auto;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                flex-direction: column-reverse;
+                cursor: auto;
+            
+            }
+
+            .folder-input[open] {
+                display: flex;
+            }
+
+            .folder-input input {
+                display: block;
+                width: 80%;
+                height: 40px;
+                padding: 8px;
+                border: none;
+                border-radius: 4px;
+                font-size: 20px;
+                background-color: #ffffff;
+                outline: none;
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
                 
         </style>
     
@@ -286,11 +322,12 @@ class BookmarkMenu extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(menuTemplate());
-        this.scrollThresholdPercentage = 0.2;
+        this.scrollThresholdPercentage = 0.25;
         this.scrollInterval;
         this.folderContainer = this.shadowRoot.querySelector('.folder-container');
         this.bookmarkMenu = this.shadowRoot.querySelector('.bookmarkmenu-updated');
-        this.folderInput = this.shadowRoot.querySelector('.folder-input');
+        this.createFolder = this.shadowRoot.querySelector('.folder-input');
+        //this.folderInput = this.shadowRoot.querySelector('.folder-input input');
         this.scrollPosition = 0;
         this.positionRestored = false;
     }
@@ -313,10 +350,12 @@ class BookmarkMenu extends HTMLElement {
                     deleteBox.appendChild(imageElement);
                 }
             } else if (this.hasAttribute('createFolder')) {
-                this.folderInput.setAttribute('open', '');
-                if (!this.folderInput.hasChildNodes()) {
-                    this.folderInput.appendChild(imageElement);
+                this.createFolder.setAttribute('open', '');
+                if (!this.createFolder.hasChildNodes()) {
+                    this.createFolder.appendChild(imageElement);
                 }
+                this.createFolder.querySelector('input').focus();
+
             }
         }
 
@@ -326,7 +365,7 @@ class BookmarkMenu extends HTMLElement {
     connectedCallback() {
         console.log('connected');
         this.restrictHighlighting.bind(this);
-        this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
         let imageElement = document.createElement('img');
         if (this.hasAttribute('src') ? imageElement.src = this.getAttribute('src') : '');
 
@@ -338,21 +377,37 @@ class BookmarkMenu extends HTMLElement {
                 deleteBox.setAttribute('open', '');
                 deleteBox.appendChild(imageElement);
             } else if (this.hasAttribute('createFolder')) {
-                this.folderInput.setAttribute('open', '');
-                this.folderInput.appendChild(imageElement);
+
+                this.createFolder.setAttribute('open', '');
+                this.createFolder.appendChild(imageElement);
+                let folderInput = this.shadowRoot.querySelector('.folder-input input');
+                folderInput.focus();
+
+                folderInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        this.handleFolderInput(); // Ensure `handleFolderInput` is defined in your class
+                    }
+                });
+
             }
         } else {
             this.bookmarkMenu.setAttribute('open', '');
+            let slot = this.shadowRoot.querySelector('slot');
+
+            // waits until all folder items are loaded
+            slot.addEventListener('slotchange', () => {
+                this.folderContainer.scrollTop = this.getAttribute('scrollPosition');
+            });
+            this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
+            let deleteBox = this.shadowRoot.querySelector('.general-btn');
+            deleteBox.addEventListener('mouseup', this.handleGeneralBtn.bind(this));
         }
 
 
 
-        let slot = this.shadowRoot.querySelector('slot');
 
-        // waits until all folder items are loaded
-        slot.addEventListener('slotchange', () => {
-            this.folderContainer.scrollTop = this.getAttribute('scrollPosition');
-        });
     }
 
     disconnectedCallback() {
@@ -372,51 +427,101 @@ class BookmarkMenu extends HTMLElement {
 
     handleMouseMove(event) {
         let rect = this.folderContainer.getBoundingClientRect();
-        let scrollSpeed = 7;
         let scrollThresholdPixels = rect.height * this.scrollThresholdPercentage;
-        let scrollStartOffset = 20;
+        let scrollStartOffset = 25;
 
-        this.removeHighlight();
+        let distanceFromBottom = rect.bottom - event.clientY;
+        let distanceFromTop = event.clientY - rect.top;
+
+        // Define max speed and easing factor for momentum
+        let maxScrollSpeed = 15;
+        let baseScrollSpeed = 1;
+        let momentum = 0;
+        let easingFactor = 0.70;
+
+        clearInterval(this.scrollInterval);
+
+        // Calculate variable speed based on proximity to edges
+        let speedDown = Math.min(maxScrollSpeed, baseScrollSpeed + (scrollThresholdPixels - distanceFromBottom) / scrollThresholdPixels * maxScrollSpeed);
+        let speedUp = Math.min(maxScrollSpeed, baseScrollSpeed + (scrollThresholdPixels - distanceFromTop) / scrollThresholdPixels * maxScrollSpeed);
 
         // Scroll down logic
-        if (event.clientY >= rect.bottom - scrollThresholdPixels - scrollStartOffset
-            && event.clientY <= rect.bottom
+        if (event.clientY >= rect.bottom - scrollThresholdPixels
+            && event.clientY <= rect.bottom + 15
             && event.clientX >= rect.left
             && event.clientX <= rect.right) {
 
-            clearInterval(this.scrollInterval);
+        
+
             this.scrollInterval = setInterval(() => {
-                this.folderContainer.scrollTop += scrollSpeed;
+                this.folderContainer.scrollTop += speedDown;
+                momentum = speedDown; // Capture momentum
             }, 10);
 
             // Scroll up logic
-        } else if (event.clientY <= rect.top + scrollThresholdPixels + scrollStartOffset
-            && event.clientY >= rect.top
+        } else if (event.clientY <= rect.top + scrollThresholdPixels
+            && event.clientY >= rect.top - 15
             && event.clientX >= rect.left
             && event.clientX <= rect.right) {
 
-            clearInterval(this.scrollInterval);
+       
+
             this.scrollInterval = setInterval(() => {
-                this.folderContainer.scrollTop -= scrollSpeed;
+                this.folderContainer.scrollTop -= speedUp;
+                momentum = -speedUp; // Capture negative momentum for upward scrolling
             }, 10);
 
         } else {
-            clearInterval(this.scrollInterval);
+            // Clear the interval but allow momentum to continue briefly
+
+            /*
+            if (momentum !== 0) {
+                // Apply easing to simulate momentum slowing down
+                this.scrollInterval = setInterval(() => {
+                    this.folderContainer.scrollTop += momentum;
+                    momentum *= easingFactor; // Reduce momentum gradually
+                    // Stop when momentum is almost zero
+                    if (Math.abs(momentum) < 0.1) {
+                        clearInterval(this.scrollInterval);
+                    }
+                }, 10); // Increased interval for smoother momentum effect
+            }
+            */
         }
         this.scrollPosition = this.folderContainer.scrollTop;
     }
 
 
 
+    handleGeneralBtn(event) {
+        this.dispatchEvent(new CustomEvent('save-general', {
+            detail: '2',
+            bubbles: true,  // Allows the event to bubble up through the DOM
+            composed: true  // Allows the event to pass through Shadow DOM boundaries
+        }));
+    }
+
+    handleFolderInput(event) {
+        let folderInput = this.shadowRoot.querySelector('.folder-input input');
+        this.dispatchEvent(new CustomEvent('create-folder', {
+            detail: folderInput.value,
+            bubbles: true,  // Allows the event to bubble up through the DOM
+            composed: true  // Allows the event to pass through Shadow DOM boundaries
+        }));
+    }
+
     removeHighlight() {
+
         if (window.getSelection) {
             window.getSelection().removeAllRanges();
         } else if (document.selection) {
             document.selection.empty();
         }
+
     }
 
     restrictHighlighting() {
+
         const menuItems = this.shadowRoot.querySelectorAll('div, dialog, p, small');
 
         menuItems.forEach(item => {
@@ -436,6 +541,7 @@ class BookmarkMenu extends HTMLElement {
 
             item.draggable = false;
         });
+
     }
 }
 

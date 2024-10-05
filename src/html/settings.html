@@ -1,246 +1,183 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Settings - DragNMark</title>
-        
-    <link rel="manifest" href="../assets/favicon/site.webmanifest">
-    <link rel="icon" href="../assets/favicon/android-chrome-192x192.png"> 
-    <link rel="icon" href="../assets/favicon/android-chrome-512x512.png">
+    <head>
+        <title>Settings - DragNMark</title>
 
-    <style> 
-        /* CSS Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        html, body {
-            height: 100%;
-        }
+        <link rel="manifest" href="../assets/favicon/site.webmanifest">
+        <link rel="icon" href="../assets/favicon/android-chrome-192x192.png"> 
+        <link rel="icon" href="../assets/favicon/android-chrome-512x512.png">
 
 
-        body {
-            line-height: 1;
-            font-family: sans-serif;
-            background: #c3baa8;
-            max-width: 100vw;
-            max-height: 100vh;
-            overflow: hidden;
-        }
+        <link rel="stylesheet" href="./styles/settings.css">
+    </head>
+    <body>
+        <div class='main-wrapper'>
+            <div class='settings-container'>
+                <div class='settings-title'>
+                    <div>Settings</div>
+                </div>
+                <div class='spacer'></div>
+                </br>
+                <div id="settingsForm">
+                    <div class='settings-card' id='presets'>
+                        <h2 class='settings-card-title'  >Presets</h2>
+                        <details>Recommended settings based on your browser.</details>
 
-        ul, ol {
-            list-style: none;
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="preset2" name="preset" checked>
+                            <span class="custom-radio"></span>
+                            Droppi's Favorites &#x2728;
+                        </label>
 
-        img, video {
-            max-width: 100%;
-            height: auto;
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="preset3" name="preset">
+                            <span class="custom-radio"></span>
+                            Contrarian
+                        </label>
 
-        a { 
-            text-decoration: none;
-            color: inherit;
-        }
-        
-        button, input {
-            border: none;
-            background: none;
-            font-family;
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="preset3" name="preset">
+                            <span class="custom-radio"></span>
+                            Clean but Untidy
+                        </label>
 
-        table { 
-            border-collapse: collapse;
-            border-spacing: 0;
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="preset1" name="preset">
+                            <span class="custom-radio"></span>
+                            Custom
+                        </label>
 
-        /* Custom Style: */
-        .main-wrapper {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .settings-container {
+                    </div>
 
-            background: #f7f4ee;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: start;
-            height: 90%;
-            
-            width: 40%;
-            max-width: 450px;
-            /*
-            border-width: 10px;
-            border-color: #35363f;
-            border-style: solid;
-            border-radius: 10px;
-            */
-            /* padding: 10px; */
-            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.4);
-            margin-left: 5%;
-            z-index: 200;
-       
-        }
+                    <div class='spacer'></div> 
+                    </br>
 
+                    <div class='settings-card' id='root-folder-pref'>
+                        <h2 class='settings-card-title'>Primary Folder</h2>
+                        <details>
+                            <p>
+                            Enabled: New folders are saved to your browser's bookmark bar folder.
+                            </p>
+                            </br>
+                            <p>Disabled: New folders are saved outside bookmark bar folder.</p>
+                            </br>
+                            <p>Note: Depending on your browser, you may have to disable this to save new folders to your bookmark bar.</p>
+                        </details>
 
-        #settingsForm {
-            padding: 10px;
-            height: 80%;
-            width: 100%;
+                        <label class="radio-container">
+                            <input type="radio" id="root-opt-1" name="options" value="1" default>
+                            <span class="custom-radio"></span>
+                            Default
+                        </label>
 
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="root-opt-2" name="options" value="2">
+                            <span class="custom-radio"></span>
+                            Bookmark Bar
+                        </label>
 
-        .image-container {
+                        <label class="radio-container">
+                            <input type="radio" id="root-opt-3" name="options" value="3">
+                            <span class="custom-radio"></span>
+                            <p id='custom-root-text' >Custom</p>
+                            <select name="bookmark-folders" class='folder-select hidden' id='custom-root-select'>
+                                <option value="" disabled selected hidden>Select a Folder</option>
+                               
+                            </select>
+                        </label>
 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: fit-content;
-            margin-right: 2%;
-        }
+                    </div>
 
-      
+                    <div class='spacer'></div>
+                    </br>
 
-        .settings-title, #submit-button {
-            width: 100%;
-            height: 10%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #484952;
-            color: #f7f4ee;
-            font-size: 2em;
-            font-weight: bold;
+                    <div class='settings-card' id='general-folder-pref'>
+                        <h2 class='settings-card-title'>General Folder</h2>
+                        <details>
+                            <p>
+                            Enabled: New folders are saved to your browser's bookmark bar folder.
+                            </p>
+                            </br>
+                            <p>Disabled: New folders are saved outside bookmark bar folder.</p>
+                            </br>
+                            <p>Note: Depending on your browser, you may have to disable this to save new folders to your bookmark bar.</p>
+                        </details>
 
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="gen-opt-1" name="general-folder" value="1" checked>
+                            <span class="custom-radio"></span>
+                            Default
+                        </label>
 
-        #submit-button:hover {
-            background: #ff8254;
-            color: #f7f4ee;
-            cursor: pointer;
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="gen-opt-2" name="general-folder" value="2">
+                            <span class="custom-radio"></span>
+                            Bookmark Bar
+                        </label>
 
-        #submit-button:active {
-            background: #f15a24;
-        }
+                        <label class="radio-container">
+                            <input type="radio" id="gen-opt-3" name="general-folder" value="3">
+                            <span class="custom-radio"></span>
+                            <p id='custom-general-text' >Custom</p>
+                            <select name="bookmark-folders" class='folder-select hidden' id='custom-general-select'>
+                                <option value="" disabled selected hidden>Select a Folder</option>
+                              
+                            </select>
+                        </label>
 
-        details { 
-            display: none;
-        }
+                    </div>
 
-        .settings-card {
-            background: white;
-            padding: 10px;
-            min-width: 80%;
-            box-shadow: 0 1px 5px RGB(0, 0, 0, 0.1);
+                    <div class='spacer'></div>
+                    </br>
 
-        }
+                    <div class='settings-card' id='sort-files'>
+                        <h2 class='settings-card-title'>Organise Files</h2>
+                        <details>Move all folders to Root folder and move files not in a folder to other root folder - can not be undone.</details>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleSwitch">
+                            <span class="slider"></span>
+                        </label>
 
-        .settings-card-title {
+                    </div>
 
-            padding-bottom: 8px;
-            color: #484952;
-            
-        }   
+                    <div class='spacer'></div>
+                    </br>
 
-         .speech-box {
-            position: absolute;
-            background-color: white;
-            /* border: 1px solid black; */
-            padding: 20px;
-            max-width: 300px;
-            font-size: 16px;
-            font-weight: 500;
-            color: #484952;
-            border-radius: 30px 0px 30px 30px;
-            box-shadow: -2px 2px 5px RGB(0, 0, 0, 0.3)
+                    <div class='settings-card' id='remove-duplicates'>
+                        <h2 class='settings-card-title'>Organise Folders</h2>
+                        <details>Will remove all duplicate bookmarks</details>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleSwitch">
+                            <span class="slider"></span>
+                        </label>
 
-        }
-         #image {
+                    </div>
 
-             max-height: 80%;
-         }
-    </style>
-</head>
-<body>
-    <div class='main-wrapper'>
-    <div class='settings-container'>
-        <div class='settings-title'>
-    <div>Settings</div>
-        </div>
-    <div class='spacer'></div>
-    </br>
-    <form id="settingsForm">
-        <div class='settings-card'>
-        <h2 class='settings-card-title'  >Presets</h2>
-        <details>Recommended settings based on your browser.</details>
-        <input type="radio" id="preset2" name="preset" checked>
-        <label for="preset2" >Chrome</label>
-        </br>
-        <input type="radio" id="preset3" name="preset">
-        <label for="preset3" >Brave</label>
-        </br>
-        <input type="radio" id="preset1" name="preset">
-        <label for="preset1" >Custom</label>
+                    <div class='spacer'></div>
+                    </br>
+
+                    <div class='settings-card' id='remove-duplicates'>
+                        <h2 class='settings-card-title'>Remove Duplicates</h2>
+                        <details>Will remove all duplicate bookmarks</details>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleSwitch">
+                            <span class="slider"></span>
+                        </label>
+
+                    </div>
+
+                </div>
+                <button id='submit-button'>Save</button>
+            </div>
+
+            <div class='image-container'>
+                <img id='image' src="../assets/orange-man-cursor3.webp">
+                <div class="speech-box" id="speechBox">Choose your root folder; folders within the root folder will be available in your bookmark menu to save new bookmarks & folders. If your browsers Chrome, root 1 is used by your browsers bookmark bar, in other browsers such as brave your bookmark bar folder may be Root 2.</div>
+            </div>
         </div>
 
-        <div class='spacer'></div> 
-        </br>
+        <script src="../settings.js"></script>
 
-        <div class='settings-card'>
-        <h2 class='settings-card-title'>Root Folder</h2>
-        <details>
-        Choose your root folder; folders within the root folder will be available in your bookmark menu to save new bookmarks & folders. If your browsers Chrome, root 1 is used by your browsers bookmark bar, in other browsers such as brave your bookmark bar folder may be Root 2. 
-        </details>
-        <input type="radio" id="root1" name="rootfolder" checked>
-        <label for="root1" >Root 1</label>
-        </br>   
-        <input type="radio" id="root2" name="rootfolder">
-        <label for="root2">Root 2</label>
-        </div>
-
-        <div class='spacer'></div>
-        </br>
-
-        <div class='settings-card'>
-        <h2 class='settings-card-title'>Sort File & Folders</h2>
-        <details>Move all folders to Root folder and move files not in a folder to other root folder - can not be undone.</details>
-        <button type="button">Sort Files & Folders</button>
-        </div>
-
-        <div class='spacer'></div>
-        </br>
-
-        <div class='settings-card'>
-        <h2 class='settings-card-title'>Remove Duplicates</h2>
-        <details>Will remove all duplicate bookmarks</details>
-        <button type="button" class='setting-button'>Remove Duplicates</button>
-        </div>
-
-        <div class='spacer'></div>
-        </br>
-
-        
-    </form>
-    <button id='submit-button'>Save</button>
-</div>
-<div class='image-container'>
-    <img id='image' src="../assets/orange-man-cursor2.webp">
-    <div class="speech-box" id="speechBox">Choose your root folder; folders within the root folder will be available in your bookmark menu to save new bookmarks & folders. If your browsers Chrome, root 1 is used by your browsers bookmark bar, in other browsers such as brave your bookmark bar folder may be Root 2.</div>
-</div>
-    </div>
-
-<script src="../settings.js"></script>
-
-</body>
+    </body>
 </html>
 

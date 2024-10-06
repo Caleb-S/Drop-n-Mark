@@ -1,49 +1,106 @@
+document.getElementById('submit-button').addEventListener('click', processSave);
+document.querySelectorAll('input[name="preset"]').forEach(function (element) {
+    element.addEventListener('click', presetOptions);
+});
 
-/*
-    document.getElementById('settingsForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const option1 = document.getElementById('option1').checked;
-        chrome.storage.sync.set({ option1: option1 }, function() {
-            console.log('Settings saved');
-        });
+let presets = {
+    "1": {
+        "rootFolder": 1,
+        "generalFolder": 1,
+        "sortFiles": true,
+        "sortFolders": false,
+        "removeDuplicates": true
+    },
+    "2": {
+        "rootFolder": 2,
+        "generalFolder": 2,
+        "sortFiles": false,
+        "sortFolders": true,
+        "removeDuplicates": true
+    },
+    "3": {
+        "rootFolder": 1,
+        "generalFolder": 2,
+        "sortFiles": true,
+        "sortFolders": true,
+        "removeDuplicates": false
+    }
+};
+
+function presetOptions() {
+    let value;
+
+    let rootFolderPref;
+    let generalFolderPref;
+    let sortFilesPref;
+    let sortFoldersPref;
+    let removeDuplicatesPref;
+    
+    function update() {
+        updateSetting('rootFolder', rootFolderPref);
+        updateSetting('generalFolder', generalFolderPref);
+        updateSetting('sortFiles', sortFilesPref);
+        updateSetting('sortFolders', sortFoldersPref);
+        updateSetting('removeDuplicates', removeDuplicatesPref);
+    }
+
+    document.querySelectorAll('input[name="preset"]').forEach(function (element) {
+        if (element.checked) {
+            value = element.value;
+        }
     });
 
-// Load saved settings
-chrome.storage.sync.get(['option1'], function(result) {
-    document.getElementById('option1').checked = result.option1 || false;
-});
-*/
+    if (value !== '0') {
+        rootFolderPref = presets[`${value}`].rootFolder;
+        generalFolderPref = presets[`${value}`].generalFolder;
+        sortFilesPref = presets[`${value}`].sortFiles;
+        sortFoldersPref = presets[`${value}`].sortFolders;
+        removeDuplicatesPref = presets[`${value}`].removeDuplicates;
+        update();   
+    }
+
+}
 
 
-    /*
-    todo: 
-    - display speechbox on settings-card hover.
-    - connect preset settings
-    - connect root settings
+function checkIfPreset() {
+    // Get the current settings from the UI
+    const rootFolder = document.querySelector('input[name="options"]:checked').value;
+    const generalFolder = document.querySelector('input[name="general-folder"]:checked').value;
+    const sortFiles = document.getElementById('organise-files-switch').checked;
+    const sortFolders = document.getElementById('organise-folders-switch').checked;
+    const removeDuplicates = document.getElementById('remove-duplicates-switch').checked;
 
+    // Compare current settings with each preset
+    for (let preset in presets) {
+        if (
+            rootFolder == presets[preset].rootFolder &&
+            generalFolder == presets[preset].generalFolder &&
+            sortFiles === presets[preset].sortFiles &&
+            sortFolders === presets[preset].sortFolders &&
+            removeDuplicates === presets[preset].removeDuplicates
+        ) {
+            console.log(`Matching preset found: ${preset}`);
+            let presetCard = document.querySelector(`input[value="${preset}"]`);
+            presetCard.checked = true;
+            return preset; // Return the preset ID that matches
+        }
+    }
+    document.querySelector('input[value="0"]').checked = true;
 
-    */
+    console.log("No matching preset found.");
+    return null; // Return null if no preset matches
+}
 
-//  function to position the speech bubble
-let speechBox = document.getElementById('speechBox');
-let bubbleX = 80;
-let bubbleY = 80;
-// Update speech box position when the window resizes or image changes
-window.addEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
-document.getElementById('image').addEventListener('load', () => positionSpeechBox(bubbleX, bubbleY));
-
-// Call the function with custom offsets (xOffset, yOffset)
-positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-
-document.getElementById('submit-button').addEventListener('click', processSave);
-
-                updateDropDownMenus();
 
 
 // function to check which speech button is being hovered.
 (function() {
+    let bubbleX = 80;
+    let bubbleY = 80;
+
     let settingsContainer = document.getElementById('settingsForm'); 
-  
+
+    let speechBox = document.getElementById('speechBox');
     let presetsCard = document.getElementById('presets');
     let rootCard = document.getElementById('root-folder-pref');
     let sortCard = document.getElementById('organise-folders');
@@ -56,46 +113,183 @@ document.getElementById('submit-button').addEventListener('click', processSave);
     let removeDupsDetails = removeDupsCard.getElementsByTagName('details')[0];
 
     // Remove text from speech box
-    //let speechBox = document.getElementById('speechBox'); 
-    speechBox.innerHTML = '';
-    speechBox.style.display = 'none';
-
     settingsContainer.addEventListener('mouseover', function (event) {
+        window.addEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
         if (presetsCard.contains(event.target)) {
             //console.log('contains preset card');
             speechBox.textContent = presetsDetails.textContent;
-            speechBox.style.display = 'block';
+            speechBox.classList.toggle('hidden', false);
             positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-
         } else if (rootCard.contains(event.target)) {
             //console.log('contains rootCard');
             speechBox.innerHTML = rootDetails.innerHTML;
-            speechBox.style.display = 'block';
+            speechBox.classList.toggle('hidden', false);
             positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-
         } else if (sortCard.contains(event.target)) {
             //console.log('contains sortCard');
             speechBox.textContent = sortDetails.textContent;
-            speechBox.style.display = 'block';
+            speechBox.classList.toggle('hidden', false);
             positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-
         } else if (removeDupsCard.contains(event.target)) {
             //console.log('contains sortCard');
             speechBox.textContent = removeDupsDetails.textContent;
-            speechBox.style.display = 'block';
+            speechBox.classList.toggle('hidden', false);
             positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-
         } else {
             speechBox.innerHTML = '';
-            speechBox.style.display = 'none';
+            speechBox.classList.toggle('hidden', true);
         }
     });
+    
+    settingsContainer.addEventListener('mouseout', function (event) {
+        speechBox.classList.toggle('hidden', true);
+        window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
+    });
 })();    
+
+
+
+// add event listeners for root folder settings section
+(function() {
+    let rootOption = document.querySelectorAll('input[name="options"]');
+    let rootSelect = document.getElementById('custom-root-select');
+    let rootText = document.getElementById('custom-root-text');
+    let dropDownMenus = document.querySelectorAll('.folder-select');
+    
+ 
+
+    for (let i = 0; i < rootOption.length; i++) {
+        rootOption[i].addEventListener('change', function() {
+            checkIfPreset();
+            if (this === rootOption[2]) {
+                rootText.classList.toggle('hidden', true);
+                rootSelect.classList.toggle('hidden', false);
+
+                rootSelect.addEventListener('mousedown', refreshDropMenus(rootSelect));
+            } else {
+                rootText.classList.toggle('hidden', false);
+                rootSelect.classList.toggle('hidden', true);
+                rootSelect.removeEventListener('mousedown', refreshDropMenus(rootSelect));
+                rootSelect.value = '';
+            }
+        });
+    }
+})();
+
+// add event listeners for general folder settings section
+(function() {
+    let genOption = document.querySelectorAll('input[name="general-folder"]');
+    let genSelect = document.getElementById('custom-general-select');
+    let genText = document.getElementById('custom-general-text');
+    let dropDownMenus = document.querySelectorAll('.folder-select');
+
+    for (let i = 0; i < genOption.length; i++) {
+        genOption[i].addEventListener('change', function() {
+            checkIfPreset();
+            if (this === genOption[2]) {
+                genText.classList.toggle('hidden', true);
+                genSelect.classList.toggle('hidden', false);
+
+                genSelect.addEventListener('mousedown', refreshDropMenus(genSelect));
+
+            } else {
+                genText.classList.toggle('hidden', false);
+                genSelect.classList.toggle('hidden', true);
+                genSelect.removeEventListener('mousedown', refreshDropMenus(genSelect));
+                genSelect.value = '';
+
+
+            }
+        });
+    }
+})();
+
+
+// event listeners for switches 
+(function() {
+let switches = document.querySelectorAll('input[type="checkbox"]');
+    for (let i = 0; i < switches.length; i++) {
+        switches[i].addEventListener('change', function() {
+            checkIfPreset();
+        });
+    }
+})();
+
+(() => {
+    // initialise settings wih stored values
+    chrome.storage.sync.get(['rootFolder', 'generalFolder', 'sortFiles', 'sortFolders', 'removeDuplicates'], function(result) {
+
+        // root folder settings
+        if (result.rootFolder) {
+        updateDropDownMenus();
+            switch (result.rootFolder) {
+                case "1":
+                    document.getElementById('root-opt-1').checked = true;
+                    break;
+                case "2":
+                    document.getElementById('root-opt-2').checked = true;
+                    break;
+                default:
+                    document.getElementById('root-opt-3').checked = true;
+                    document.getElementById('custom-root-text').classList.toggle('hidden');
+                    const customRootSelect = document.getElementById('custom-root-select');
+                    customRootSelect.classList.toggle('hidden');
+
+                    const observer = new MutationObserver(() => {
+                        if (customRootSelect.options.length > 1) {
+                            customRootSelect.value = parseInt(result.rootFolder);
+                            observer.disconnect();
+                        }
+                    });
+
+                    observer.observe(customRootSelect, { childList: true });
+                    break;
+            }
+
+            // general folder settings
+            switch (result.generalFolder) {
+                case "1":
+                    document.getElementById('gen-opt-1').checked = true;
+                    break;
+                case "2":
+                    document.getElementById('gen-opt-2').checked = true;
+                    break;
+                default:
+                    document.getElementById('gen-opt-3').checked = true;
+                    document.getElementById('custom-general-text').classList.toggle('hidden');
+                    const customGeneralSelect = document.getElementById('custom-general-select');
+                    customGeneralSelect.classList.toggle('hidden');
+
+                    const observer = new MutationObserver(() => {
+                        if (customGeneralSelect.options.length > 1) {
+                            customGeneralSelect.value = parseInt(result.generalFolder);
+                            observer.disconnect();
+                        }
+                    });
+
+                    observer.observe(customGeneralSelect, { childList: true });
+                    break;
+            }
+
+            // Organise Files settings
+            document.getElementById('organise-files-switch').checked = result.sortFiles;
+console.log('sort files: ', result.sortFiles);
+            // Organise Folders settings
+            document.getElementById('organise-folders-switch').checked = result.sortFolders;
+
+            // Remove Duplicates settings
+            document.getElementById('remove-duplicates-switch').checked = result.removeDuplicates;
+        }
+    });
+})();
+
+
+
 
 function positionSpeechBox(xOffset = 0, yOffset = 0) {
     const img = document.getElementById('image');
 
-
+    let speechBox = document.getElementById('speechBox');
     // Get image dimensions and position
     const imgRect = img.getBoundingClientRect();
 
@@ -113,17 +307,7 @@ function positionSpeechBox(xOffset = 0, yOffset = 0) {
     speechBox.style.left = `${Math.floor(centerX - speechBox.offsetWidth / 1 + xOffset)}px`;
     speechBox.style.top = `${Math.floor(centerY - yOffset)}px`;
     //console.log(`${Math.floor(centerY - speechBox.offsetHeight / 1 + yOffset)}px`);
-
 }
-
-/*
-document.getElementById("rootBookmarkBar").addEventListener("change", function() {
-    if (this.checked) {
-        console.log("Switch is ON");
-    } else {
-        console.log("Switch is OFF");
-    }
-});*/
 
 function refreshDropMenus(selectElement) {
     selectElement.querySelectorAll('option').forEach(function (option) {
@@ -134,81 +318,8 @@ function refreshDropMenus(selectElement) {
     updateDropDownMenus();
 }
 
-// add event listeners for root folder settings section
-(function() {
-    let rootOption = document.querySelectorAll('input[name="options"]');
-    let rootSelect = document.getElementById('custom-root-select');
-    let rootText = document.getElementById('custom-root-text');
-    let dropDownMenus = document.querySelectorAll('.folder-select');
-    
- 
-
-    for (let i = 0; i < rootOption.length; i++) {
-        rootOption[i].addEventListener('change', function() {
-            console.log('event triggered');
-            if (this === rootOption[2]) {
-                rootText.classList.toggle('hidden');
-                rootSelect.classList.toggle('hidden');
-
-                rootSelect.addEventListener('mousedown', refreshDropMenus(rootSelect));
-            } else {
-                if (rootText.classList.contains('hidden')) {
-                    rootText.classList.toggle('hidden');
-                    rootSelect.classList.toggle('hidden');
-                    rootSelect.removeEventListener('mousedown', refreshDropMenus(rootSelect));
-                    rootSelect.value = '';
-                }
-            }
-        });
-    }
-})();
-
-// add event listeners for general folder settings section
-(function() {
-    let genOption = document.querySelectorAll('input[name="general-folder"]');
-    let genSelect = document.getElementById('custom-general-select');
-    let genText = document.getElementById('custom-general-text');
-    let dropDownMenus = document.querySelectorAll('.folder-select');
-
-    for (let i = 0; i < genOption.length; i++) {
-        genOption[i].addEventListener('change', function() {
-            console.log('event triggered');
-            if (this === genOption[2]) {
-                genText.classList.toggle('hidden');
-                genSelect.classList.toggle('hidden');
-
-                genSelect.addEventListener('mousedown', refreshDropMenus(genSelect));
-
-            } else {
-                if (genText.classList.contains('hidden')) {
-                    genText.classList.toggle('hidden');
-                    genSelect.classList.toggle('hidden');
-                    genSelect.removeEventListener('mousedown', refreshDropMenus(genSelect));
-                    genSelect.value = '';
-                }
-
-            }
-        });
-    }
-})();
-
-/*
-for (let i = 0; i < dropDownMenus.length; i++) {
-    dropDownMenus[i].addEventListener('mousedown', function () {
-        // remove all options in menus
-        
-        dropDownMenus[i].querySelectorAll('option').forEach(function (option) {
-            option.remove();
-        });
-        updateDropDownMenus();
-    });
-}*/
-
 function updateDropDownMenus() {
-  
-
     let dropDownMenus = document.querySelectorAll('.folder-select');
-
 
     chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
         if (chrome.runtime.lastError) {
@@ -303,17 +414,13 @@ function processSave() {
         chrome.storage.sync.set({ removeDuplicates: isChecked });
     })();
 
-    //console.log(chrome.storage.sync.get(['rootFolder', 'generalFolder', 'organiseFiles', 'organiseFolders', 'removeDuplicates']));
-
 }
 
-(() => {
-// initialise settings wih stored values
-    chrome.storage.sync.get(['rootFolder', 'generalFolder', 'sortFiles', 'sortFolders', 'removeDuplicates'], function(result) {
+function updateSetting(setting, value) {
 
-        updateDropDownMenus();
-   
-        switch (result.rootFolder) {
+    // root folder settings
+    if (setting === 'rootFolder') {
+        switch ('' + value) {
             case "1":
                 document.getElementById('root-opt-1').checked = true;
                 break;
@@ -321,6 +428,7 @@ function processSave() {
                 document.getElementById('root-opt-2').checked = true;
                 break;
             default:
+                updateDropDownMenus();
                 document.getElementById('root-opt-3').checked = true;
                 document.getElementById('custom-root-text').classList.toggle('hidden');
                 const customRootSelect = document.getElementById('custom-root-select');
@@ -328,7 +436,7 @@ function processSave() {
 
                 const observer = new MutationObserver(() => {
                     if (customRootSelect.options.length > 1) {
-                        customRootSelect.value = parseInt(result.rootFolder);
+                        customRootSelect.value = parseInt(value);
                         observer.disconnect();
                     }
                 });
@@ -336,8 +444,12 @@ function processSave() {
                 observer.observe(customRootSelect, { childList: true });
                 break;
         }
-   
-        switch (result.generalFolder) {
+    }
+
+    // general folder settings
+    if (setting === 'generalFolder') {
+
+        switch ('' + value) {
             case "1":
                 document.getElementById('gen-opt-1').checked = true;
                 break;
@@ -345,6 +457,7 @@ function processSave() {
                 document.getElementById('gen-opt-2').checked = true;
                 break;
             default:
+                updateDropDownMenus();
                 document.getElementById('gen-opt-3').checked = true;
                 document.getElementById('custom-general-text').classList.toggle('hidden');
                 const customGeneralSelect = document.getElementById('custom-general-select');
@@ -352,7 +465,7 @@ function processSave() {
 
                 const observer = new MutationObserver(() => {
                     if (customGeneralSelect.options.length > 1) {
-                        customGeneralSelect.value = parseInt(result.generalFolder);
+                        customGeneralSelect.value = parseInt(value);
                         observer.disconnect();
                     }
                 });
@@ -360,10 +473,24 @@ function processSave() {
                 observer.observe(customGeneralSelect, { childList: true });
                 break;
         }
-         console.log(result.sortFiles);
-        document.getElementById('organise-files-switch').checked = result.sortFiles;
-        document.getElementById('organise-folders-switch').checked = result.sortFolders;
-        document.getElementById('remove-duplicates-switch').checked = result.removeDuplicates;
+    }
 
-    });
-})();
+    if (setting === 'sortFiles') {
+
+        // Organise Files settings
+        document.getElementById('organise-files-switch').checked = value;
+    }
+
+    if (setting === 'sortFolders') {
+        // Organise Folders settings
+        document.getElementById('organise-folders-switch').checked = value;
+    }
+
+    if (setting === 'removeDuplicates') {
+        // Remove Duplicates settings
+        document.getElementById('remove-duplicates-switch').checked = value;
+    }
+
+
+}
+

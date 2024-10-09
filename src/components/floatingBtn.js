@@ -87,6 +87,17 @@ class FloatButton extends HTMLElement {
     });
   }
 
+disconnectedCallback() {
+
+    try {
+        document.removeEventListener('mouseup', this.boundResetFloatBtn);
+        document.removeEventListener('mousemove', this.boundHandleMouseMove);
+    } catch (error) {
+        console.log('Failed to remove eventlistners:', error);
+    }
+ 
+}
+
   handlemousedown(event) {
     try {
       this.initialX = event.clientX;

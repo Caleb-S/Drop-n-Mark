@@ -12,33 +12,37 @@
     </head>
     <body>
         <div class='main-wrapper'>
+
             <div class='settings-container'>
+
                 <div class='settings-title'>
                     <div>Settings</div>
                 </div>
-                <div class='spacer'></div>
-                </br>
+
                 <div id="settingsForm">
+                    
+                    <!-- Presets -->
                     <div class='settings-card' id='presets'>
                         <h2 class='settings-card-title'  >Presets</h2>
-                        <details>Recommended settings based on your browser.</details>
+                        <small>Recommended settings based on your browser.
+                        </small>
 
                         <label class="radio-container">
                             <input type="radio" id="preset2" name="preset" value="1" checked>
                             <span class="custom-radio"></span>
-                            Droppi's Favorites &#x2728;
+                            Default
                         </label>
 
                         <label class="radio-container">
                             <input type="radio" id="preset3" name="preset" value="2">
                             <span class="custom-radio"></span>
-                            Contrarian
+                            Recommended &#x2728;
                         </label>
 
                         <label class="radio-container">
                             <input type="radio" id="preset4" name="preset" value="3">
                             <span class="custom-radio"></span>
-                            Clean but Untidy
+                            Maverick
                         </label>
 
                         <label class="radio-container">
@@ -48,13 +52,12 @@
                         </label>
 
                     </div>
-
-                    <div class='spacer'></div> 
                     </br>
 
+                    <!-- Root Folder Settings -->
                     <div class='settings-card' id='root-folder-pref'>
                         <h2 class='settings-card-title'>Primary Folder</h2>
-                        <details>
+                        <small>
                             <p>
                             Enabled: New folders are saved to your browser's bookmark bar folder.
                             </p>
@@ -62,16 +65,16 @@
                             <p>Disabled: New folders are saved outside bookmark bar folder.</p>
                             </br>
                             <p>Note: Depending on your browser, you may have to disable this to save new folders to your bookmark bar.</p>
-                        </details>
+                        </small>
 
                         <label class="radio-container">
-                            <input type="radio" id="root-opt-1" name="options" value="1" checked>
+                            <input type="radio" id="root-opt-1" name="options" value="2" checked>
                             <span class="custom-radio"></span>
                             Default
                         </label>
 
                         <label class="radio-container">
-                            <input type="radio" id="root-opt-2" name="options" value="2">
+                            <input type="radio" id="root-opt-2" name="options" value="1">
                             <span class="custom-radio"></span>
                             Bookmark Bar
                         </label>
@@ -82,18 +85,17 @@
                             <p id='custom-root-text' >Custom</p>
                             <select name="bookmark-folders" class='folder-select hidden' id='custom-root-select'>
                                 <option value="" disabled selected hidden>Select a Folder</option>
-                               
+
                             </select>
                         </label>
 
                     </div>
-
-                    <div class='spacer'></div>
                     </br>
 
+                    <!-- General Folder Settings -->
                     <div class='settings-card' id='general-folder-pref'>
                         <h2 class='settings-card-title'>General Folder</h2>
-                        <details>
+                        <small>
                             <p>
                             Enabled: New folders are saved to your browser's bookmark bar folder.
                             </p>
@@ -101,16 +103,16 @@
                             <p>Disabled: New folders are saved outside bookmark bar folder.</p>
                             </br>
                             <p>Note: Depending on your browser, you may have to disable this to save new folders to your bookmark bar.</p>
-                        </details>
+                        </small>
 
                         <label class="radio-container">
-                            <input type="radio" id="gen-opt-1" name="general-folder" value="1" checked>
+                            <input type="radio" id="gen-opt-1" name="general-folder" value="2" checked>
                             <span class="custom-radio"></span>
                             Default
                         </label>
 
                         <label class="radio-container">
-                            <input type="radio" id="gen-opt-2" name="general-folder" value="2">
+                            <input type="radio" id="gen-opt-2" name="general-folder" value="1">
                             <span class="custom-radio"></span>
                             Bookmark Bar
                         </label>
@@ -121,63 +123,66 @@
                             <p id='custom-general-text' >Custom</p>
                             <select name="bookmark-folders" class='folder-select hidden' id='custom-general-select'>
                                 <option value="" disabled selected hidden>Select a Folder</option>
-                              
+
                             </select>
                         </label>
 
                     </div>
-
-                    <div class='spacer'></div>
                     </br>
 
+                    <!-- Sort Files Settings -->
                     <div class='settings-card' id='organise-files'>
                         <h2 class='settings-card-title'>Organise Files</h2>
-                        <details>Move all folders to Root folder and move files not in a folder to other root folder - can not be undone.</details>
+                        <small>Move all folders to Root folder and move files not in a folder to other root folder - can not be undone.</small>
+                        </br>
                         <label class="switch">
                             <input type="checkbox" id="organise-files-switch">
                             <span class="slider"></span>
                         </label>
 
                     </div>
-
-                    <div class='spacer'></div>
                     </br>
 
+                    <!-- Sort Folders Settings -->
                     <div class='settings-card' id='organise-folders'>
                         <h2 class='settings-card-title'>Organise Folders</h2>
-                        <details>Will remove all duplicate bookmarks</details>
+                        <small>Will remove all duplicate bookmarks</small>
+                        </br>
                         <label class="switch">
                             <input type="checkbox" id="organise-folders-switch">
                             <span class="slider"></span>
                         </label>
 
                     </div>
-
-                    <div class='spacer'></div>
                     </br>
 
+                    <!-- Remove Duplicates Settings -->
                     <div class='settings-card' id='remove-duplicates'>
                         <h2 class='settings-card-title'>Remove Duplicates</h2>
-                        <details>Will remove all duplicate bookmarks</details>
+                        <small>Will remove all duplicate bookmarks</small>
+                        </br>
                         <label class="switch">
                             <input type="checkbox" id="remove-duplicates-switch">
                             <span class="slider"></span>
                         </label>
-
                     </div>
 
                 </div>
+
+                <!-- Save Settings Button -->
                 <button id='submit-button'>Save</button>
+
             </div>
 
+            <!-- Mascot Image --> 
             <div class='image-container'>
                 <img id='image' src="../assets/orange-man-cursor3.webp">
                 <div class="speech-box hidden" id="speechBox">Choose your root folder; folders within the root folder will be available in your bookmark menu to save new bookmarks & folders. If your browsers Chrome, root 1 is used by your browsers bookmark bar, in other browsers such as brave your bookmark bar folder may be Root 2.</div>
             </div>
+
         </div>
 
         <script src="../settings.js"></script>
-
     </body>
 </html>
 

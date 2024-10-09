@@ -1,27 +1,28 @@
 const devmode = true;
+(() => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action === 'getEnvironment') {
+            sendResponse({ devmode: devmode });
+        }
+    });
 
+    // restart extension
+    if (devmode) {
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (message.action === 'refreshExtension') {
+                chrome.runtime.reload();
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'getEnvironment') {
-    sendResponse({ devmode: devmode });
-  }
-});
+                sendResponse({ result: 'Extension refresh initiated' });
+            }
 
-// restart extension
-if (devmode) {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'refreshExtension') {
-      console.log('Received refresh request from content script');
-
-      chrome.runtime.reload();
-
-
-      sendResponse({ result: 'Extension refresh initiated' });
+        });
     }
+})();
 
-  });
-}
 
+let mutatingBookmarks = false;  
+
+// get all bookmarks and folders
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "getAllBookmarks") {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
@@ -33,82 +34,85 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.action === "saveCurrentPageToBookmark") {
-    var parentFolderId = request.parentFolderId;
-    var currentPageUrl = request.currentPageUrl;
-    var currentPageTitle = request.currentPageTitle;
+    if (request.action === "saveCurrentPageToBookmark") {
+        mutatingBookmarks = true;
+        // add event listner for created where mutatingBookmarks is false
+        // Add the listener
+        chrome.bookmarks.onCreated.addListener(onBookmarkCreated);
+
+        var parentFolderId = request.parentFolderId;
+        var currentPageUrl = request.currentPageUrl;
+        var currentPageTitle = request.currentPageTitle;
+
+        // Uses the chrome permission "tabs" to get the current tab's URL
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            var currentPage = tabs[0];
 
 
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      var currentPage = tabs[0];
+            chrome.bookmarks.create({
+                url: currentPageUrl,
+                title: currentPageTitle,
+                parentId: parentFolderId // Use the provided parent folder ID
+            }, function (bookmark) {
+                sendResponse({ success: true, bookmark: bookmark });
+            });
+        });
 
-
-      chrome.bookmarks.create({
-        url: currentPageUrl,
-        title: currentPageTitle,
-        parentId: parentFolderId // Use the provided parent folder ID
-      }, function (bookmark) {
-        sendResponse({ success: true, bookmark: bookmark });
-      });
-    });
-
-    return true;
-  }
+        return true;
+    }
 });
 
+// triggered when delete dupes button is clicked
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.action === "deleteDuplicates") {
     deleteDuplicateBookmarks();
-    updateButton();
+  
   }
 });
 
 // Function to delete duplicate bookmarks, keeping one instance in each folder
 function deleteDuplicateBookmarks() {
-  // Retrieve all bookmarks
-  chrome.bookmarks.getTree(function (bookmarkTree) {
-    const rootFolder = bookmarkTree[0];
+    // Retrieve all bookmarks
+    chrome.bookmarks.getTree(function (bookmarkTree) {
+        const rootFolder = bookmarkTree[0];
+        // Create an object to store unique URLs for each folder
+        const uniqueURLsByFolder = {};
 
-    // Create an object to store unique URLs for each folder
-    const uniqueURLsByFolder = {};
+        // Search for duplicates and destroy them
+        searchAndDestroy(rootFolder, uniqueURLsByFolder);
+    });
 
-    // Traverse through all folders recursively
-    traverseFolders(rootFolder, uniqueURLsByFolder);
-  });
 
-}
+    // Recursive function to traverse through folders and delete duplicate bookmarks
+    function searchAndDestroy(folder, uniqueURLsByFolder) {
+        if (folder.children) {
+            for (let i = 0; i < folder.children.length; i++) {
+                const child = folder.children[i];
 
-// Recursive function to traverse through folders and delete duplicate bookmarks
-function traverseFolders(folder, uniqueURLsByFolder) {
-  if (folder.children) {
-    for (let i = 0; i < folder.children.length; i++) {
-      const child = folder.children[i];
+                if (child.url) {
+                    // Bookmark found
+                    const bookmarkURL = child.url;
 
-      if (child.url) {
-        // Bookmark found
-        const bookmarkURL = child.url;
-
-        // Check if the URL already exists in the uniqueURLsByFolder object for the current folder
-        if (uniqueURLsByFolder[folder.id] && uniqueURLsByFolder[folder.id].hasOwnProperty(bookmarkURL)) {
-          // Duplicate bookmark found within the folder, remove it
-          chrome.bookmarks.remove(child.id);
-        } else {
-          // Add the URL to the uniqueURLsByFolder object for the current folder
-          if (!uniqueURLsByFolder[folder.id]) {
-            uniqueURLsByFolder[folder.id] = {};
-          }
-          uniqueURLsByFolder[folder.id][bookmarkURL] = true;
+                    // Check if the URL already exists in the uniqueURLsByFolder object for the current folder
+                    if (uniqueURLsByFolder[folder.id] && uniqueURLsByFolder[folder.id].hasOwnProperty(bookmarkURL)) {
+                        // Duplicate bookmark found within the folder, remove it
+                        chrome.bookmarks.remove(child.id);
+                    } else {
+                        // Add the URL to the uniqueURLsByFolder object for the current folder
+                        if (!uniqueURLsByFolder[folder.id]) {
+                            uniqueURLsByFolder[folder.id] = {};
+                        }
+                        uniqueURLsByFolder[folder.id][bookmarkURL] = true;
+                    }
+                } else {
+                    // Folder found, recursively traverse through its children
+                    searchAndDestroy(child, uniqueURLsByFolder);
+                }
+            }
         }
-      } else {
-        // Folder found, recursively traverse through its children
-        traverseFolders(child, uniqueURLsByFolder);
-      }
     }
-  }
+
 }
-
-
-
 
 function countDuplicates(folder, uniqueURLsByFolder, duplicates) {
   if (folder.children) {
@@ -141,42 +145,40 @@ function countDuplicates(folder, uniqueURLsByFolder, duplicates) {
 }
 
 
+async function folderOrBookmarkCreated(trigger) {
+        // Get and process settings
+        result = await new Promise(resolve => chrome.storage.sync.get(['sortFiles', 'sortFolders', 'removeDuplicates'], resolve));
+        // Sort Folders if enabled
+        if (result.sortFolders && trigger === 'created') {
+            mutatingBookmarks = true;
+            chrome.bookmarks.onMoved.removeListener(onBookmarkMoved);
+            await moveAllFoldersToRoot()
+                .then(() => {
+                    mutatingBookmarks = false;
+                    chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
+                });
+        }
 
-function sendMessageToContentScript(tabId) {
-  chrome.tabs.sendMessage(tabId, { action: "generateMenu" });
+        // Sort Files if enabled
+        if (result.sortFilesi && trigger === 'moved') {
+            
+            chrome.bookmarks.onMoved.removeListener(onBookmarkMoved);
+            mutatingBookmarks = true;
+            await moveAllFilesToRoot()
+                .then(() => {
+                    chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
+                    mutatingBookmarks = false;
+                });
+        }
+
+        // Remove Duplicates if enabled
+        if (result.removeDuplicates && trigger === 'moved') {
+            deleteDuplicateBookmarks();
+        }
 }
 
-function handleBookmarksUpdated(id, changeInfo) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-
-    sendMessageToContentScript(tabs[0].id);
-  });
-}
-
-chrome.bookmarks.onCreated.addListener(handleBookmarksUpdated);
-chrome.bookmarks.onRemoved.addListener(handleBookmarksUpdated);
-chrome.bookmarks.onChanged.addListener(handleBookmarksUpdated);
 
 
-
-
-function updateButton() {
-  // Send a message to the background script to update the button
-  chrome.runtime.sendMessage({ action: "updateButton" }, function (response) {
-    if (chrome.runtime.lastError) {
-      // Handle error, if any
-      console.error(chrome.runtime.lastError);
-    } else {
-      // Handle response, if needed
-      console.log(response);
-    }
-  });
-}
-
-
-chrome.action.onClicked.addListener(function (tab) {
-  updateButton();
-});
 
 // Listen for messages from the content script or other parts of the extension
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -184,7 +186,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     // Perform the logic to count duplicates
 
     chrome.bookmarks.getTree(function (bookmarkTree) {
-      console.log("counting");
       const rootFolder = bookmarkTree[0];
       const uniqueURLsByFolder = {};
 
@@ -196,92 +197,71 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-/*
-// Add event listener for "keydown" event in the content script
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === 'createFolder') {
-    const folderName = request.folderName.trim(); // Get the folder name from the message and remove leading/trailing whitespace
+function onBookmarkCreated() {
+    console.log('delete listener');
+    mutatingBookmarks = false;
+    chrome.bookmarks.onCreated.removeListener(onBookmarkCreated);
+}
 
-    if (folderName !== '') {
-      // Get the "Bookmarks Bar" folder
-      chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
-        const bookmarksBarFolder = bookmarkTreeNodes[0].children[0];
-
-        if (bookmarksBarFolder) {
-          // Get the first child of the "Bookmarks Bar" folder
-          const firstChild = bookmarksBarFolder.children[0];
-
-          // Create a new folder in the "Bookmarks Bar" folder at the top
-          chrome.bookmarks.create({ parentId: bookmarksBarFolder.id, index: firstChild ? firstChild.index : 0, title: folderName }, function (newFolder) {
-            console.log('New folder created:', newFolder);
-
-            // Set the folderId variable to the ID of the newly created folder
-            folderId = newFolder.id;
-
-            // Send the folderId back to the content script
-            sendResponse({ folderId: folderId });
-          });
-        }
-      });
-    }
-  }
-
-  return true;
-});
-*/
 
 // Add event listener for "keydown" event in the content script
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.action === 'createFolder') {
-    const folderName = request.folderName.trim(); // Get the folder name from the message and remove leading/trailing whitespace
-    const parentFolderId = request.parentFolderId;
-    console.log('test | parent folder: ', parentFolderId);
-    if (folderName !== '') {
+    if (request.action === 'createFolder') {
+        mutatingBookmarks = true;
+ 
 
-      if (typeof parentFolderId !== 'undefined') {
-        console.log('test | Correct Path');
-        chrome.bookmarks.create({ parentId: parentFolderId, index: 0, title: folderName }, function (newFolder) {
-          console.log('New folder created:', newFolder);
+        // Add the listener
+        chrome.bookmarks.onCreated.addListener(onBookmarkCreated);
 
-          // Set the folderId variable to the ID of the newly created folder
-          folderId = newFolder.id;
+   
 
-          // Send the folderId back to the content script
-          sendResponse({ folderId: folderId });
-        });
+        const folderName = request.folderName.trim(); // Get the folder name from the message and remove leading/trailing whitespace
+        const parentFolderId = request.parentFolderId;
+        if (folderName !== '') {
 
-      } else {
-        console.log('test | Wrong Path');
-        chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
-          const bookmarksBarFolder = bookmarkTreeNodes[0].children[0];
+            if (typeof parentFolderId !== 'undefined') {
+                chrome.bookmarks.create({ parentId: parentFolderId, index: 0, title: folderName }, function (newFolder) {
+                    // Set the folderId variable to the ID of the newly created folder
+                    folderId = newFolder.id;
+                    // Send the folderId back to the content script
+                    sendResponse({ folderId: folderId });
 
-          if (bookmarksBarFolder) {
-            // Get the first child of the "Bookmarks Bar" folder
-            const firstChild = bookmarksBarFolder.children[0];
+                });
 
-            // Create a new folder in the "Bookmarks Bar" folder at the top
-            chrome.bookmarks.create({ parentId: bookmarksBarFolder.id, index: firstChild ? firstChild.index : 0, title: folderName }, function (newFolder) {
-              console.log('New folder created:', newFolder);
+            } else {
 
-              // Set the folderId variable to the ID of the newly created folder
-              folderId = newFolder.id;
+                chrome.bookmarks.getTree(function (bookmarkTreeNodes) { // update to await tree
+                    const bookmarksBarFolder = bookmarkTreeNodes[0].children[0];
+                    chrome.storage.sync.get(['rootFolder'], function (result) {
+                        
+                        let folderId = result.rootFolder;
 
-              // Send the folderId back to the content script
-              sendResponse({ folderId: folderId });
-            });
-          }
-        });
 
-      }
-      // Get the "Bookmarks Bar" folder
+                        if (bookmarksBarFolder) {
+                            // Get the first child of the "Bookmarks Bar" folder
+                            const firstChild = bookmarksBarFolder.children[0];
 
+                            // Create a new folder in the "Bookmarks Bar" folder at the top
+                            chrome.bookmarks.create({ parentId: folderId, index: firstChild ? firstChild.index : 0, title: folderName }, function (newFolder) {
+                                // Set the folderId variable to the ID of the newly created folder
+                                folderId = newFolder.id;
+                                // Send the folderId back to the content script
+                                sendResponse({ folderId: folderId });
+                            });
+                        }
+                    });
+                });
+
+            }
+            // Get the "Bookmarks Bar" folder
+
+        }
     }
-  }
 
-  return true;
+    return true;
 });
 
-// Listen for messages from content.js
+// checks if a url is saved as a bookmark
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "checkBookmark") {
     // Check if the current page is bookmarked
@@ -295,7 +275,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-
+// delete all instances of a bookmark
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "deleteBookmark") {
     chrome.bookmarks.search({ url: sender.tab.url }, function (bookmarks) {
@@ -328,9 +308,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
           // Delete bookmark from all folders
           foldersToDeleteFrom.forEach(function (folderId) {
-            chrome.bookmarks.remove(bookmarkId, function () {
-              console.log("Bookmark deleted from folder with ID:", folderId);
-            });
+            chrome.bookmarks.remove(bookmarkId); 
           });
 
           sendResponse({ success: true });
@@ -343,3 +321,227 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return true; // Required to send a response asynchronously
   }
 });
+
+async function moveAllFoldersToRoot() {
+
+    //mutatingBookmarks = true;
+    const getBookmarkTree = () => new Promise(resolve => chrome.bookmarks.getTree(resolve));
+    const getStorage = () => new Promise(resolve => chrome.storage.sync.get(['rootFolder'], resolve));
+    const getBookmarkById = (id) => new Promise(resolve => chrome.bookmarks.get(id, resolve));
+    const moveBookmark = (id, parentId) => new Promise(resolve => chrome.bookmarks.move(id, { parentId }, resolve));
+
+    const bookmarkTree = await getBookmarkTree();
+    const tree = bookmarkTree[0];
+    const bookmarkBar = bookmarkTree[0].children[0];
+    const otherBookmarks = bookmarkTree[0].children[1];
+    let rootFolder = otherBookmarks.id;
+
+    const storageResult = await getStorage();
+    if (storageResult.rootFolder === "1") {
+        rootFolder = bookmarkBar.id;
+    } else if (storageResult.rootFolder === "2") {
+        rootFolder = otherBookmarks.id;
+    } else if (storageResult.rootFolder) {
+        const bookmarkNodes = await getBookmarkById(storageResult.rootFolder);
+        if (bookmarkNodes.length > 0 && !bookmarkNodes[0].url) {
+            rootFolder = storageResult.rootFolder;
+        } else {
+            console.log('Custom Folder does not exist, using Fallback folder.');
+        }
+    }
+
+    // Non-recursive, breadth-first folder traversal with batching
+    const folderQueue = [tree];
+    const foldersToMove = [];
+
+    while (folderQueue.length) {
+        const folder = folderQueue.shift();
+        if (folder.children) {
+            for (const child of folder.children) {
+                if (child.children && child.parentId !== tree.id &&
+                    (child.parentId === otherBookmarks.id || child.parentId === bookmarkBar.id)) {
+                    foldersToMove.push(child.id);  // Queue for moving
+                }
+                folderQueue.push(child);  // Queue child folders for traversal
+            }
+        }
+    }
+
+    // Move folders to root in batches to avoid freezing
+    for (const folderId of foldersToMove) {
+        //mutatingBookmarks = true;
+        await moveBookmark(folderId, rootFolder)
+            .then(() => {
+                //mutatingBookmarks = true;
+                //chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
+
+            });
+ 
+    }
+}
+
+
+
+async function moveAllFilesToRoot() {
+        //mutatingBookmarks = true;
+    const getBookmarkTree = () => new Promise(resolve => chrome.bookmarks.getTree(resolve));
+    const getStorage = () => new Promise(resolve => chrome.storage.sync.get(['generalFolder'], resolve));
+    
+    const getRoot = () => new Promise(resolve => chrome.storage.sync.get(['rootFolder'], resolve));
+    const getBookmarkById = (id) => new Promise(resolve => chrome.bookmarks.get(id, resolve));
+    const moveBookmark = (id, parentId) => new Promise(resolve => chrome.bookmarks.move(id, { parentId }, resolve));
+
+    // Retrieve the full bookmark tree
+    const bookmarkTree = await getBookmarkTree();
+    const tree = bookmarkTree[0];
+    const bookmarkBar = bookmarkTree[0].children[0];
+    const otherBookmarks = bookmarkTree[0].children[1];
+    let generalFolder = otherBookmarks.id;
+
+    // Get storage settings for the root folder
+    const storageResult = await getStorage();
+    if (storageResult.generalFolder === "1") {
+        generalFolder = bookmarkBar.id;
+    } else if (storageResult.generalFolder === "2") {
+        generalFolder = otherBookmarks.id;
+    } else if (storageResult.generalFolder) {
+        (async () => {
+            const bookmarkNodes = await getBookmarkById(storageResult.generalFolder);
+            if (bookmarkNodes.length > 0 && !bookmarkNodes[0].url) {
+                generalFolder = storageResult.generalFolder;
+            } else {
+                console.log('Custom Folder does not exist, using Fallback folder.');
+            }
+        })();
+    }
+
+
+
+    const rootResult = await getRoot();
+    const rootFolder = rootResult.rootFolder;
+    if (rootResult.rootFolder !== "1" && rootResult.rootFolder !== "2") {
+        (async () => {
+
+            const bookmarkNodes = await getBookmarkById(storageResult.rootFolder);
+            if (bookmarkNodes.length > 0 && !bookmarkNodes[0].url) {
+                rootFolder = storageResult.rootFolder;
+            } else {
+                console.log('Custom Folder does not exist, using Fallback folder.');
+            }
+
+        })();
+    }
+
+
+    // Queue for breadth-first traversal
+    const folderQueue = [tree];
+    const filesToMove = [];
+
+    // Traverse folders and identify files for moving
+    while (folderQueue.length) {
+        const folder = folderQueue.shift();
+        if (folder.children) {
+            for (const child of folder.children) {
+                if ((child.url && child.parentId === "1") || (child.url &&  child.parentId === "2")) {
+
+                    // Collect files with URLs outside the root folder
+                    filesToMove.push(child.id);
+                }
+                if (child.children) {
+                    folderQueue.push(child);  // Queue subfolders for traversal
+                }
+            }
+        }
+    }
+
+    // Move files to the root folder in batches to avoid freezing
+    for (const fileId of filesToMove) {
+        //mutatingBookmarks = true;
+        
+        await moveBookmark(fileId, generalFolder)
+            .then(() => {
+                //mutatingBookmarks = true;
+                //chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
+
+            });
+    }
+
+}
+
+
+
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+
+    if (request.action === "updateSettings") {
+        result = await new Promise(resolve => chrome.storage.sync.get(['sortFiles', 'sortFolders', 'removeDuplicates'], resolve));
+        // Sort Folders if enabled
+        if (result.sortFolders) {
+            mutatingBookmarks = true;
+            await moveAllFoldersToRoot()
+                .then(() => {
+                mutatingBookmarks = false;
+               // chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
+                });
+        }
+
+        // Sort Files if enabled
+        if (result.sortFiles) {
+            mutatingBookmarks = true;
+            await moveAllFilesToRoot()
+            .then(() => {
+                mutatingBookmarks = false;
+                // chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
+
+
+            });
+
+        }
+
+        // Remove Duplicates if enabled
+        if (result.removeDuplicates) {
+            deleteDuplicateBookmarks();
+        }
+        return true; // Required to send a response asynchronously
+    }
+});
+
+// Listener for bookmark or folder creation
+chrome.bookmarks.onCreated.addListener((id, bookmark) => {
+    if (!mutatingBookmarks) {
+        // Check if the created item is a folder (folders have no 'url' property)
+        console.log('creating time');
+        if (!bookmark.url) {
+            folderOrBookmarkCreated('created'); // change names from created & moved to folder / file
+        } else {
+            folderOrBookmarkCreated('moved');
+        }
+    }
+});
+
+
+chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
+    
+
+chrome.bookmarks.onRemoved.addListener(function(id, removeInfo) {
+  console.log("Bookmark ID removed:", id);
+  console.log("Remove Info:", removeInfo);
+});
+
+function onBookmarkMoved() {
+    //mutatingBookmarks = false;
+    //chrome.bookmarks.onMoved.removeListener(onBookmarkMoved);
+    if (!mutatingBookmarks) {
+        // Check if the created item is a folder (folders have no 'url' property)
+        console.log('moving time');
+            folderOrBookmarkCreated('created');
+        /*
+        if (!bookmark.url) {
+            folderOrBookmarkCreated('created'); // change names from created & moved to folder / file
+
+        } else {
+            folderOrBookmarkCreated('moved');
+        }
+        */
+    }
+}
+

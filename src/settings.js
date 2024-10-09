@@ -2,28 +2,31 @@ document.getElementById('submit-button').addEventListener('click', processSave);
 document.querySelectorAll('input[name="preset"]').forEach(function (element) {
     element.addEventListener('click', presetOptions);
 });
-
+    
 let presets = {
     "1": {
+        "name": 'Default',
         "rootFolder": 1,
         "generalFolder": 1,
-        "sortFiles": true,
+        "sortFiles": false,
         "sortFolders": false,
-        "removeDuplicates": true
+        "removeDuplicates": false
     },
     "2": {
+        "name": 'Recommended',
         "rootFolder": 2,
-        "generalFolder": 2,
-        "sortFiles": false,
+        "generalFolder": 1,
+        "sortFiles": true,
         "sortFolders": true,
         "removeDuplicates": true
     },
     "3": {
+        "name": 'Maverick',
         "rootFolder": 1,
         "generalFolder": 2,
-        "sortFiles": true,
+        "sortFiles": false,
         "sortFolders": true,
-        "removeDuplicates": false
+        "removeDuplicates": true
     }
 };
 
@@ -149,6 +152,7 @@ function checkIfPreset() {
 
 
 
+
 // add event listeners for root folder settings section
 (function() {
     let rootOption = document.querySelectorAll('input[name="options"]');
@@ -221,7 +225,7 @@ let switches = document.querySelectorAll('input[type="checkbox"]');
 
         // root folder settings
         if (result.rootFolder) {
-        updateDropDownMenus();
+            updateDropDownMenus();
             switch (result.rootFolder) {
                 case "1":
                     document.getElementById('root-opt-1').checked = true;
@@ -273,13 +277,15 @@ let switches = document.querySelectorAll('input[type="checkbox"]');
 
             // Organise Files settings
             document.getElementById('organise-files-switch').checked = result.sortFiles;
-console.log('sort files: ', result.sortFiles);
+            console.log('sort files: ', result.sortFiles);
             // Organise Folders settings
             document.getElementById('organise-folders-switch').checked = result.sortFolders;
 
             // Remove Duplicates settings
             document.getElementById('remove-duplicates-switch').checked = result.removeDuplicates;
         }
+
+        checkIfPreset();
     });
 })();
 
@@ -413,6 +419,9 @@ function processSave() {
         let isChecked = removeDuplicatesSwitch.checked ? true : false;
         chrome.storage.sync.set({ removeDuplicates: isChecked });
     })();
+
+
+      chrome.runtime.sendMessage({ action: "updateSettings" });
 
 }
 

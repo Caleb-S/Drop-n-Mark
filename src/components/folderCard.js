@@ -111,7 +111,9 @@ function folderCardTemplate() {
             width: 85%;
             margin-top: 1px;
             padding-left: 75px;
-            background-color: #fdba74;
+            /* background-color: #fdba74; */
+            background-color: #D4D4D4;
+
 
             color: #57534e;
             font-size: 20px;
@@ -136,7 +138,8 @@ function folderCardTemplate() {
             justify-content: center;
             align-items: center;
 
-            background-color: #EBC9A6;
+            /* background-color: #EBC9A6; */
+            background-color: #ECECEC;
         }
 
         .sub-add-folder:hover {
@@ -148,9 +151,11 @@ function folderCardTemplate() {
             width: 67%;
             margin-top: 0px;
             padding-left: 17px;
-            background-color: #C5C1B4;
+            /* background-color: #C5C1B4; */
+            background-color: #9E9E9E;
 
-            color: #57534e;
+            /* color: #57534e; */
+            color: #f7f4ee;
             font-size: 17px;
         }
 

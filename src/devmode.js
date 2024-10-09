@@ -9,7 +9,7 @@ chrome.runtime.sendMessage({ action: 'getEnvironment' }, response => {
 });
 
 function devEnvWarningMsg() {
-    console.warn(`| WARNING: DROPNMARK IS IN DEVMODE
+    console.log(`| WARNING: DROPNMARK IS IN DEVMODE
   |
   | COMMANDS:
   | [Ctrl Shift L] - Reload Extension

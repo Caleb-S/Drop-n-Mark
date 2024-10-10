@@ -506,6 +506,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 });
 
 // Listener for bookmark or folder creation
+/*
 chrome.bookmarks.onCreated.addListener((id, bookmark) => {
     if (!mutatingBookmarks) {
         // Check if the created item is a folder (folders have no 'url' property)
@@ -517,58 +518,96 @@ chrome.bookmarks.onCreated.addListener((id, bookmark) => {
         }
     }
 });
+*/
+
+function handleBookmarkCreation() {
+
+    if (!mutatingBookmarks) {
+            folderOrBookmarkCreated('created'); // change names from created & moved to folder / file
+    }
+}
+
+chrome.bookmarks.onCreated.addListener(handleBookmarkCreation);
 
 
 chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
     
 
-chrome.bookmarks.onRemoved.addListener(function(id, removeInfo) {
+chrome.bookmarks.onRemoved.addListener(function (id, removeInfo) {
+    // Check if it's a folder (no URL indicates a folder)
     if (!removeInfo.node.url) {
-        console.log("Bookmark ID removed:", id);
-        console.log("title:", removeInfo.node.title);
-        console.log("parentId:", removeInfo.parentId);
-        console.log("Remove Info:", removeInfo);
+        console.log("Bookmark folder removed, ID:", id);
         
-        // ------------------------------------------
-        chrome.storage.sync.get(['rootFolder'], function (result) {
-
-            let folderId = result.rootFolder;
-
-
+        // Retrieve and recreate the root or general folder if deleted
+        chrome.storage.sync.get(['rootFolder', 'generalFolder'], function (result) {
+            let folderType;
+            let storageKey;
             if (result.rootFolder === id) {
-                // Get the first child of the "Bookmarks Bar" folder
-
-                // Create a new folder in the "Bookmarks Bar" folder at the top
-                chrome.bookmarks.create({ parentId: removeInfo.parentId, index: 0, title: removeInfo.node.title }, function (newFolder) {
-                    // Set the folderId variable to the ID of the newly created folder
-                    console.log("new folder id:", newFolder.id);
-                    folderId = newFolder.id;
-                    chrome.storage.sync.set({ rootFolder: newFolder.id });
-                    // Send the folderId back to the content script
-                    //sendResponse({ folderId: folderId });
-                });
+                folderType = 'rootFolder';
+                storageKey = 'rootFolder';
+            } else if (result.generalFolder === id) {
+                folderType = 'generalFolder';
+                storageKey = 'generalFolder';
+            } else {
+                console.log("Deleted folder is not tracked.");
+                return;
             }
-        });
-        /*
-            let rootFolder = chrome.storage.sync.get(['rootFolder']);
-        if (rootFolder === id) {
-            console.log("root folder");
-            mutatingBookmarks = true;
-            chrome.bookmarks.onCreated.addListener(onBookmarkCreated);
-            chrome.bookmarks.create({ parentId: removeInfo.parentId, index: 0, title: removeInfo.node.title }, function (newFolder) {
-                folderId = newFolder.id;
-                sendResponse({ folderId: folderId });
 
+            chrome.bookmarks.create({ parentId: removeInfo.parentId, title: removeInfo.node.title }, function (newFolder) {
+                if (!newFolder) {
+                    console.error("Failed to recreate the deleted folder.");
+                    return;
+                }
+                
+                console.log(`Recreated ${folderType}, new ID:`, newFolder.id);
+                chrome.storage.sync.set({ [storageKey]: newFolder.id });
+
+                const newFolderIds = { [removeInfo.node.id]: newFolder.id };
+
+                // Recursive function to restore folder structure
+                function restoreFolderStructure(oldNode, parentFolderId) {
+                    if (oldNode.children) {
+                        oldNode.children.forEach((childNode) => {
+                            const newFolderData = {
+                                parentId: parentFolderId,
+                                title: childNode.title,
+                                index: childNode.index
+                            };
+
+                            if (childNode.url) {
+                                // Recreate the bookmark
+                                newFolderData.url = childNode.url;
+                                chrome.bookmarks.create(newFolderData, function (newBookmark) {
+                                    if (newBookmark) {
+                                        console.log("Recreated bookmark:", newBookmark);
+                                    } else {
+                                        console.error("Failed to recreate bookmark:", childNode);
+                                    }
+                                });
+                            } else {
+                                // Recreate the folder
+                                chrome.bookmarks.create(newFolderData, function (newSubFolder) {
+                                    if (newSubFolder) {
+                                        newFolderIds[childNode.id] = newSubFolder.id;
+                                        console.log("Recreated folder:", newSubFolder);
+                                        restoreFolderStructure(childNode, newSubFolder.id);
+                                    } else {
+                                        console.error("Failed to recreate folder:", childNode);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+
+                restoreFolderStructure(removeInfo.node, newFolder.id);
             });
-
-
-        }
-        */       
-
-    } else { 
-        console.log("not a folder");
+        });
+    } else {
+        console.log("Removed item is not a folder, no action taken.");
     }
 });
+
 
 function onBookmarkMoved() {
     //mutatingBookmarks = false;

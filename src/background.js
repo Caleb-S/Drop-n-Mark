@@ -523,8 +523,51 @@ chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
     
 
 chrome.bookmarks.onRemoved.addListener(function(id, removeInfo) {
-  console.log("Bookmark ID removed:", id);
-  console.log("Remove Info:", removeInfo);
+    if (!removeInfo.node.url) {
+        console.log("Bookmark ID removed:", id);
+        console.log("title:", removeInfo.node.title);
+        console.log("parentId:", removeInfo.parentId);
+        console.log("Remove Info:", removeInfo);
+        
+        // ------------------------------------------
+        chrome.storage.sync.get(['rootFolder'], function (result) {
+
+            let folderId = result.rootFolder;
+
+
+            if (result.rootFolder === id) {
+                // Get the first child of the "Bookmarks Bar" folder
+
+                // Create a new folder in the "Bookmarks Bar" folder at the top
+                chrome.bookmarks.create({ parentId: removeInfo.parentId, index: 0, title: removeInfo.node.title }, function (newFolder) {
+                    // Set the folderId variable to the ID of the newly created folder
+                    console.log("new folder id:", newFolder.id);
+                    folderId = newFolder.id;
+                    chrome.storage.sync.set({ rootFolder: newFolder.id });
+                    // Send the folderId back to the content script
+                    //sendResponse({ folderId: folderId });
+                });
+            }
+        });
+        /*
+            let rootFolder = chrome.storage.sync.get(['rootFolder']);
+        if (rootFolder === id) {
+            console.log("root folder");
+            mutatingBookmarks = true;
+            chrome.bookmarks.onCreated.addListener(onBookmarkCreated);
+            chrome.bookmarks.create({ parentId: removeInfo.parentId, index: 0, title: removeInfo.node.title }, function (newFolder) {
+                folderId = newFolder.id;
+                sendResponse({ folderId: folderId });
+
+            });
+
+
+        }
+        */       
+
+    } else { 
+        console.log("not a folder");
+    }
 });
 
 function onBookmarkMoved() {

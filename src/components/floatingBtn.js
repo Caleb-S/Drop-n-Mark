@@ -92,6 +92,7 @@ disconnectedCallback() {
     try {
         document.removeEventListener('mouseup', this.boundResetFloatBtn);
         document.removeEventListener('mousemove', this.boundHandleMouseMove);
+        this.shadowRoot.removeEventListener('mousedown', this.handlemousedown.bind(this));
     } catch (error) {
         console.log('Failed to remove eventlistners:', error);
     }

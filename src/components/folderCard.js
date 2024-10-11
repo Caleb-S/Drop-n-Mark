@@ -146,6 +146,7 @@ function folderCardTemplate() {
             background-color: #b17842;
         }
 
+
         .nested-folder {
             min-height: 40px;
             width: 67%;
@@ -192,14 +193,17 @@ class FolderCard extends HTMLElement {
         this.buttonType;
         this.container = this.shadowRoot.getElementById('container');
         this.folderBtn = this.shadowRoot.getElementById('folder-button');
+
+        // Bind the event handlers to ensure correct context
+        this.handleMouseUpOnContainer = this.handleMouseUpOnContainer.bind(this);
+        this.handleMouseUpOnFolderBtn = this.handleMouseUpOnFolderBtn.bind(this);
     }
 
-
     connectedCallback() {
-
         this.buttonType = this.getAttribute('type');
         let imgSrc = this.getAttribute('src');
 
+        // Set up the folder card based on the button type
         if (this.buttonType === 'main') {
             this.container.classList.add('main-folder');
             this.folderBtn.classList.add('main-add-folder');
@@ -213,29 +217,33 @@ class FolderCard extends HTMLElement {
             this.folderBtn.style.display = 'none';
         }
 
-        this.container.addEventListener('mouseup', (event) => {
-            if (event.target !== this.folderBtn) {
-                this.dispatchEvent(new CustomEvent('create-bookmark', {
-                    detail: event.detail,
-                    bubbles: true,  // Allows the event to bubble up through the DOM
-                    composed: true  // Allows the event to pass through Shadow DOM boundaries
-                }));
-            }
+        // Add event listeners
+        this.container.addEventListener('mouseup', this.handleMouseUpOnContainer);
+        this.folderBtn.addEventListener('mouseup', this.handleMouseUpOnFolderBtn);
+    }
 
-        });
+    disconnectedCallback() {
+        // Clean up event listeners
+        this.container.removeEventListener('mouseup', this.handleMouseUpOnContainer);
+        this.folderBtn.removeEventListener('mouseup', this.handleMouseUpOnFolderBtn);
+    }
 
-        this.folderBtn.addEventListener('mouseup', (event) => {
-            this.dispatchEvent(new CustomEvent('create-sub-folder', {
+    handleMouseUpOnContainer(event) {
+        if (event.target !== this.folderBtn) {
+            this.dispatchEvent(new CustomEvent('create-bookmark', {
                 detail: event.detail,
                 bubbles: true,  // Allows the event to bubble up through the DOM
                 composed: true  // Allows the event to pass through Shadow DOM boundaries
             }));
-        });
+        }
+    }
 
-
-
-
-
+    handleMouseUpOnFolderBtn(event) {
+        this.dispatchEvent(new CustomEvent('create-sub-folder', {
+            detail: event.detail,
+            bubbles: true,  // Allows the event to bubble up through the DOM
+            composed: true  // Allows the event to pass through Shadow DOM boundaries
+        }));
     }
 }
 

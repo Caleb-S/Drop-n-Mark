@@ -33,6 +33,11 @@
             text-decoration: none;
             color: inherit;
         }
+        p, span, h2, small{
+
+
+            pointer-events: none;
+        }
         
         button, input {
             /* css reset */
@@ -183,11 +188,19 @@
              max-height: 80%;
              min-width: 530px;
          }
+         small {
+             display: none;
+             font-size: 12px;
+         }
          @media (max-width: 1199px) {
              .speech-box {
                  display: none;
              }
              details { 
+                 display: block;
+             }
+
+             small {
                  display: block;
              }
          }
@@ -197,9 +210,6 @@
             display: none;
          }
          
-         small {
-             font-size: 12px;
-         }
 /* Components ---------------------------------------------------------------------------------------------------- */
 
 

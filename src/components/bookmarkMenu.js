@@ -323,13 +323,15 @@ class BookmarkMenu extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(menuTemplate());
         this.scrollThresholdPercentage = 0.25;
-        this.scrollInterval;
+        this.scrollInterval = null; // Initialize scrollInterval as null
         this.folderContainer = this.shadowRoot.querySelector('.folder-container');
         this.bookmarkMenu = this.shadowRoot.querySelector('.bookmarkmenu-updated');
         this.createFolder = this.shadowRoot.querySelector('.folder-input');
-        //this.folderInput = this.shadowRoot.querySelector('.folder-input input');
         this.scrollPosition = 0;
         this.positionRestored = false;
+
+        // Store references to event listeners for removal
+        this.eventListeners = [];
     }
 
     static get observedAttributes() {
@@ -338,10 +340,12 @@ class BookmarkMenu extends HTMLElement {
 
     attributeChangedCallback() {
         let imageElement = document.createElement('img');
-        if (this.hasAttribute('src') ? imageElement.src = this.getAttribute('src') : '');
+        if (this.hasAttribute('src')) {
+            imageElement.src = this.getAttribute('src');
+        }
 
         if (this.hasAttribute('bookmarked') || this.hasAttribute('createFolder')) {
-            this.bookmarkMenu.hasAttribute('open') ? this.bookmarkMenu.removeAttribute('open', '') : '';
+            this.bookmarkMenu.hasAttribute('open') ? this.bookmarkMenu.removeAttribute('open') : '';
 
             if (this.hasAttribute('bookmarked')) {
                 let deleteBox = this.shadowRoot.querySelector('.deleteBox');
@@ -355,11 +359,8 @@ class BookmarkMenu extends HTMLElement {
                     this.createFolder.appendChild(imageElement);
                 }
                 this.createFolder.querySelector('input').focus();
-
             }
         }
-
-
     }
 
     connectedCallback() {
@@ -367,55 +368,67 @@ class BookmarkMenu extends HTMLElement {
         this.restrictHighlighting.bind(this);
 
         let imageElement = document.createElement('img');
-        if (this.hasAttribute('src') ? imageElement.src = this.getAttribute('src') : '');
+        if (this.hasAttribute('src')) {
+            imageElement.src = this.getAttribute('src');
+        }
 
         if (this.hasAttribute('bookmarked') || this.hasAttribute('createFolder')) {
-            this.bookmarkMenu.hasAttribute('open') ? this.bookmarkMenu.removeAttribute('open', '') : '';
+            this.bookmarkMenu.hasAttribute('open') ? this.bookmarkMenu.removeAttribute('open') : '';
 
             if (this.hasAttribute('bookmarked')) {
                 let deleteBox = this.shadowRoot.querySelector('.deleteBox');
                 deleteBox.setAttribute('open', '');
                 deleteBox.appendChild(imageElement);
             } else if (this.hasAttribute('createFolder')) {
-
                 this.createFolder.setAttribute('open', '');
                 this.createFolder.appendChild(imageElement);
                 let folderInput = this.shadowRoot.querySelector('.folder-input input');
                 folderInput.focus();
 
-                folderInput.addEventListener('keydown', (event) => {
+                // Store the event listener for removal
+                const handleKeyDown = (event) => {
                     if (event.key === 'Enter') {
                         event.preventDefault();
                         this.handleFolderInput(); // Ensure `handleFolderInput` is defined in your class
                     }
-                });
-
+                };
+                folderInput.addEventListener('keydown', handleKeyDown);
+                this.eventListeners.push({ element: folderInput, type: 'keydown', handler: handleKeyDown });
             }
         } else {
             this.bookmarkMenu.setAttribute('open', '');
             let slot = this.shadowRoot.querySelector('slot');
 
-            // waits until all folder items are loaded
-            slot.addEventListener('slotchange', () => {
+            // Waits until all folder items are loaded
+            const slotChangeHandler = () => {
                 this.folderContainer.scrollTop = this.getAttribute('scrollPosition');
-            });
-            this.shadowRoot.addEventListener('mousemove', this.handleMouseMove.bind(this));
+            };
+            slot.addEventListener('slotchange', slotChangeHandler);
+            this.eventListeners.push({ element: slot, type: 'slotchange', handler: slotChangeHandler });
 
+            // Add mousemove listener
+            const mouseMoveHandler = this.handleMouseMove.bind(this);
+            this.shadowRoot.addEventListener('mousemove', mouseMoveHandler);
+            this.eventListeners.push({ element: this.shadowRoot, type: 'mousemove', handler: mouseMoveHandler });
+
+            // Add general button mouseup listener
+            const generalBtnHandler = this.handleGeneralBtn.bind(this);
             let deleteBox = this.shadowRoot.querySelector('.general-btn');
-            deleteBox.addEventListener('mouseup', this.handleGeneralBtn.bind(this));
+            deleteBox.addEventListener('mouseup', generalBtnHandler);
+            this.eventListeners.push({ element: deleteBox, type: 'mouseup', handler: generalBtnHandler });
         }
-
-
-
-
     }
 
     disconnectedCallback() {
         console.log('disconnected');
-        this.shadowRoot.removeEventListener('mousemove', this.handleMouseMove.bind(this));
+
+        // Remove all stored event listeners
+        this.eventListeners.forEach(({ element, type, handler }) => {
+            element.removeEventListener(type, handler);
+        });
+        this.eventListeners = []; // Clear the array after removal
+
         this.positionRestored = false;
-
-
 
         this.dispatchEvent(new CustomEvent('menu-scroll-point', {
             detail: this.scrollPosition,
@@ -423,7 +436,6 @@ class BookmarkMenu extends HTMLElement {
             composed: true  // Allows the event to pass through Shadow DOM boundaries
         }));
     }
-
 
     handleMouseMove(event) {
         let rect = this.folderContainer.getBoundingClientRect();
@@ -450,48 +462,23 @@ class BookmarkMenu extends HTMLElement {
             && event.clientY <= rect.bottom + 15
             && event.clientX >= rect.left
             && event.clientX <= rect.right) {
-
-        
-
             this.scrollInterval = setInterval(() => {
                 this.folderContainer.scrollTop += speedDown;
                 momentum = speedDown; // Capture momentum
             }, 10);
-
-            // Scroll up logic
         } else if (event.clientY <= rect.top + scrollThresholdPixels
             && event.clientY >= rect.top - 15
             && event.clientX >= rect.left
             && event.clientX <= rect.right) {
-
-       
-
             this.scrollInterval = setInterval(() => {
                 this.folderContainer.scrollTop -= speedUp;
                 momentum = -speedUp; // Capture negative momentum for upward scrolling
             }, 10);
-
         } else {
             // Clear the interval but allow momentum to continue briefly
-
-            /*
-            if (momentum !== 0) {
-                // Apply easing to simulate momentum slowing down
-                this.scrollInterval = setInterval(() => {
-                    this.folderContainer.scrollTop += momentum;
-                    momentum *= easingFactor; // Reduce momentum gradually
-                    // Stop when momentum is almost zero
-                    if (Math.abs(momentum) < 0.1) {
-                        clearInterval(this.scrollInterval);
-                    }
-                }, 10); // Increased interval for smoother momentum effect
-            }
-            */
         }
         this.scrollPosition = this.folderContainer.scrollTop;
     }
-
-
 
     handleGeneralBtn(event) {
         this.dispatchEvent(new CustomEvent('save-general', {
@@ -511,40 +498,36 @@ class BookmarkMenu extends HTMLElement {
     }
 
     removeHighlight() {
-
         if (window.getSelection) {
             window.getSelection().removeAllRanges();
         } else if (document.selection) {
             document.selection.empty();
         }
-
     }
 
     restrictHighlighting() {
-
         const menuItems = this.shadowRoot.querySelectorAll('div, dialog, p, small');
-
         menuItems.forEach(item => {
-            item.addEventListener('contextmenu', event => {
-                event.preventDefault();
-            });
+            const preventContextMenu = event => event.preventDefault();
+            item.addEventListener('contextmenu', preventContextMenu);
+            this.eventListeners.push({ element: item, type: 'contextmenu', handler: preventContextMenu });
 
-            item.addEventListener('selectstart', event => {
-                event.preventDefault();
-            });
+            const preventSelectStart = event => event.preventDefault();
+            item.addEventListener('selectstart', preventSelectStart);
+            this.eventListeners.push({ element: item, type: 'selectstart', handler: preventSelectStart });
 
-            item.addEventListener('mousedown', event => {
+            const preventMouseDown = event => {
                 if (event.button === 2) {
                     event.preventDefault();
                 }
-            });
+            };
+            item.addEventListener('mousedown', preventMouseDown);
+            this.eventListeners.push({ element: item, type: 'mousedown', handler: preventMouseDown });
 
             item.draggable = false;
         });
-
     }
 }
 
-
-
 customElements.define('bookmark-menu', BookmarkMenu);
+

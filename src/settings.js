@@ -114,6 +114,106 @@ function checkIfPreset() {
     let rootDetails = rootCard.getElementsByTagName('details')[0];
     let sortDetails = sortCard.getElementsByTagName('details')[0];
     let removeDupsDetails = removeDupsCard.getElementsByTagName('details')[0];
+    
+    // Remove text from speech box
+    settingsContainer.addEventListener('mouseover', function (event) {
+
+
+            console.log(event.target);
+            console.log(event.target.parentNode);
+        console.log('\n');
+        if (event.target.matches('label'))  {
+            // console.log(event.target);
+            //console.log(event.target.getElementsByTagName('template')[0].innerHTML);
+
+            let insideText = event.target.getElementsByTagName('template')[0].innerHTML;
+            event.target.parentNode.getElementsByTagName('small')[0].innerHTML = insideText;
+            speechBox.textContent = insideText;
+            speechBox.classList.toggle('hidden', false);
+            positionSpeechBox(bubbleX, bubbleY);
+
+        } else if (event.target.parentNode.matches('label')) {
+            let insideText = event.target.parentNode.getElementsByTagName('template')[0].innerHTML;
+            event.target.parentNode.parentNode.getElementsByTagName('small')[0].innerHTML = insideText;
+            speechBox.textContent = insideText;
+            speechBox.classList.toggle('hidden', false);
+            positionSpeechBox(bubbleX, bubbleY);
+
+        } else if (!event.target.matches('.settings-card')){
+            // Get all <small> elements and set innerHtml to ''. 
+                let smallTags = settingsContainer.getElementsByTagName('small');
+            for (let i = 0; i < smallTags.length; i++) {
+                smallTags[i].innerHTML = ''
+            }
+             speechBox.classList.toggle('hidden', true);
+            window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
+
+        }
+        
+
+    });
+
+
+
+    settingsContainer.addEventListener('mouseout', function (event) {
+            //speechBox.classList.toggle('hidden', true);
+           // window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
+        });
+
+            /*
+            window.addEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
+            if (presetsCard.contains(event.target)) {
+                //console.log('contains preset card');
+                speechBox.textContent = presetsDetails.textContent;
+                speechBox.classList.toggle('hidden', false);
+                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
+            } else if (rootCard.contains(event.target)) {
+                //console.log('contains rootCard');
+                speechBox.innerHTML = rootDetails.innerHTML;
+                speechBox.classList.toggle('hidden', false);
+                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
+            } else if (sortCard.contains(event.target)) {
+                //console.log('contains sortCard');
+                speechBox.textContent = sortDetails.textContent;
+                speechBox.classList.toggle('hidden', false);
+                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
+            } else if (removeDupsCard.contains(event.target)) {
+                //console.log('contains sortCard');
+                speechBox.textContent = removeDupsDetails.textContent;
+                speechBox.classList.toggle('hidden', false);
+                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
+            } else {
+                speechBox.innerHTML = '';
+                speechBox.classList.toggle('hidden', true);
+            }
+    });
+
+        settingsContainer.addEventListener('mouseout', function (event) {
+            speechBox.classList.toggle('hidden', true);
+            window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
+        });
+            */
+})();    
+
+/*
+// function to check which speech button is being hovered.
+(function() {
+    let bubbleX = 80;
+    let bubbleY = 80;
+
+    let settingsContainer = document.getElementById('settingsForm'); 
+
+    let speechBox = document.getElementById('speechBox');
+    let presetsCard = document.getElementById('presets');
+    let rootCard = document.getElementById('root-folder-pref');
+    let sortCard = document.getElementById('organise-folders');
+    let removeDupsCard = document.getElementById('remove-duplicates');
+
+    // Get details of element
+    let presetsDetails = presetsCard.getElementsByTagName('details')[0];
+    let rootDetails = rootCard.getElementsByTagName('details')[0];
+    let sortDetails = sortCard.getElementsByTagName('details')[0];
+    let removeDupsDetails = removeDupsCard.getElementsByTagName('details')[0];
 
     // Remove text from speech box
     settingsContainer.addEventListener('mouseover', function (event) {
@@ -149,7 +249,7 @@ function checkIfPreset() {
         window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
     });
 })();    
-
+*/
 
 
 

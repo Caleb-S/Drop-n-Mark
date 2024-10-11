@@ -30,6 +30,28 @@ let presets = {
     }
 };
 
+(function () {
+  const scripts = ['toast'];
+  const prodpath = 'src/components/dist/';
+  const devpath = 'src/components/';
+
+  chrome.runtime.sendMessage({ action: 'getEnvironment' }, response => {
+    let path;
+    devmode = response.devmode;
+    response.devmode ? path = devpath : path = prodpath;
+    for (let script of scripts) {
+      loadScript(path + script + '.js');
+    }
+  });
+
+  function loadScript(scriptPath) {
+    let script = document.createElement('script');
+    script.src = chrome.runtime.getURL(scriptPath);
+    script.onerror = () => { console.warn(`Error loading script: ${script.src}`); };
+    document.head.appendChild(script);
+  }
+})();
+
 function presetOptions() {
     let value;
 
@@ -155,101 +177,7 @@ function checkIfPreset() {
 
 
 
-    settingsContainer.addEventListener('mouseout', function (event) {
-            //speechBox.classList.toggle('hidden', true);
-           // window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
-        });
-
-            /*
-            window.addEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
-            if (presetsCard.contains(event.target)) {
-                //console.log('contains preset card');
-                speechBox.textContent = presetsDetails.textContent;
-                speechBox.classList.toggle('hidden', false);
-                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-            } else if (rootCard.contains(event.target)) {
-                //console.log('contains rootCard');
-                speechBox.innerHTML = rootDetails.innerHTML;
-                speechBox.classList.toggle('hidden', false);
-                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-            } else if (sortCard.contains(event.target)) {
-                //console.log('contains sortCard');
-                speechBox.textContent = sortDetails.textContent;
-                speechBox.classList.toggle('hidden', false);
-                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-            } else if (removeDupsCard.contains(event.target)) {
-                //console.log('contains sortCard');
-                speechBox.textContent = removeDupsDetails.textContent;
-                speechBox.classList.toggle('hidden', false);
-                positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-            } else {
-                speechBox.innerHTML = '';
-                speechBox.classList.toggle('hidden', true);
-            }
-    });
-
-        settingsContainer.addEventListener('mouseout', function (event) {
-            speechBox.classList.toggle('hidden', true);
-            window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
-        });
-            */
 })();    
-
-/*
-// function to check which speech button is being hovered.
-(function() {
-    let bubbleX = 80;
-    let bubbleY = 80;
-
-    let settingsContainer = document.getElementById('settingsForm'); 
-
-    let speechBox = document.getElementById('speechBox');
-    let presetsCard = document.getElementById('presets');
-    let rootCard = document.getElementById('root-folder-pref');
-    let sortCard = document.getElementById('organise-folders');
-    let removeDupsCard = document.getElementById('remove-duplicates');
-
-    // Get details of element
-    let presetsDetails = presetsCard.getElementsByTagName('details')[0];
-    let rootDetails = rootCard.getElementsByTagName('details')[0];
-    let sortDetails = sortCard.getElementsByTagName('details')[0];
-    let removeDupsDetails = removeDupsCard.getElementsByTagName('details')[0];
-
-    // Remove text from speech box
-    settingsContainer.addEventListener('mouseover', function (event) {
-        window.addEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
-        if (presetsCard.contains(event.target)) {
-            //console.log('contains preset card');
-            speechBox.textContent = presetsDetails.textContent;
-            speechBox.classList.toggle('hidden', false);
-            positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-        } else if (rootCard.contains(event.target)) {
-            //console.log('contains rootCard');
-            speechBox.innerHTML = rootDetails.innerHTML;
-            speechBox.classList.toggle('hidden', false);
-            positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-        } else if (sortCard.contains(event.target)) {
-            //console.log('contains sortCard');
-            speechBox.textContent = sortDetails.textContent;
-            speechBox.classList.toggle('hidden', false);
-            positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-        } else if (removeDupsCard.contains(event.target)) {
-            //console.log('contains sortCard');
-            speechBox.textContent = removeDupsDetails.textContent;
-            speechBox.classList.toggle('hidden', false);
-            positionSpeechBox(bubbleX, bubbleY); // Example values to adjust the position
-        } else {
-            speechBox.innerHTML = '';
-            speechBox.classList.toggle('hidden', true);
-        }
-    });
-    
-    settingsContainer.addEventListener('mouseout', function (event) {
-        speechBox.classList.toggle('hidden', true);
-        window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
-    });
-})();    
-*/
 
 
 
@@ -327,10 +255,10 @@ let switches = document.querySelectorAll('input[type="checkbox"]');
         if (result.rootFolder) {
             updateDropDownMenus();
             switch (result.rootFolder) {
-                case "1":
+                case "2":
                     document.getElementById('root-opt-1').checked = true;
                     break;
-                case "2":
+                case "1":
                     document.getElementById('root-opt-2').checked = true;
                     break;
                 default:
@@ -352,10 +280,10 @@ let switches = document.querySelectorAll('input[type="checkbox"]');
 
             // general folder settings
             switch (result.generalFolder) {
-                case "1":
+                case "2":
                     document.getElementById('gen-opt-1').checked = true;
                     break;
-                case "2":
+                case "1":
                     document.getElementById('gen-opt-2').checked = true;
                     break;
                 default:
@@ -522,7 +450,7 @@ function processSave() {
 
 
       chrome.runtime.sendMessage({ action: "updateSettings" });
-
+    showToast('Settings Updated');
 }
 
 function updateSetting(setting, value) {
@@ -530,10 +458,10 @@ function updateSetting(setting, value) {
     // root folder settings
     if (setting === 'rootFolder') {
         switch ('' + value) {
-            case "1":
+            case "2":
                 document.getElementById('root-opt-1').checked = true;
                 break;
-            case "2":
+            case "1":
                 document.getElementById('root-opt-2').checked = true;
                 break;
             default:
@@ -559,10 +487,10 @@ function updateSetting(setting, value) {
     if (setting === 'generalFolder') {
 
         switch ('' + value) {
-            case "1":
+            case "2":
                 document.getElementById('gen-opt-1').checked = true;
                 break;
-            case "2":
+            case "1":
                 document.getElementById('gen-opt-2').checked = true;
                 break;
             default:
@@ -602,4 +530,19 @@ function updateSetting(setting, value) {
 
 
 }
+function showToast(toastText) {
+  let toastCreate = document.createElement('bookmark-toast');
+  let text = toastText ? toastText : "Null";
+  let toasts = document.querySelectorAll('bookmark-toast');
 
+  toasts.forEach(function (toast) {
+    toast.remove();
+  });
+
+  toastCreate.innerText = text;
+  document.body.appendChild(toastCreate);
+
+  setTimeout(function () {
+    toastCreate.remove();
+  }, 3000);
+}

@@ -203,6 +203,12 @@
              small {
                  display: block;
              }
+             img {
+                 display: none;
+             }
+             .main-wrapper {
+                 justify-content: center;
+             }
          }
 
 

@@ -262,6 +262,7 @@ function menuTemplate() {
                 background-color: #ffffff;
                 outline: none;
                 box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+                color: #484952;
             }
                 
         </style>

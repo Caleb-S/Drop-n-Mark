@@ -104,7 +104,6 @@ function checkIfPreset() {
             sortFolders === presets[preset].sortFolders &&
             removeDuplicates === presets[preset].removeDuplicates
         ) {
-            console.log(`Matching preset found: ${preset}`);
             let presetCard = document.querySelector(`input[value="${preset}"]`);
             presetCard.checked = true;
             return preset; // Return the preset ID that matches
@@ -112,7 +111,6 @@ function checkIfPreset() {
     }
     document.querySelector('input[value="0"]').checked = true;
 
-    console.log("No matching preset found.");
     return null; // Return null if no preset matches
 }
 
@@ -144,15 +142,7 @@ function checkIfPreset() {
     
     // Remove text from speech box
     settingsContainer.addEventListener('mouseover', function (event) {
-
-
-        
-            console.log(event.target);
-            console.log(event.target.parentNode);
-        console.log('\n');
         if (event.target.matches('label'))  {
-            // console.log(event.target);
-            //console.log(event.target.getElementsByTagName('template')[0].innerHTML);
             let smallTag = event.target.parentNode.getElementsByTagName('small')[0];
             let insideText = event.target.getElementsByTagName('template')[0].innerHTML;
             event.target.parentNode.getElementsByTagName('small')[0].innerHTML = insideText;
@@ -314,7 +304,6 @@ let switches = document.querySelectorAll('input[type="checkbox"]');
 
             // Organise Files settings
             document.getElementById('organise-files-switch').checked = result.sortFiles;
-            console.log('sort files: ', result.sortFiles);
             // Organise Folders settings
             document.getElementById('organise-folders-switch').checked = result.sortFolders;
 
@@ -349,7 +338,6 @@ function positionSpeechBox(xOffset = 0, yOffset = 0) {
     // Position the speech box in the center, with additional offsets
     speechBox.style.left = `${Math.floor(centerX - speechBox.offsetWidth / 1 + xOffset)}px`;
     speechBox.style.top = `${Math.floor(centerY - yOffset)}px`;
-    //console.log(`${Math.floor(centerY - speechBox.offsetHeight / 1 + yOffset)}px`);
 }
 
 function refreshDropMenus(selectElement) {

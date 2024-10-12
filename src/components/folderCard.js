@@ -1,6 +1,6 @@
 
 function folderCardTemplate() {
-    template = document.createElement('template');
+    let template = document.createElement('template');
     let escapeHTMLPolicy = trustedTypes.createPolicy("forceInner", {
         createHTML: (to_escape) => to_escape
     })
@@ -204,29 +204,48 @@ class FolderCard extends HTMLElement {
     }
 
     connectedCallback() {
-        this.buttonType = this.getAttribute('type');
-        let imgSrc = this.getAttribute('src');
+    this.buttonType = this.getAttribute('type');
+    let imgSrc = this.getAttribute('src');
 
-        // Set up the folder card based on the button type
-        if (this.buttonType === 'main') {
-            this.container.classList.add('main-folder');
-            this.folderBtn.classList.add('main-add-folder');
-            this.folderBtn.innerHTML = `<img src="${imgSrc}">`;
-        } else if (this.buttonType === 'sub') {
-            this.container.classList.add('sub-folder');
-            this.folderBtn.classList.add('sub-add-folder');
-            this.folderBtn.innerHTML = `<img src="${imgSrc}">`;
-        } else if (this.buttonType === 'nested') {
-            this.container.classList.add('nested-folder');
-            this.folderBtn.style.display = 'none';
+    // Basic URL validation (modify as per your domain requirements)
+    const isValidUrl = (url) => {
+        try {
+            new URL(url, window.location.origin); // Validates if `url` is relative or absolute
+            return true;
+        } catch (e) {
+            console.warn("Invalid URL:", url);
+            return false;
         }
+    };
 
-        // Add event listeners
-        this.container.addEventListener('mouseup', this.handleMouseUpOnContainer);
-        this.folderBtn.addEventListener('mouseup', this.handleMouseUpOnFolderBtn);
+    // Set up the folder card based on the button type
+    if (this.buttonType === 'main') {
+        this.container.classList.add('main-folder');
+        this.folderBtn.classList.add('main-add-folder');
+        if (isValidUrl(imgSrc)) {
+            const imgElement = document.createElement('img');
+            imgElement.setAttribute('src', imgSrc);
+            this.folderBtn.appendChild(imgElement);
+        }
+    } else if (this.buttonType === 'sub') {
+        this.container.classList.add('sub-folder');
+        this.folderBtn.classList.add('sub-add-folder');
+        if (isValidUrl(imgSrc)) {
+            const imgElement = document.createElement('img');
+            imgElement.setAttribute('src', imgSrc);
+            this.folderBtn.appendChild(imgElement);
+        }
+    } else if (this.buttonType === 'nested') {
+        this.container.classList.add('nested-folder');
+        this.folderBtn.style.display = 'none';
     }
 
-    disconnectedCallback() {
+    // Add event listeners
+    this.container.addEventListener('mouseup', this.handleMouseUpOnContainer.bind(this));
+    this.folderBtn.addEventListener('mouseup', this.handleMouseUpOnFolderBtn.bind(this));
+}
+
+     disconnectedCallback() {
         // Clean up event listeners
         this.container.removeEventListener('mouseup', this.handleMouseUpOnContainer);
         this.folderBtn.removeEventListener('mouseup', this.handleMouseUpOnFolderBtn);

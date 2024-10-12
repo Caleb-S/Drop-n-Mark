@@ -1,4 +1,4 @@
-const devmode = true;
+const devmode = false;
 (() => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.action === 'getEnvironment') {
@@ -370,12 +370,7 @@ async function moveAllFoldersToRoot() {
     // Move folders to root in batches to avoid freezing
     for (const folderId of foldersToMove) {
         //mutatingBookmarks = true;
-        await moveBookmark(folderId, rootFolder)
-            .then(() => {
-                //mutatingBookmarks = true;
-                //chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
-
-            });
+        await moveBookmark(folderId, rootFolder);
  
     }
 }
@@ -456,14 +451,7 @@ async function moveAllFilesToRoot() {
 
     // Move files to the root folder in batches to avoid freezing
     for (const fileId of filesToMove) {
-        //mutatingBookmarks = true;
-        
-        await moveBookmark(fileId, generalFolder)
-            .then(() => {
-                //mutatingBookmarks = true;
-                //chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
-
-            });
+        await moveBookmark(fileId, generalFolder);
     }
 
 }
@@ -480,7 +468,6 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
             await moveAllFoldersToRoot()
                 .then(() => {
                 mutatingBookmarks = false;
-               // chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
                 });
         }
 
@@ -490,9 +477,6 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
             await moveAllFilesToRoot()
             .then(() => {
                 mutatingBookmarks = false;
-                // chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
-
-
             });
 
         }
@@ -505,33 +489,6 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     }
 });
 
-// Listener for bookmark or folder creation
-/*
-chrome.bookmarks.onCreated.addListener((id, bookmark) => {
-    if (!mutatingBookmarks) {
-        // Check if the created item is a folder (folders have no 'url' property)
-        console.log('creating time');
-        if (!bookmark.url) {
-            folderOrBookmarkCreated('created'); // change names from created & moved to folder / file
-        } else {
-            folderOrBookmarkCreated('moved');
-        }
-    }
-});
-*/
-
-function handleBookmarkCreation() {
-
-    if (!mutatingBookmarks) {
-            folderOrBookmarkCreated('created'); // change names from created & moved to folder / file
-    }
-}
-
-chrome.bookmarks.onCreated.addListener(handleBookmarkCreation);
-
-
-chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
-    
 
 chrome.bookmarks.onRemoved.addListener(function (id, removeInfo) {
     // Check if it's a folder (no URL indicates a folder)
@@ -608,6 +565,19 @@ chrome.bookmarks.onRemoved.addListener(function (id, removeInfo) {
     }
 });
 
+
+
+function handleBookmarkCreation() {
+
+    if (!mutatingBookmarks) {
+        folderOrBookmarkCreated('created'); // change names from created & moved to folder / file
+    }
+}
+
+chrome.bookmarks.onCreated.addListener(handleBookmarkCreation);
+
+
+chrome.bookmarks.onMoved.addListener(onBookmarkMoved);
 
 function onBookmarkMoved() {
     //mutatingBookmarks = false;

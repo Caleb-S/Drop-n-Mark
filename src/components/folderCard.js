@@ -121,6 +121,7 @@ function folderCardTemplate() {
 
         .sub-folder:hover {
             background-color: #f59d4e;
+            background-color: #bfbdbd;
      
         }
 
@@ -144,6 +145,8 @@ function folderCardTemplate() {
 
         .sub-add-folder:hover {
             background-color: #b17842;
+            background-color: #5b5550;
+            background-color: #999999;
         }
 
 
@@ -162,6 +165,7 @@ function folderCardTemplate() {
 
         .nested-folder:hover {
             background-color: #a79e91;
+            background-color: #737373;
         }
         
         img {

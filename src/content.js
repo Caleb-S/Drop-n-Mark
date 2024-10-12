@@ -163,7 +163,7 @@ function saveBookmarkToFolder(folderId) {
 }
 
 function createFolderItem(type, title, id) {
-    let image = type === 'main' ? 'src/assets/newFolderLarge.svg' : 'src/assets/newFolderLarge.svg';
+    let image = type === 'main' ? 'src/assets/newFolderLarge.svg' : 'src/assets/newFolderMedium.svg';
 
     let folderItem = document.createElement('bookmark-folder-card');
     folderItem.innerText = title;

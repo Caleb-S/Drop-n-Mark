@@ -31,10 +31,19 @@ let devmode;
   floatingButton.addEventListener('mousedown', handleMouseDown);
 })();
 
+document.addEventListener('mouseup', (e) => {
+    if (document.getElementsByTagName('bookmark-menu').length > 0) {
+        
+        let menu = document.getElementsByTagName('bookmark-menu')[0];
+        if (!menu.hasAttribute('createFolder')) {
+            menu.remove();
+        }
+    }
+});
 
 function handleMouseDown(event) {
     let bookmarkMenu = document.createElement('bookmark-menu');
-    bookmarkMenu.addEventListener('mouseup', () => bookmarkMenu.remove());
+    //document.addEventListener('mouseup', () => bookmarkMenu.remove());
         
 
     chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {

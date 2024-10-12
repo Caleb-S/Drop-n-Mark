@@ -6,24 +6,24 @@ document.querySelectorAll('input[name="preset"]').forEach(function (element) {
 let presets = {
     "1": {
         "name": 'Default',
-        "rootFolder": 1,
-        "generalFolder": 1,
+        "rootFolder": 2,
+        "generalFolder": 2,
         "sortFiles": false,
         "sortFolders": false,
         "removeDuplicates": false
     },
     "2": {
         "name": 'Recommended',
-        "rootFolder": 2,
-        "generalFolder": 1,
+        "rootFolder": 1,
+        "generalFolder": 2,
         "sortFiles": true,
         "sortFolders": true,
         "removeDuplicates": true
     },
     "3": {
         "name": 'Maverick',
-        "rootFolder": 1,
-        "generalFolder": 2,
+        "rootFolder": 2,
+        "generalFolder": 1,
         "sortFiles": false,
         "sortFolders": true,
         "removeDuplicates": true
@@ -136,38 +136,47 @@ function checkIfPreset() {
     let rootDetails = rootCard.getElementsByTagName('details')[0];
     let sortDetails = sortCard.getElementsByTagName('details')[0];
     let removeDupsDetails = removeDupsCard.getElementsByTagName('details')[0];
+    let smallTags = settingsContainer.getElementsByTagName('small');
+
+    for (let i = 0; i < smallTags.length; i++) {
+        smallTags[i].classList.toggle('hidden', true);
+    }
     
     // Remove text from speech box
     settingsContainer.addEventListener('mouseover', function (event) {
 
 
+        
             console.log(event.target);
             console.log(event.target.parentNode);
         console.log('\n');
         if (event.target.matches('label'))  {
             // console.log(event.target);
             //console.log(event.target.getElementsByTagName('template')[0].innerHTML);
-
+            let smallTag = event.target.parentNode.getElementsByTagName('small')[0];
             let insideText = event.target.getElementsByTagName('template')[0].innerHTML;
             event.target.parentNode.getElementsByTagName('small')[0].innerHTML = insideText;
-            speechBox.textContent = insideText;
+            speechBox.innerHTML = insideText;
             speechBox.classList.toggle('hidden', false);
+            smallTag.classList.toggle('hidden', false);
             positionSpeechBox(bubbleX, bubbleY);
 
         } else if (event.target.parentNode.matches('label')) {
+            let smallTag = event.target.parentNode.parentNode.getElementsByTagName('small')[0];
             let insideText = event.target.parentNode.getElementsByTagName('template')[0].innerHTML;
             event.target.parentNode.parentNode.getElementsByTagName('small')[0].innerHTML = insideText;
-            speechBox.textContent = insideText;
+            speechBox.innerHTML = insideText;
             speechBox.classList.toggle('hidden', false);
+            smallTag.classList.toggle('hidden', false);
             positionSpeechBox(bubbleX, bubbleY);
 
         } else if (!event.target.matches('.settings-card')){
-            // Get all <small> elements and set innerHtml to ''. 
-                let smallTags = settingsContainer.getElementsByTagName('small');
             for (let i = 0; i < smallTags.length; i++) {
+                smallTags[i].classList.toggle('hidden', true);
                 smallTags[i].innerHTML = ''
+                smallTags[i].classList.toggle('hidden', true);
             }
-             speechBox.classList.toggle('hidden', true);
+            speechBox.classList.toggle('hidden', true);
             window.removeEventListener('resize', () => positionSpeechBox(bubbleX, bubbleY));
 
         }

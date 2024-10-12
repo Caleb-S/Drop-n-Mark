@@ -20,15 +20,19 @@
                 </div>
 
                 <div id="settingsForm">
-                    
+
                     <!-- Presets -->
                     <div class='settings-card' id='presets'>
                         <h2 class='settings-card-title'  >Presets</h2>
-                        <small></small>
 
                         <label class="radio-container">
                             <template>
-                                favourite color gold
+                                <p>
+                                <b>Default:</b>
+                                <br><br>
+                                New folders and uncategorized files will be saved outside your bookmark bar. 
+                                <br><br>Your current files and folders will remain unchanged, you will be in complete control.
+                                </p>
                             </template>
                             <input type="radio" id="preset2" name="preset" value="1" checked>
                             <span class="custom-radio"></span>
@@ -38,7 +42,15 @@
                         <label class="radio-container">
 
                             <template>
-                                favourite color brown
+                                <p>
+                                <b>Recommended:</b>
+                                <br><br> 
+                                New folders will be saved to your bookmark bar, 
+                                while uncategorized files will be stored outside of it. 
+                                <br><br>Existing folders will be relocated to the bookmark bar and
+                                any uncategorized files will be moved out of your bookmark bar.
+                                <br><br>All duplicate files will be removed.
+                                </p>
                             </template>
                             <input type="radio" id="preset3" name="preset" value="2">
                             <span class="custom-radio"></span>
@@ -47,7 +59,11 @@
 
                         <label class="radio-container">
                             <template>
-                                favourite color gray
+                                <b>Maverick:</b>
+                                <br><br>
+                                For the contrarians, this is the opposite of the recommended preset.
+                                <br><br>Folders will be kept out of your bookmark bar, and you will choose what files are stored in your bookmark bar.
+                                <br><br>Say goodbye to duplicate files. 
                             </template>
                             <input type="radio" id="preset4" name="preset" value="3">
                             <span class="custom-radio"></span>
@@ -56,24 +72,29 @@
 
                         <label class="radio-container">
                             <template>
-                                favourite color maroon
+                                <b>Custom:</b>   
+                                <br><br>
+                                The do what you wish preset where you do what you wish.
                             </template>
                             <input type="radio" id="preset5" name="preset" value="0">
                             <span class="custom-radio"></span>
                             Custom
                         </label>
-
+                        <small></small>
                     </div>
-                    </br>
+                    <br>
 
                     <!-- Root Folder Settings -->
                     <div class='settings-card' id='root-folder-pref'>
                         <h2 class='settings-card-title'>Primary Folder</h2>
-                        <small></small>
 
                         <label class="radio-container">
                             <template>
-                                favourite color magenta
+                                <p>
+                                <b>Default:</b>
+                                <br><br>
+                                New folders will be saved outside your bookmark bar.
+                                </p>
                             </template>
                             <input type="radio" id="root-opt-1" name="options" value="2" checked>
                             <span class="custom-radio"></span>
@@ -82,7 +103,11 @@
 
                         <label class="radio-container">
                             <template>
-                                favourite color pink
+                                <p>
+                                <b>Bookmark Bar:</b>
+                                <br><br>
+                                New folders will be saved to your bookmark bar.
+                                </p>
                             </template>
                             <input type="radio" id="root-opt-2" name="options" value="1">
                             <span class="custom-radio"></span>
@@ -91,7 +116,12 @@
 
                         <label class="radio-container">
                             <template>
-                                favourite color purple
+                                <p>
+                                <b>Custom:</b>
+                                <br><br>
+                                Choose a folder you want new folders to be saved to.
+                                The selected folder will not be able to be deleted. 
+                                </p> 
                             </template>
                             <input type="radio" id="root-opt-3" name="options" value="3">
                             <span class="custom-radio"></span>
@@ -101,18 +131,22 @@
 
                             </select>
                         </label>
+                        <small></small>
 
                     </div>
-                    </br>
+                    <br>
 
                     <!-- General Folder Settings -->
                     <div class='settings-card' id='general-folder-pref'>
                         <h2 class='settings-card-title'>General Folder</h2>
-                        <small></small>
 
                         <label class="radio-container">
                             <template>
-                                favourite color cyan
+                                <p>
+                                <b>Default:</b>
+                                <br><br>
+                                Uncategorized files will be saved outside your bookmark bar.
+                                </p>
                             </template>
                             <input type="radio" id="gen-opt-1" name="general-folder" value="2" checked>
                             <span class="custom-radio"></span>
@@ -121,7 +155,11 @@
 
                         <label class="radio-container">
                             <template>
-                                favourite color green
+                                <p>
+                                <b>Bookmark Bar:</b>
+                                <br><br>
+                                Uncategorized files will be saved to your bookmark bar.
+                                </p>
                             </template>
                             <input type="radio" id="gen-opt-2" name="general-folder" value="1">
                             <span class="custom-radio"></span>
@@ -130,7 +168,12 @@
 
                         <label class="radio-container">
                             <template>
-                                favourite color orange 
+                                <p>
+                                <b>Custom:</b>
+                                <br><br>
+                                Choose a folder you want uncategorized files to be saved to.
+                                The selected folder will not be able to be deleted.
+                                </p>
                             </template>
                             <input type="radio" id="gen-opt-3" name="general-folder" value="3">
                             <span class="custom-radio"></span>
@@ -141,54 +184,67 @@
                             </select>
                         </label>
 
+                        <small></small>
                     </div>
-                    </br>
+                    <br>
 
                     <!-- Sort Files Settings -->
                     <div class='settings-card' id='organise-files'>
                         <h2 class='settings-card-title'>Organise Files</h2>
-                        <small></small>
-                        </br>
+                        <br>
                         <label class="switch">
                              <template>
-                                favourite color yellow 
+                                 <p>
+                                 <b>Enabled:</b>
+                                 <br><br>
+                                 Existing and any new uncategorized files will be moved and kept in the selected General Folder.
+                                 </p>
                             </template>
 
                             <input type="checkbox" id="organise-files-switch">
                             <span class="slider"></span>
                         </label>
 
+                        <small></small>
                     </div>
-                    </br>
+                    <br>
 
                     <!-- Sort Folders Settings -->
                     <div class='settings-card' id='organise-folders'>
                         <h2 class='settings-card-title'>Organise Folders</h2>
-                        <small></small>
-                        </br>
+                        <br>
                         <label class="switch">
                             <template>
-                                favourite color red 
+                                <p>
+                                <b>Enabled:</b>
+                                <br><br>
+                                Existing and any new folders will be moved and kept in the selected Primary Folder.
+                                </p>
                             </template>
                             <input type="checkbox" id="organise-folders-switch">
                             <span class="slider"></span>
                         </label>
 
+                        <small></small>
                     </div>
-                    </br>
+                    <br>
 
                     <!-- Remove Duplicates Settings -->
                     <div class='settings-card' id='remove-duplicates'>
                         <h2 class='settings-card-title'>Remove Duplicates</h2>
-                        <small></small>
-                        </br>
+                        <br>
                         <label class="switch">
                             <template>
-                                favourite color blue
+                                <p>
+                                <b>Enabled:</b>
+                                <br><br>
+                                Exisitng and any new duplicates will be removed.
+                                </p>
                             </template>
                             <input type="checkbox" id="remove-duplicates-switch">
                             <span class="slider"></span>
                         </label>
+                        <small></small>
                     </div>
 
                 </div>

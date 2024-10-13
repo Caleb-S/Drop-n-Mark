@@ -11,6 +11,7 @@ function menuTemplate() {
                 font-size: 20px !important;
                 color: #484952 !important;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+                 transform: translate(-50%, -50%) scale(calc(1 / (window.devicePixelRatio || 1)));
      
             }
     

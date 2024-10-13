@@ -14,7 +14,7 @@
     ],
     "minified": true,
      "only": ["src/components"],
-     "ignore": ["src/components/dist"],
+     "ignore": ["src/components/dist", "src/components/styles"],
     "assumptions": {
         "superIsCallableConstructor": true
       }

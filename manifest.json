@@ -50,7 +50,8 @@
         "src/components/folderCard.js",
         "src/assets/favicon/android-chrome-192x192.png",
         "src/assets/favicon/android-chrome-512x512.png",
-        "src/assets/orange-man-cursor.webp"
+        "src/assets/orange-man-cursor.webp",
+        "src/components/styles/floating-btn.css"
       ],
       "matches": ["<all_urls>"]
     }

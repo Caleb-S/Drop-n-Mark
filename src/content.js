@@ -29,6 +29,7 @@ let devmode;
   let floatingButton = document.createElement('bookmark-float-button');
   document.body.appendChild(floatingButton);
   floatingButton.addEventListener('mousedown', handleMouseDown);
+  floatingButton.setAttribute('style', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
 })();
 
 document.addEventListener('mouseup', (e) => {
@@ -74,6 +75,8 @@ function handleMouseDown(event) {
 
         newFolder.shadowRoot.querySelector('.backdrop').addEventListener('mousedown', () => {
             let floatingButton = document.createElement('bookmark-float-button');
+
+  floatingButton.setAttribute('style', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
             floatingButton.addEventListener('mousedown', handleMouseDown);
             document.body.appendChild(floatingButton);
 
@@ -90,6 +93,8 @@ function handleMouseDown(event) {
                     : showToast('Failed to Create folder');
 
                 let floatingButton = document.createElement('bookmark-float-button');
+
+  floatingButton.setAttribute('style', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
                 floatingButton.addEventListener('mousedown', handleMouseDown);
                 document.body.appendChild(floatingButton);
 

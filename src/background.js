@@ -1,6 +1,9 @@
 const devmode = false;
 
 
+
+
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getEnvironment') {
     sendResponse({ devmode: devmode });
@@ -24,6 +27,12 @@ if (devmode) {
 
 // -----------------------------------------------------------------------------
 
+function injectedFunction() {
+  document.body.style.backgroundColor = "orange";
+    console.log('injectedFunction');
+}
+
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "getAllBookmarks") {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
@@ -42,10 +51,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     var currentPageTitle = request.currentPageTitle;
 
 
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      var currentPage = tabs[0];
-
-
       chrome.bookmarks.create({
         url: currentPageUrl,
         title: currentPageTitle,
@@ -53,7 +58,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       }, function (bookmark) {
         sendResponse({ success: true, bookmark: bookmark });
       });
-    });
 
     return true;
   }

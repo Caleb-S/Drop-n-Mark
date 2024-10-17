@@ -19,7 +19,7 @@ let devmode;
   function loadScript(scriptPath) {
     let script = document.createElement('script');
     script.src = chrome.runtime.getURL(scriptPath);
-    script.onerror = () => { console.warn(`Error loading script: ${script.src}`); };
+    script.onerror = () => { console.log(`Error loading script: ${script.src}`); };
     document.head.appendChild(script);
   }
 })();
@@ -29,16 +29,20 @@ let devmode;
   let floatingButton = document.createElement('bookmark-float-button');
   document.body.appendChild(floatingButton);
   floatingButton.addEventListener('mousedown', handleMouseDown);
-  floatingButton.setAttribute('style', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
+  floatingButton.setAttribute('stylesheet', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
 })();
 
 document.addEventListener('mouseup', (e) => {
     if (document.getElementsByTagName('bookmark-menu').length > 0) {
         
-        let menu = document.getElementsByTagName('bookmark-menu')[0];
-        if (!menu.hasAttribute('createFolder')) {
-            menu.remove();
-        }
+      let menus = document.getElementsByTagName('bookmark-menu');
+
+for (let i = menus.length - 1; i >= 0; i--) {
+    if (!menus[i].hasAttribute('createFolder')) {
+        menus[i].remove();
+    }
+}
+
     }
 });
 
@@ -47,9 +51,14 @@ function handleMouseDown(event) {
     //document.addEventListener('mouseup', () => bookmarkMenu.remove());
         
 
-    chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
-        response.bookmarked ? displayDeleteBox() :  displayBookmarkMenu();
-    });
+    console.log('runtime: ' + chrome.runtime?.id);
+    if (chrome.runtime?.id) {
+        chrome.runtime.sendMessage({ action: "checkBookmark" }, function (response) {
+            response.bookmarked ? displayDeleteBox() :  displayBookmarkMenu();
+        });
+    } else {
+       showToast('Error: Refresh Page & Try Again'); 
+    }
 
 
     function displayDeleteBox() {
@@ -76,7 +85,7 @@ function handleMouseDown(event) {
         newFolder.shadowRoot.querySelector('.backdrop').addEventListener('mousedown', () => {
             let floatingButton = document.createElement('bookmark-float-button');
 
-  floatingButton.setAttribute('style', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
+            floatingButton.setAttribute('stylesheet', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
             floatingButton.addEventListener('mousedown', handleMouseDown);
             document.body.appendChild(floatingButton);
 
@@ -94,7 +103,7 @@ function handleMouseDown(event) {
 
                 let floatingButton = document.createElement('bookmark-float-button');
 
-  floatingButton.setAttribute('style', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
+                floatingButton.setAttribute('stylesheet', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
                 floatingButton.addEventListener('mousedown', handleMouseDown);
                 document.body.appendChild(floatingButton);
 
@@ -190,6 +199,7 @@ function createFolderItem(type, title, id) {
         newFolder.shadowRoot.querySelector('.backdrop').addEventListener('mousedown', () => {
             let floatingButton = document.createElement('bookmark-float-button');
             floatingButton.addEventListener('mousedown', handleMouseDown);
+            floatingButton.setAttribute('stylesheet', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
             document.body.appendChild(floatingButton);
 
             newFolder.remove();
@@ -206,6 +216,7 @@ function createFolderItem(type, title, id) {
 
                 let floatingButton = document.createElement('bookmark-float-button');
                 floatingButton.addEventListener('mousedown', handleMouseDown);
+                floatingButton.setAttribute('stylesheet', chrome.runtime.getURL('src/components/styles/floating-btn.css'));
                 document.body.appendChild(floatingButton);
 
                 newFolder.remove();

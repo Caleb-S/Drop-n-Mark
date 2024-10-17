@@ -33,7 +33,7 @@ class FloatButton extends HTMLElement {
     }
 
     connectedCallback() {
-        let style = this.getAttribute('style');
+        let style = this.getAttribute('stylesheet');
 
         // Basic URL validation (modify as per your domain requirements)
         const isValidUrl = (url) => {
@@ -49,7 +49,7 @@ class FloatButton extends HTMLElement {
         if (isValidUrl(style)) {
             const linkElem = document.createElement('link');
             linkElem.setAttribute('rel', 'stylesheet');
-            linkElem.setAttribute('href',style);
+           linkElem.setAttribute('href',style);
 
         this.shadowRoot.appendChild(linkElem);
         }

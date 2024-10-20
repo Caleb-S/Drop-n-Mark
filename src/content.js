@@ -24,7 +24,6 @@ let devmode;
   }
 })();
 
-
 (function () {
   let floatingButton = document.createElement('bookmark-float-button');
   document.body.appendChild(floatingButton);
@@ -47,9 +46,10 @@ for (let i = menus.length - 1; i >= 0; i--) {
 });
 
 function handleMouseDown(event) {
+
     let bookmarkMenu = document.createElement('bookmark-menu');
     //document.addEventListener('mouseup', () => bookmarkMenu.remove());
-        
+
 
     console.log('runtime: ' + chrome.runtime?.id);
     if (chrome.runtime?.id) {
@@ -114,7 +114,6 @@ function handleMouseDown(event) {
 
     function displayBookmarkMenu() {
         const newFolderBtn = bookmarkMenu.shadowRoot.querySelector('.new-folder-btn');
-        document.body.appendChild(bookmarkMenu);
 
         newFolderBtn.addEventListener('mouseup', displayCreateFolder);
 
@@ -123,7 +122,7 @@ function handleMouseDown(event) {
         });
 
         bookmarkMenu.addEventListener('save-general', (event) => {
-            chrome.storage.sync.get(['generalFolder'], function (result) {
+            chrome.storage.local.get(['generalFolder'], function (result) {
                 result.generalFolder ? saveBookmarkToFolder(result.generalFolder) : saveBookmarkToFolder("2");
             });
         });
@@ -136,12 +135,44 @@ function handleMouseDown(event) {
         });
 
         chrome.runtime.sendMessage({ action: "getAllBookmarks" }, function (response) {
-                (response.bookmarks).forEach(function (bookmark) {
-                    handleBookmarkLevel(bookmark, bookmarkMenu, 'root');
-                });
-                devmode ? printBookmarkTree(response.bookmarks) : '';
+            chrome.storage.local.get(['storedBookmarks', 'storedHtml'], function (result) {
+                if (!response.bookmarks || response.bookmarks.length === 0) {
+                    console.log('no bookmarks received');
+                    return; // Early exit if there are no bookmarks
+                }
+
+                const currentBookmarks = response.bookmarks[0];
+
+                if (result.storedBookmarks === undefined) {
+                    console.log('no stored bookmarks');
+                    updateBookmarks(currentBookmarks);
+                } else if (JSON.stringify(currentBookmarks) !== JSON.stringify(result.storedBookmarks)) {
+                    console.log('stored bookmarks changed');
+                    updateBookmarks(currentBookmarks);
+                } else {
+                    console.log('stored bookmarks using storedHtml');
+                    bookmarkMenu.innerHTML = result.storedHtml;
+                    document.body.appendChild(bookmarkMenu);
+                }
+            });
+
+            if (devmode) {
+                printBookmarkTree(response.bookmarks);
+            }
+
+            function updateBookmarks(bookmark) {
+                handleBookmarkLevel(bookmark, bookmarkMenu, 'root');
+                document.body.appendChild(bookmarkMenu);
+                chrome.storage.local.set({ storedBookmarks: bookmark });
+                chrome.storage.local.set({ storedHtml: bookmarkMenu.innerHTML });
+            }
         });
+
+
+
     }
+    
+
 }
 
 
@@ -251,19 +282,20 @@ function handleBookmarkLevel(bookmark, parentElement, level) {
 
         case 'main':
             if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
+                for (let i = 0; i < bookmark.children.length; i++) {
+                    handleBookmarkLevel(bookmark.children[i], parentElement, 'sub');
+                }
                 parentElement.appendChild(createFolderItem('main', bookmark.title, bookmark.id));
-                bookmark.children.forEach(function (subChild) {
-                    handleBookmarkLevel(subChild, parentElement, 'sub');
-                });
             }
             break;
 
         case 'sub':
             if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
+                for (let i = 0; i < bookmark.children.length; i++) {
+                    handleBookmarkLevel(bookmark.children[i], parentElement, 'nested');
+                }
                 parentElement.appendChild(createFolderItem('sub', bookmark.title, bookmark.id));
-                bookmark.children.forEach(function (nestedChild) {
-                    handleBookmarkLevel(nestedChild, parentElement, 'nested');
-                });
+           
             }
             break;
 

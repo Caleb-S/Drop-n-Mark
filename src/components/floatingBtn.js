@@ -55,7 +55,7 @@ class FloatButton extends HTMLElement {
         }
 
 
-        this.restrictHighlighting.bind(this);
+        //this.restrictHighlighting.bind(this);
         this.shadowRoot.addEventListener('mousedown', this.handlemousedown.bind(this));
 
         let floatingButton = this.shadowRoot.querySelector('.float-button');
@@ -116,9 +116,9 @@ class FloatButton extends HTMLElement {
         let floatingButton = this.shadowRoot.querySelector('.float-button');
         document.addEventListener('mouseup', this.boundResetFloatBtn);
 
-        floatingButton.addEventListener('contextmenu', event => event.preventDefault());
-        floatingButton.addEventListener('selectstart', event => event.preventDefault());
-        floatingButton.addEventListener('mousedown', event => event.preventDefault());
+        //floatingButton.addEventListener('contextmenu', event => event.preventDefault());
+        //floatingButton.addEventListener('selectstart', event => event.preventDefault());
+        //floatingButton.addEventListener('mousedown', event => event.preventDefault());
         floatingButton.style.pointerEvents = 'none';
         document.body.style.cursor = 'grabbing';
 

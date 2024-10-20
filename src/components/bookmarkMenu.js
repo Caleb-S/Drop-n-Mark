@@ -32,7 +32,7 @@ function menuTemplate() {
                 margin: auto;
                
                 
-                background-color: #F7F4EE;
+                background-color: #efeadf;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                 
                 overflow: none;

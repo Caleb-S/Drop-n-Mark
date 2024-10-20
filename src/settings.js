@@ -248,7 +248,7 @@ let switches = document.querySelectorAll('input[type="checkbox"]');
 
 (() => {
     // initialise settings wih stored values
-    chrome.storage.sync.get(['rootFolder', 'generalFolder', 'sortFiles', 'sortFolders', 'removeDuplicates'], function(result) {
+    chrome.storage.local.get(['rootFolder', 'generalFolder', 'sortFiles', 'sortFolders', 'removeDuplicates'], function(result) {
 
         // root folder settings
         if (result.rootFolder) {
@@ -404,9 +404,9 @@ function processSave() {
      (() => { 
          let selectedFolder = document.getElementById('custom-root-select').value;
          let options = document.querySelectorAll('input[name="options"]');
-         chrome.storage.sync.set({ rootFolder: selectedFolder });
+         chrome.storage.local.set({ rootFolder: selectedFolder });
          if (selectedFolder === "") {
-             chrome.storage.sync.set({ rootFolder:  options[options[0].checked ? 0 : 1].value });
+             chrome.storage.local.set({ rootFolder:  options[options[0].checked ? 0 : 1].value });
          }
      })();
 
@@ -415,9 +415,9 @@ function processSave() {
     (() => { 
         let selectedFolder = document.getElementById('custom-general-select').value;
         let options = document.querySelectorAll('input[name="general-folder"]');
-        chrome.storage.sync.set({ generalFolder: selectedFolder });
+        chrome.storage.local.set({ generalFolder: selectedFolder });
         if (selectedFolder === "") {
-            chrome.storage.sync.set({ generalFolder:  options[options[0].checked ? 0 : 1].value });
+            chrome.storage.local.set({ generalFolder:  options[options[0].checked ? 0 : 1].value });
         }
     })();
 
@@ -426,7 +426,7 @@ function processSave() {
     (() => {         
         var organiseFilesSwitch = document.getElementById('organise-files-switch');
         let isChecked = organiseFilesSwitch.checked ? true : false;
-        chrome.storage.sync.set({ sortFiles: isChecked });
+        chrome.storage.local.set({ sortFiles: isChecked });
     })();
 
     // Organise Folders settings
@@ -434,7 +434,7 @@ function processSave() {
     (() => {        
         var sortFoldersSwitch = document.getElementById('organise-folders-switch');
         let isChecked = sortFoldersSwitch.checked ? true : false;
-        chrome.storage.sync.set({ sortFolders: isChecked });
+        chrome.storage.local.set({ sortFolders: isChecked });
     })();
 
     // Remove Duplicates settings
@@ -442,7 +442,7 @@ function processSave() {
     (() => {         
         var removeDuplicatesSwitch = document.getElementById('remove-duplicates-switch');
         let isChecked = removeDuplicatesSwitch.checked ? true : false;
-        chrome.storage.sync.set({ removeDuplicates: isChecked });
+        chrome.storage.local.set({ removeDuplicates: isChecked });
     })();
 
 

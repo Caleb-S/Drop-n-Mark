@@ -1,6 +1,31 @@
 const devmode = false;
 
 
+// Function to create 100 folders inside "Other Bookmarks"
+function createBookmarkFolders() {
+    var amount = 500; 
+    // Find the "Other Bookmarks" folder
+    chrome.bookmarks.search({ title: 'Test Folder' }, function(results) {
+        if (results.length > 0) {
+            // Get the "Other Bookmarks" folder id
+            const otherBookmarksId = results[0].id;
+            
+            // Create 100 folders within the "Other Bookmarks" folder
+            for (let i = 1; i <= 5000; i++) {
+                chrome.bookmarks.create({
+                    parentId: otherBookmarksId,
+                    title: `Folder ${i}`
+                });
+            }
+            console.log(`{amount} folders created in 'Other bookmarks'.`);
+        } else {
+            console.log("'Other bookmarks' folder not found.");
+        }
+    });
+}
+
+// Call the function to create the folders
+//createBookmarkFolders();
 
 
 
@@ -148,7 +173,7 @@ function countDuplicates(folder, uniqueURLsByFolder, duplicates) {
 
 async function folderOrBookmarkCreated(trigger) {
         // Get and process settings
-        result = await new Promise(resolve => chrome.storage.sync.get(['sortFiles', 'sortFolders', 'removeDuplicates'], resolve));
+        result = await new Promise(resolve => chrome.storage.local.get(['sortFiles', 'sortFolders', 'removeDuplicates'], resolve));
         // Sort Folders if enabled
         if (result.sortFolders && trigger === 'created') {
             await moveAllFoldersToRoot();
@@ -215,7 +240,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
           const bookmarksBarFolder = bookmarkTreeNodes[0].children[0];
             //let folderId; 
-            chrome.storage.sync.get(['rootFolder'], function (result) {
+            chrome.storage.local.get(['rootFolder'], function (result) {
                 let folderId = result.rootFolder;
 
 
@@ -309,7 +334,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 async function moveAllFoldersToRoot() {
     const getBookmarkTree = () => new Promise(resolve => chrome.bookmarks.getTree(resolve));
-    const getStorage = () => new Promise(resolve => chrome.storage.sync.get(['rootFolder'], resolve));
+    const getStorage = () => new Promise(resolve => chrome.storage.local.get(['rootFolder'], resolve));
     const getBookmarkById = (id) => new Promise(resolve => chrome.bookmarks.get(id, resolve));
     const moveBookmark = (id, parentId) => new Promise(resolve => chrome.bookmarks.move(id, { parentId }, resolve));
 
@@ -360,9 +385,9 @@ async function moveAllFoldersToRoot() {
 
 async function moveAllFilesToRoot() {
     const getBookmarkTree = () => new Promise(resolve => chrome.bookmarks.getTree(resolve));
-    const getStorage = () => new Promise(resolve => chrome.storage.sync.get(['generalFolder'], resolve));
+    const getStorage = () => new Promise(resolve => chrome.storage.local.get(['generalFolder'], resolve));
     
-    const getRoot = () => new Promise(resolve => chrome.storage.sync.get(['rootFolder'], resolve));
+    const getRoot = () => new Promise(resolve => chrome.storage.local.get(['rootFolder'], resolve));
     const getBookmarkById = (id) => new Promise(resolve => chrome.bookmarks.get(id, resolve));
     const moveBookmark = (id, parentId) => new Promise(resolve => chrome.bookmarks.move(id, { parentId }, resolve));
 
@@ -439,7 +464,7 @@ async function moveAllFilesToRoot() {
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
     if (request.action === "updateSettings") {
-        result = await new Promise(resolve => chrome.storage.sync.get(['sortFiles', 'sortFolders', 'removeDuplicates'], resolve));
+        result = await new Promise(resolve => chrome.storage.local.get(['sortFiles', 'sortFolders', 'removeDuplicates'], resolve));
         // Sort Folders if enabled
         if (result.sortFolders) {
             await moveAllFoldersToRoot();

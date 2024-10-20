@@ -163,7 +163,6 @@ function handleMouseDown(event) {
                             // Optional: Delay between appends for better UX
                         }
                     document.body.appendChild(bookmarkMenu); // Append the bookmarkMenu to the body once done
-                        console.log('finished appending');
 
 
 
@@ -296,19 +295,19 @@ function handleBookmarkLevel(bookmark, parentElement, level) {
 
         case 'main':
             if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
+                parentElement.appendChild(createFolderItem('main', bookmark.title, bookmark.id));
                 for (let i = 0; i < bookmark.children.length; i++) {
                     handleBookmarkLevel(bookmark.children[i], parentElement, 'sub');
                 }
-                parentElement.appendChild(createFolderItem('main', bookmark.title, bookmark.id));
             }
             break;
 
         case 'sub':
             if (bookmark.children && !bookmark.url && bookmark.title.trim() !== "") {
+                parentElement.appendChild(createFolderItem('sub', bookmark.title, bookmark.id));
                 for (let i = 0; i < bookmark.children.length; i++) {
                     handleBookmarkLevel(bookmark.children[i], parentElement, 'nested');
                 }
-                parentElement.appendChild(createFolderItem('sub', bookmark.title, bookmark.id));
            
             }
             break;

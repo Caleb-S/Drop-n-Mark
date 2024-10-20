@@ -1,4 +1,4 @@
-const devmode = true;
+const devmode = false; 
 
 
 // Function to create 100 folders inside "Other Bookmarks"

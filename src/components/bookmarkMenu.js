@@ -404,7 +404,7 @@ class BookmarkMenu extends HTMLElement {
             // Waits until all folder items are loaded
             const slotChangeHandler = debounce(() => {
                 this.folderContainer.scrollTop = this.getAttribute('scrollPosition');
-                console.log('slotchange');
+                slot.removeEventListener('slotchange', slotChangeHandler);
             }, 0); // Adjust the wait time as needed
 
             slot.addEventListener('slotchange', slotChangeHandler);

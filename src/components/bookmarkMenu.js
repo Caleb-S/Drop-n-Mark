@@ -32,7 +32,7 @@ function menuTemplate() {
                 margin: auto;
                
                 
-                background-color: #efeadf;
+                background-color: #F7F4EE;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                 
                 overflow: none;
@@ -402,9 +402,11 @@ class BookmarkMenu extends HTMLElement {
             let slot = this.shadowRoot.querySelector('slot');
 
             // Waits until all folder items are loaded
-            const slotChangeHandler = () => {
+            const slotChangeHandler = debounce(() => {
                 this.folderContainer.scrollTop = this.getAttribute('scrollPosition');
-            };
+                console.log('slotchange');
+            }, 0); // Adjust the wait time as needed
+
             slot.addEventListener('slotchange', slotChangeHandler);
             this.eventListeners.push({ element: slot, type: 'slotchange', handler: slotChangeHandler });
 
@@ -529,6 +531,17 @@ class BookmarkMenu extends HTMLElement {
             item.draggable = false;
         });
     }
+}
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 customElements.define('bookmark-menu', BookmarkMenu);

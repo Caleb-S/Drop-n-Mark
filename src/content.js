@@ -151,8 +151,22 @@ function handleMouseDown(event) {
                     updateBookmarks(currentBookmarks);
                 } else {
                     console.log('stored bookmarks using storedHtml');
-                    bookmarkMenu.innerHTML = result.storedHtml;
-                    document.body.appendChild(bookmarkMenu);
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = result.storedHtml; // Create a temporary container
+                    const divs = Array.from(tempDiv.children);
+
+                        for (const div of divs) {
+                            timeout = setTimeout(() => {
+                            bookmarkMenu.appendChild(div); // Append the existing div directly
+                                }, 0);
+
+                            // Optional: Delay between appends for better UX
+                        }
+                    document.body.appendChild(bookmarkMenu); // Append the bookmarkMenu to the body once done
+                        console.log('finished appending');
+
+
+
                 }
             });
 
